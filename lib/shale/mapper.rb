@@ -54,7 +54,7 @@ module Shale
     end
 
     def initialize(**props)
-      super
+      super()
 
       props.each_key do |name|
         unless self.class.attributes.keys.include?(name)
