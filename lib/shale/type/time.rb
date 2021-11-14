@@ -7,7 +7,14 @@ module Shale
   module Type
     class Time < Base
       def self.cast(value)
-        ::Time.parse(value) unless value.empty?
+        if value.is_a?(::String)
+          return if value.empty?
+          ::Time.parse(value)
+        elsif value.respond_to?(:to_time)
+          value.to_time
+        else
+          value
+        end
       end
     end
   end
