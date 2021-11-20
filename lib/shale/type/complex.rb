@@ -16,9 +16,14 @@ module Shale
             attribute = attributes[mapping]
             next unless attribute
 
+            unless value
+              instance.public_send("#{attribute.name}=", nil)
+              next
+            end
+
             if attribute.collection?
               [*value].each do |val|
-                val = attribute.type.out_of_hash(val)
+                val = val ? attribute.type.out_of_hash(val) : val
                 instance.public_send(attribute.name) << attribute.type.cast(val)
               end
             else
@@ -40,8 +45,13 @@ module Shale
 
             value = instance.public_send(attribute.name)
 
+            unless value
+              hash[element] = nil
+              next
+            end
+
             if attribute.collection?
-              hash[element] = [*value].map { |v| attribute.type.as_hash(v) }
+              hash[element] = [*value].map { |v| v ? attribute.type.as_hash(v) : v }
             else
               hash[element] = attribute.type.as_hash(value)
             end
@@ -62,9 +72,14 @@ module Shale
             attribute = attributes[mapping]
             next unless attribute
 
+            unless value
+              instance.public_send("#{attribute.name}=", nil)
+              next
+            end
+
             if attribute.collection?
               [*value].each do |val|
-                val = attribute.type.out_of_json(val)
+                val = val ? attribute.type.out_of_json(val) : val
                 instance.public_send(attribute.name) << attribute.type.cast(val)
               end
             else
@@ -88,8 +103,13 @@ module Shale
 
             value = instance.public_send(attribute.name)
 
+            unless value
+              hash[element] = nil
+              next
+            end
+
             if attribute.collection?
-              hash[element] = [*value].map { |v| attribute.type.as_json(v) }
+              hash[element] = [*value].map { |v| v ? attribute.type.as_json(v) : v }
             else
               hash[element] = attribute.type.as_json(value)
             end
@@ -112,9 +132,14 @@ module Shale
             attribute = attributes[mapping]
             next unless attribute
 
+            unless value
+              instance.public_send("#{attribute.name}=", nil)
+              next
+            end
+
             if attribute.collection?
               [*value].each do |val|
-                val = attribute.type.out_of_yaml(val)
+                val = val ? attribute.type.out_of_yaml(val) : val
                 instance.public_send(attribute.name) << attribute.type.cast(val)
               end
             else
@@ -139,8 +164,13 @@ module Shale
             element = element.to_s
             value = instance.public_send(attribute.name)
 
+            unless value
+              hash[element] = nil
+              next
+            end
+
             if attribute.collection?
-              hash[element] = [*value].map { |v| attribute.type.as_yaml(v) }
+              hash[element] = [*value].map { |v| v ? attribute.type.as_yaml(v) : v }
             else
               hash[element] = attribute.type.as_yaml(value)
             end
