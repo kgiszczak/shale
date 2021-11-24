@@ -31,6 +31,16 @@ module Shale
         def as_yaml(value)
           value
         end
+
+        def out_of_xml(node)
+          node.text
+        end
+
+        def as_xml(value, name, doc)
+          element = doc.create_element(name)
+          doc.add_text(element, value.to_s)
+          element
+        end
       end
     end
   end

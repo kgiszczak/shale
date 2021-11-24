@@ -2,24 +2,27 @@
 
 require_relative 'attribute'
 require_relative 'error'
-require_relative 'mapping'
+require_relative 'mapping/key_value'
+require_relative 'mapping/xml'
 require_relative 'type/complex'
 
 module Shale
   class Mapper < Type::Complex
     @attributes = {}
-    @hash_mapping = Mapping.new
-    @json_mapping = Mapping.new
-    @yaml_mapping = Mapping.new
+    @hash_mapping = Mapping::KeyValue.new
+    @json_mapping = Mapping::KeyValue.new
+    @yaml_mapping = Mapping::KeyValue.new
+    @xml_mapping = Mapping::Xml.new
 
     class << self
-      attr_reader :attributes, :hash_mapping, :json_mapping, :yaml_mapping
+      attr_reader :attributes, :hash_mapping, :json_mapping, :yaml_mapping, :xml_mapping
 
       def inherited(subclass)
         subclass.instance_variable_set('@attributes', @attributes.dup)
         subclass.instance_variable_set('@hash_mapping', @hash_mapping.dup)
         subclass.instance_variable_set('@json_mapping', @json_mapping.dup)
         subclass.instance_variable_set('@yaml_mapping', @yaml_mapping.dup)
+        subclass.instance_variable_set('@xml_mapping', @xml_mapping.dup)
       end
 
       def attribute(name, type, collection: false, default: nil)
@@ -50,6 +53,10 @@ module Shale
 
       def yaml(&block)
         @yaml_mapping.instance_eval(&block)
+      end
+
+      def xml(&block)
+        @xml_mapping.instance_eval(&block)
       end
     end
 
