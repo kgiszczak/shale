@@ -34,7 +34,7 @@ module Shale
           instance
         end
 
-        alias :from_hash :out_of_hash
+        alias from_hash out_of_hash
 
         def as_hash(instance)
           hash = {}
@@ -60,7 +60,7 @@ module Shale
           hash
         end
 
-        alias :to_hash :as_hash
+        alias to_hash as_hash
 
         def out_of_json(hash)
           instance = new

@@ -6,7 +6,7 @@ module Shale
   module Type
     class Integer < Base
       def self.cast(value)
-        value.to_i unless value.nil?
+        value&.to_i
       end
     end
   end

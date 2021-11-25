@@ -6,7 +6,7 @@ module Shale
   module Type
     class String < Base
       def self.cast(value)
-        value.to_s unless value.nil?
+        value&.to_s
       end
     end
   end

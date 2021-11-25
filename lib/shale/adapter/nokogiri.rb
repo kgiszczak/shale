@@ -76,7 +76,7 @@ module Shale
             .filter(&:text?)
             .first
 
-          first.text if first
+          first&.text
         end
       end
     end

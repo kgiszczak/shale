@@ -19,6 +19,7 @@ module Shale
       attr_reader :attributes, :hash_mapping, :json_mapping, :yaml_mapping, :xml_mapping
 
       def inherited(subclass)
+        super
         subclass.instance_variable_set('@attributes', @attributes.dup)
 
         subclass.instance_variable_set('@__hash_mapping_init', @hash_mapping.dup)
@@ -40,7 +41,7 @@ module Shale
         name = name.to_sym
 
         unless default.nil? || default.respond_to?(:call)
-          raise DefaultNotCallableError.new(self.to_s, name)
+          raise DefaultNotCallableError.new(to_s, name)
         end
 
         @attributes[name] = Attribute.new(name, type, collection, default)
