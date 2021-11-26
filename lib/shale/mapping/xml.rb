@@ -6,7 +6,6 @@ module Shale
       attr_reader :elements, :attributes, :content
 
       def initialize
-        super
         @elements = {}
         @attributes = {}
         @content = nil

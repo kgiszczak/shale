@@ -32,7 +32,7 @@ module Shale
         subclass.instance_variable_set('@yaml_mapping', @yaml_mapping.dup)
 
         xml_mapping = @xml_mapping.dup
-        xml_mapping.root(Utils.underscore(subclass.name))
+        xml_mapping.root(Utils.underscore(subclass.name || ''))
 
         subclass.instance_variable_set('@xml_mapping', xml_mapping.dup)
       end

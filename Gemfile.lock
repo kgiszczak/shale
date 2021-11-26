@@ -7,13 +7,34 @@ GEM
   remote: https://rubygems.org/
   specs:
     ast (2.4.2)
+    diff-lcs (1.4.4)
+    docile (1.4.0)
+    mini_portile2 (2.6.1)
+    nokogiri (1.12.5)
+      mini_portile2 (~> 2.6.1)
+      racc (~> 1.4)
+    ox (2.14.6)
     parallel (1.21.0)
     parser (3.0.2.0)
       ast (~> 2.4.1)
+    racc (1.6.0)
     rainbow (3.0.0)
     rake (13.0.1)
     regexp_parser (2.1.1)
     rexml (3.2.4)
+    rspec (3.10.0)
+      rspec-core (~> 3.10.0)
+      rspec-expectations (~> 3.10.0)
+      rspec-mocks (~> 3.10.0)
+    rspec-core (3.10.1)
+      rspec-support (~> 3.10.0)
+    rspec-expectations (3.10.1)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.10.0)
+    rspec-mocks (3.10.2)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.10.0)
+    rspec-support (3.10.3)
     rubocop (1.22.3)
       parallel (~> 1.10)
       parser (>= 3.0.0.0)
@@ -26,15 +47,25 @@ GEM
     rubocop-ast (1.13.0)
       parser (>= 3.0.1.1)
     ruby-progressbar (1.11.0)
+    simplecov (0.21.2)
+      docile (~> 1.1)
+      simplecov-html (~> 0.11)
+      simplecov_json_formatter (~> 0.1)
+    simplecov-html (0.12.3)
+    simplecov_json_formatter (0.1.3)
     unicode-display_width (2.1.0)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
+  nokogiri
+  ox
   rake (~> 13.0)
+  rspec (~> 3.10.0)
   rubocop (~> 1.21)
   shale!
+  simplecov (~> 0.21.2)
 
 BUNDLED WITH
    2.1.4
