@@ -65,7 +65,7 @@ person = Person.new(
 ### Converting JSON to object
 
 ```ruby
-Person.from_json(<<~DATA)
+person = Person.from_json(<<~DATA)
 {
   "first_name": "John",
   "last_name": "Doe",
@@ -118,7 +118,7 @@ person.to_json
 ### Converting YAML to object
 
 ```ruby
-Person.from_yaml(<<~DATA)
+person = Person.from_yaml(<<~DATA)
 first_name: John
 last_name: Doe
 age: 50
@@ -156,7 +156,7 @@ person.to_yaml
 ### Converting Hash to object
 
 ```ruby
-person.from_hash(
+person = Person.from_hash(
   'first_name' => 'John',
   'last_name' => 'Doe',
   'age' => 50,
@@ -189,7 +189,7 @@ person.to_hash
 ### Converting XML to object
 
 ```ruby
-Person.from_xml(<<~DATA)
+person = Person.from_xml(<<~DATA)
 <person>
   <first_name>John</first_name>
   <last_name>Doe</last_name>
@@ -307,7 +307,7 @@ class Person < Shale::Mapper
   end
 end
 
-Person.from_xml(<<~DATA)
+person = Person.from_xml(<<~DATA)
 <Person age="50">
   <FirstName>John</FirstName>
   <LastName>Doe</LastName>
