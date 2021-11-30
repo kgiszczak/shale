@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'shale/type/base'
+require 'shale/adapter/rexml'
 require 'rexml/document'
 
 RSpec.describe Shale::Type::Base do
