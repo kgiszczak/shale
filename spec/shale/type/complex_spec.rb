@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
-require 'shale/type/complex'
-require 'shale/mapper'
+require 'shale'
 
 module ShaleComplexTesting
   class ComplexType < Shale::Mapper
@@ -29,6 +28,7 @@ module ShaleComplexTesting
     attribute :root_attr1, Shale::Type::String
     attribute :root_attr2, Shale::Type::String, collection: true
     attribute :root_attr3, Shale::Type::String
+    attribute :root_bool, Shale::Type::Boolean
     attribute :root_collection, Shale::Type::String, collection: true
     attribute :root_attr_complex, ComplexType
 
@@ -36,6 +36,7 @@ module ShaleComplexTesting
       map 'root_attr1', to: :root_attr1
       map 'root_attr2', to: :root_attr2
       map 'root_attr3', to: :root_attr3
+      map 'root_bool', to: :root_bool
       map 'root_attr_complex', to: :root_attr_complex
     end
 
@@ -43,6 +44,7 @@ module ShaleComplexTesting
       map 'root_attr1', to: :root_attr1
       map 'root_attr2', to: :root_attr2
       map 'root_attr3', to: :root_attr3
+      map 'root_bool', to: :root_bool
       map 'root_attr_complex', to: :root_attr_complex
     end
 
@@ -50,6 +52,7 @@ module ShaleComplexTesting
       map 'root_attr1', to: :root_attr1
       map 'root_attr2', to: :root_attr2
       map 'root_attr3', to: :root_attr3
+      map 'root_bool', to: :root_bool
       map 'root_attr_complex', to: :root_attr_complex
     end
 
@@ -59,6 +62,7 @@ module ShaleComplexTesting
       map_attribute 'collection', to: :root_collection
       map_element 'element1', to: :root_attr2
       map_element 'element2', to: :root_attr3
+      map_element 'element_bool', to: :root_bool
       map_element 'element_complex', to: :root_attr_complex
     end
   end
@@ -71,6 +75,7 @@ RSpec.describe Shale::Type::Complex do
         'root_attr1' => 'foo',
         'root_attr2' => %w[one two three],
         'root_attr3' => nil,
+        'root_bool' => false,
         'root_attr_complex' => { 'complex_attr1' => 'bar' },
       }
     end
@@ -82,6 +87,7 @@ RSpec.describe Shale::Type::Complex do
         expect(instance.root_attr1).to eq('foo')
         expect(instance.root_attr2).to eq(%w[one two three])
         expect(instance.root_attr3).to eq(nil)
+        expect(instance.root_bool).to eq(false)
         expect(instance.root_attr_complex.complex_attr1).to eq('bar')
       end
     end
@@ -92,6 +98,7 @@ RSpec.describe Shale::Type::Complex do
           root_attr1: 'foo',
           root_attr2: %w[one two three],
           root_attr3: nil,
+          root_bool: false,
           root_attr_complex: ShaleComplexTesting::ComplexType.new(complex_attr1: 'bar')
         )
 
@@ -107,6 +114,7 @@ RSpec.describe Shale::Type::Complex do
           "root_attr1": "foo",
           "root_attr2": ["one", "two", "three"],
           "root_attr3": null,
+          "root_bool": false,
           "root_attr_complex": { "complex_attr1": "bar" }
         }
       JSON
@@ -119,6 +127,7 @@ RSpec.describe Shale::Type::Complex do
         expect(instance.root_attr1).to eq('foo')
         expect(instance.root_attr2).to eq(%w[one two three])
         expect(instance.root_attr3).to eq(nil)
+        expect(instance.root_bool).to eq(false)
         expect(instance.root_attr_complex.complex_attr1).to eq('bar')
       end
     end
@@ -129,6 +138,7 @@ RSpec.describe Shale::Type::Complex do
           root_attr1: 'foo',
           root_attr2: %w[one two three],
           root_attr3: nil,
+          root_bool: false,
           root_attr_complex: ShaleComplexTesting::ComplexType.new(complex_attr1: 'bar')
         )
 
@@ -148,6 +158,7 @@ RSpec.describe Shale::Type::Complex do
         - two
         - three
         root_attr3: 
+        root_bool: false
         root_attr_complex:
           complex_attr1: bar
       YAML
@@ -161,6 +172,7 @@ RSpec.describe Shale::Type::Complex do
         expect(instance.root_attr1).to eq('foo')
         expect(instance.root_attr2).to eq(%w[one two three])
         expect(instance.root_attr3).to eq(nil)
+        expect(instance.root_bool).to eq(false)
         expect(instance.root_attr_complex.complex_attr1).to eq('bar')
       end
     end
@@ -171,6 +183,7 @@ RSpec.describe Shale::Type::Complex do
           root_attr1: 'foo',
           root_attr2: %w[one two three],
           root_attr3: nil,
+          root_bool: false,
           root_attr_complex: ShaleComplexTesting::ComplexType.new(complex_attr1: 'bar')
         )
 
@@ -186,6 +199,7 @@ RSpec.describe Shale::Type::Complex do
           <element1>one</element1>
           <element1>two</element1>
           <element1>three</element1>
+          <element_bool>false</element_bool>
           <element_complex>bar</element_complex>
         </root_type>
       XML
@@ -198,6 +212,7 @@ RSpec.describe Shale::Type::Complex do
         expect(instance.root_attr1).to eq('foo')
         expect(instance.root_attr2).to eq(%w[one two three])
         expect(instance.root_attr3).to eq(nil)
+        expect(instance.root_bool).to eq(false)
         expect(instance.root_attr_complex.complex_attr1).to eq('bar')
       end
     end
@@ -209,6 +224,7 @@ RSpec.describe Shale::Type::Complex do
           root_attr2: %w[one two three],
           root_attr3: nil,
           root_collection: ['collection'],
+          root_bool: false,
           root_attr_complex: ShaleComplexTesting::ComplexType.new(complex_attr1: 'bar')
         )
 

@@ -16,7 +16,7 @@ module Shale
             attribute = attributes[mapping]
             next unless attribute
 
-            unless value
+            if value.nil?
               instance.public_send("#{attribute.name}=", nil)
               next
             end
@@ -45,7 +45,7 @@ module Shale
 
             value = instance.public_send(attribute.name)
 
-            unless value
+            if value.nil?
               hash[key] = nil
               next
             end
@@ -72,7 +72,7 @@ module Shale
             attribute = attributes[mapping]
             next unless attribute
 
-            unless value
+            if value.nil?
               instance.public_send("#{attribute.name}=", nil)
               next
             end
@@ -103,7 +103,7 @@ module Shale
 
             value = instance.public_send(attribute.name)
 
-            unless value
+            if value.nil?
               hash[key] = nil
               next
             end
@@ -132,7 +132,7 @@ module Shale
             attribute = attributes[mapping]
             next unless attribute
 
-            unless value
+            if value.nil?
               instance.public_send("#{attribute.name}=", nil)
               next
             end
@@ -163,7 +163,7 @@ module Shale
 
             value = instance.public_send(attribute.name)
 
-            unless value
+            if value.nil?
               hash[key] = nil
               next
             end
@@ -263,11 +263,11 @@ module Shale
             next unless attribute
 
             value = instance.public_send(attribute.name)
-            next unless value
+            next if value.nil?
 
             if attribute.collection?
               [*value].each do |v|
-                next unless v
+                next if v.nil?
                 doc.add_element(element, attribute.type.as_xml(v, xml_name, doc))
               end
             else
