@@ -5,7 +5,15 @@ require_relative 'base'
 
 module Shale
   module Type
+    # Cast value to Date
+    #
+    # @api public
     class Date < Base
+      # @param [any] value Value to cast
+      #
+      # @return [Date, nil]
+      #
+      # @api private
       def self.cast(value)
         if value.is_a?(::String)
           return if value.empty?

@@ -4,8 +4,19 @@ require_relative 'base'
 
 module Shale
   module Type
+    # Build complex object. Don't use it directly.
+    # It serves as a base type class for @see Shale::Mapper
+    #
+    # @api private
     class Complex < Base
       class << self
+        # Convert Hash to Object
+        #
+        # @param [Hash] hash Hash to convert
+        #
+        # @return [Shale::Mapper]
+        #
+        # @api public
         def out_of_hash(hash)
           instance = new
 
@@ -36,6 +47,13 @@ module Shale
 
         alias from_hash out_of_hash
 
+        # Convert Object to Hash
+        #
+        # @param [Shale::Type::Base] instance Object to convert
+        #
+        # @return [Hash]
+        #
+        # @api public
         def as_hash(instance)
           hash = {}
 
@@ -62,6 +80,13 @@ module Shale
 
         alias to_hash as_hash
 
+        # Convert JSON document to Object
+        #
+        # @param [Hash] hash JSON document to convert
+        #
+        # @return [Shale::Mapper]
+        #
+        # @api public
         def out_of_json(hash)
           instance = new
 
@@ -90,10 +115,24 @@ module Shale
           instance
         end
 
+        # Convert JSON to Object
+        #
+        # @param [String] json JSON to convert
+        #
+        # @return [Shale::Mapper]
+        #
+        # @api public
         def from_json(json)
           out_of_json(Shale.json_adapter.load(json))
         end
 
+        # Convert Object to JSON document
+        #
+        # @param [Shale::Type::Base] instance Object to convert
+        #
+        # @return [Hash]
+        #
+        # @api public
         def as_json(instance)
           hash = {}
 
@@ -118,10 +157,24 @@ module Shale
           hash
         end
 
+        # Convert Object to JSON
+        #
+        # @param [Shale::Type::Base] instance Object to convert
+        #
+        # @return [String]
+        #
+        # @api public
         def to_json(instance)
           Shale.json_adapter.dump(as_json(instance))
         end
 
+        # Convert YAML document to Object
+        #
+        # @param [Hash] hash YAML document to convert
+        #
+        # @return [Shale::Mapper]
+        #
+        # @api public
         def out_of_yaml(hash)
           instance = new
 
@@ -150,10 +203,24 @@ module Shale
           instance
         end
 
+        # Convert YAML to Object
+        #
+        # @param [String] yaml YAML to convert
+        #
+        # @return [Shale::Mapper]
+        #
+        # @api public
         def from_yaml(yaml)
           out_of_yaml(Shale.yaml_adapter.load(yaml))
         end
 
+        # Convert Object to YAML document
+        #
+        # @param [Shale::Type::Base] instance Object to convert
+        #
+        # @return [Hash]
+        #
+        # @api public
         def as_yaml(instance)
           hash = {}
 
@@ -178,10 +245,24 @@ module Shale
           hash
         end
 
+        # Convert Object to YAML
+        #
+        # @param [Shale::Type::Base] instance Object to convert
+        #
+        # @return [String]
+        #
+        # @api public
         def to_yaml(instance)
           Shale.yaml_adapter.dump(as_yaml(instance))
         end
 
+        # Convert XML document to Object
+        #
+        # @param [Shale::Adapter::<XML adapter>::Node] xml XML to convert
+        #
+        # @return [Shale::Mapper]
+        #
+        # @api public
         def out_of_xml(element)
           instance = new
 
@@ -225,10 +306,26 @@ module Shale
           instance
         end
 
+        # Convert XML to Object
+        #
+        # @param [String] xml XML to convert
+        #
+        # @return [Shale::Mapper]
+        #
+        # @api public
         def from_xml(xml)
           out_of_xml(Shale.xml_adapter.load(xml))
         end
 
+        # Convert Object to XML document
+        #
+        # @param [Shale::Type::Base] instance Object to convert
+        # @param [String, nil] node_name XML node name
+        # @param [Shale::Adapter::<xml adapter>::Document, nil] doc Object to convert
+        #
+        # @return [::REXML::Document, ::Nokogiri::Document, ::Ox::Document]
+        #
+        # @api public
         def as_xml(instance, node_name = nil, doc = nil)
           unless doc
             doc = Shale.xml_adapter.create_document
@@ -278,23 +375,50 @@ module Shale
           element
         end
 
+        # Convert Object to XML
+        #
+        # @param [Shale::Type::Base] instance Object to convert
+        #
+        # @return [String]
+        #
+        # @api public
         def to_xml(instance)
           Shale.xml_adapter.dump(as_xml(instance))
         end
       end
 
+      # Convert Object to Hash
+      #
+      # @return [Hash]
+      #
+      # @api public
       def to_hash
         self.class.to_hash(self)
       end
 
+      # Convert Object to JSON
+      #
+      # @return [String]
+      #
+      # @api public
       def to_json
         self.class.to_json(self)
       end
 
+      # Convert Object to YAML
+      #
+      # @return [String]
+      #
+      # @api public
       def to_yaml
         self.class.to_yaml(self)
       end
 
+      # Convert Object to XML
+      #
+      # @return [String]
+      #
+      # @api public
       def to_xml
         self.class.to_xml(self)
       end

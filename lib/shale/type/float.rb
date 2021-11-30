@@ -4,7 +4,15 @@ require_relative 'base'
 
 module Shale
   module Type
+    # Cast value to Float
+    #
+    # @api public
     class Float < Base
+      # @param [#to_f, String, nil] value Value to cast
+      #
+      # @return [Float, nil]
+      #
+      # @api private
       def self.cast(value)
         return if value.nil?
 
