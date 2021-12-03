@@ -5,7 +5,7 @@ require_relative 'error'
 require_relative 'utils'
 require_relative 'mapping/key_value'
 require_relative 'mapping/xml'
-require_relative 'type/complex'
+require_relative 'type/composite'
 
 module Shale
   # Base class used for mapping
@@ -42,7 +42,7 @@ module Shale
   #   person.to_json
   #
   # @api public
-  class Mapper < Type::Complex
+  class Mapper < Type::Composite
     @attributes = {}
     @hash_mapping = Mapping::KeyValue.new
     @json_mapping = Mapping::KeyValue.new

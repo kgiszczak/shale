@@ -4,11 +4,11 @@ require_relative 'base'
 
 module Shale
   module Type
-    # Build complex object. Don't use it directly.
+    # Build composite object. Don't use it directly.
     # It serves as a base type class for @see Shale::Mapper
     #
     # @api private
-    class Complex < Base
+    class Composite < Base
       class << self
         # Convert Hash to Object
         #
