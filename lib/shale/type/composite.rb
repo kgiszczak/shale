@@ -10,122 +10,90 @@ module Shale
     # @api private
     class Composite < Base
       class << self
-        # Convert Hash to Object
-        #
-        # @param [Hash] hash Hash to convert
-        #
-        # @return [Shale::Mapper]
-        #
-        # @api public
-        def out_of_hash(hash)
-          instance = new
+        %i[hash json yaml].each do |format|
+          class_eval(<<-RUBY, __FILE__, __LINE__ + 1)
+            # Convert Hash to Object using Hash/JSON/YAML mapping
+            #
+            # @param [Hash] hash Hash to convert
+            #
+            # @return [Shale::Mapper]
+            #
+            # @api public
+            def out_of_#{format}(hash)
+              instance = new
 
-          hash.each do |key, value|
-            mapping = hash_mapping.keys[key]
-            next unless mapping
+              mapping_keys = #{format}_mapping.keys
 
-            if mapping.is_a?(Hash)
-              instance.send(mapping[:from], value)
-            else
-              attribute = attributes[mapping]
-              next unless attribute
+              hash.each do |key, value|
+                mapping = mapping_keys[key]
+                next unless mapping
 
-              if value.nil?
-                instance.public_send("#{attribute.name}=", nil)
-                next
-              end
+                if mapping.is_a?(Hash)
+                  instance.send(mapping[:from], value)
+                else
+                  attribute = attributes[mapping]
+                  next unless attribute
 
-              if attribute.collection?
-                [*value].each do |val|
-                  val = val ? attribute.type.out_of_hash(val) : val
-                  instance.public_send(attribute.name) << attribute.type.cast(val)
+                  if value.nil?
+                    instance.public_send("\#{attribute.name}=", nil)
+                    next
+                  end
+
+                  if attribute.collection?
+                    [*value].each do |val|
+                      val = val ? attribute.type.out_of_#{format}(val) : val
+                      instance.public_send(attribute.name) << attribute.type.cast(val)
+                    end
+                  else
+                    val = attribute.type.out_of_#{format}(value)
+                    instance.public_send("\#{attribute.name}=", val)
+                  end
                 end
-              else
-                instance.public_send("#{attribute.name}=", attribute.type.out_of_hash(value))
               end
-            end
-          end
 
-          instance
+              instance
+            end
+
+            # Convert Object to Hash using Hash/JSON/YAML mapping
+            #
+            # @param [Shale::Type::Base] instance Object to convert
+            #
+            # @return [Hash]
+            #
+            # @api public
+            def as_#{format}(instance)
+              hash = {}
+
+              instance.class.#{format}_mapping.keys.each do |key, attr|
+                if attr.is_a?(Hash)
+                  hash[key] = instance.send(attr[:to])
+                else
+                  attribute = instance.class.attributes[attr]
+                  next unless attribute
+
+                  value = instance.public_send(attribute.name)
+
+                  if value.nil?
+                    hash[key] = nil
+                    next
+                  end
+
+                  if attribute.collection?
+                    hash[key] = [*value].map { |v| v ? attribute.type.as_#{format}(v) : v }
+                  else
+                    hash[key] = attribute.type.as_#{format}(value)
+                  end
+                end
+              end
+
+              hash
+            end
+          RUBY
         end
 
         alias from_hash out_of_hash
 
-        # Convert Object to Hash
-        #
-        # @param [Shale::Type::Base] instance Object to convert
-        #
-        # @return [Hash]
-        #
-        # @api public
-        def as_hash(instance)
-          hash = {}
-
-          instance.class.hash_mapping.keys.each do |key, attr|
-            if attr.is_a?(Hash)
-              hash[key] = instance.send(attr[:to])
-            else
-              attribute = instance.class.attributes[attr]
-              next unless attribute
-
-              value = instance.public_send(attribute.name)
-
-              if value.nil?
-                hash[key] = nil
-                next
-              end
-
-              if attribute.collection?
-                hash[key] = [*value].map { |v| v ? attribute.type.as_hash(v) : v }
-              else
-                hash[key] = attribute.type.as_hash(value)
-              end
-            end
-          end
-
-          hash
-        end
-
         alias to_hash as_hash
-
-        # Convert JSON document to Object
-        #
-        # @param [Hash] hash JSON document to convert
-        #
-        # @return [Shale::Mapper]
-        #
-        # @api public
-        def out_of_json(hash)
-          instance = new
-
-          hash.each do |key, value|
-            mapping = json_mapping.keys[key]
-            next unless mapping
-
-            if mapping.is_a?(Hash)
-              instance.send(mapping[:from], value)
-            else
-              attribute = attributes[mapping]
-              next unless attribute
-
-              if value.nil?
-                instance.public_send("#{attribute.name}=", nil)
-                next
-              end
-
-              if attribute.collection?
-                [*value].each do |val|
-                  val = val ? attribute.type.out_of_json(val) : val
-                  instance.public_send(attribute.name) << attribute.type.cast(val)
-                end
-              else
-                instance.public_send("#{attribute.name}=", attribute.type.out_of_json(value))
-              end
-            end
-          end
-
-          instance
-        end
 
         # Convert JSON to Object
         #
@@ -136,41 +104,6 @@ module Shale
         # @api public
         def from_json(json)
           out_of_json(Shale.json_adapter.load(json))
-        end
-
-        # Convert Object to JSON document
-        #
-        # @param [Shale::Type::Base] instance Object to convert
-        #
-        # @return [Hash]
-        #
-        # @api public
-        def as_json(instance)
-          hash = {}
-
-          instance.class.json_mapping.keys.each do |key, attr|
-            if attr.is_a?(Hash)
-              hash[key] = instance.send(attr[:to])
-            else
-              attribute = instance.class.attributes[attr]
-              next unless attribute
-
-              value = instance.public_send(attribute.name)
-
-              if value.nil?
-                hash[key] = nil
-                next
-              end
-
-              if attribute.collection?
-                hash[key] = [*value].map { |v| v ? attribute.type.as_json(v) : v }
-              else
-                hash[key] = attribute.type.as_json(value)
-              end
-            end
-          end
-
-          hash
         end
 
         # Convert Object to JSON
@@ -184,45 +117,6 @@ module Shale
           Shale.json_adapter.dump(as_json(instance))
         end
 
-        # Convert YAML document to Object
-        #
-        # @param [Hash] hash YAML document to convert
-        #
-        # @return [Shale::Mapper]
-        #
-        # @api public
-        def out_of_yaml(hash)
-          instance = new
-
-          hash.each do |key, value|
-            mapping = yaml_mapping.keys[key]
-            next unless mapping
-
-            if mapping.is_a?(Hash)
-              instance.send(mapping[:from], value)
-            else
-              attribute = attributes[mapping]
-              next unless attribute
-
-              if value.nil?
-                instance.public_send("#{attribute.name}=", nil)
-                next
-              end
-
-              if attribute.collection?
-                [*value].each do |val|
-                  val = val ? attribute.type.out_of_yaml(val) : val
-                  instance.public_send(attribute.name) << attribute.type.cast(val)
-                end
-              else
-                instance.public_send("#{attribute.name}=", attribute.type.out_of_yaml(value))
-              end
-            end
-          end
-
-          instance
-        end
-
         # Convert YAML to Object
         #
         # @param [String] yaml YAML to convert
@@ -232,41 +126,6 @@ module Shale
         # @api public
         def from_yaml(yaml)
           out_of_yaml(Shale.yaml_adapter.load(yaml))
-        end
-
-        # Convert Object to YAML document
-        #
-        # @param [Shale::Type::Base] instance Object to convert
-        #
-        # @return [Hash]
-        #
-        # @api public
-        def as_yaml(instance)
-          hash = {}
-
-          instance.class.yaml_mapping.keys.each do |key, attr|
-            if attr.is_a?(Hash)
-              hash[key] = instance.send(attr[:to])
-            else
-              attribute = instance.class.attributes[attr]
-              next unless attribute
-
-              value = instance.public_send(attribute.name)
-
-              if value.nil?
-                hash[key] = nil
-                next
-              end
-
-              if attribute.collection?
-                hash[key] = [*value].map { |v| v ? attribute.type.as_yaml(v) : v }
-              else
-                hash[key] = attribute.type.as_yaml(value)
-              end
-            end
-          end
-
-          hash
         end
 
         # Convert Object to YAML
