@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    shale (0.1.0)
+    shale (0.2.0)
 
 GEM
   remote: https://rubygems.org/
@@ -68,4 +68,4 @@ DEPENDENCIES
   simplecov (~> 0.21.2)
 
 BUNDLED WITH
-   2.1.4
+   2.3.5
