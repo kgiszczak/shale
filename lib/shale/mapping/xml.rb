@@ -1,8 +1,10 @@
 # frozen_string_literal: true
 
+require_relative 'base'
+
 module Shale
   module Mapping
-    class Xml
+    class Xml < Base
       # Return elements mapping hash
       #
       # @return [Hash]
@@ -28,6 +30,7 @@ module Shale
       #
       # @api private
       def initialize
+        super
         @elements = {}
         @attributes = {}
         @content = nil
@@ -39,9 +42,12 @@ module Shale
       # @param [String] element Document's element
       # @param [Symbol] to Object's attribute
       #
+      # @raise [IncorrectMappingArgumentsError] when arguments are incorrect
+      #
       # @api private
-      def map_element(element, to:)
-        @elements[element] = to
+      def map_element(element, to: nil, using: nil)
+        validate_arguments(element, to, using)
+        @elements[element] = to || using
       end
 
       # Map document's attribute to object's attribute
@@ -49,9 +55,12 @@ module Shale
       # @param [String] attribute Document's attribute
       # @param [Symbol] to Object's attribute
       #
+      # @raise [IncorrectMappingArgumentsError] when arguments are incorrect
+      #
       # @api private
-      def map_attribute(attribute, to:)
-        @attributes[attribute] = to
+      def map_attribute(attribute, to: nil, using: nil)
+        validate_arguments(attribute, to, using)
+        @attributes[attribute] = to || using
       end
 
       # Map document's content to object's attribute

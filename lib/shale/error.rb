@@ -30,4 +30,10 @@ module Shale
       super("'#{attribute}' default is not callable for #{record}.")
     end
   end
+
+  # Error for passing incorrect arguments to map functions
+  #
+  # @api private
+  class IncorrectMappingArgumentsError < StandardError
+  end
 end

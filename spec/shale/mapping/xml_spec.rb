@@ -25,18 +25,102 @@ RSpec.describe Shale::Mapping::Xml do
   end
 
   describe '#map_element' do
-    it 'adds mapping to elements hash' do
-      obj = described_class.new
-      obj.map_element('foo', to: :bar)
-      expect(obj.elements).to eq('foo' => :bar)
+    context 'when :to and :using is nil' do
+      it 'raises an error' do
+        obj = described_class.new
+
+        expect do
+          obj.map_element('foo')
+        end.to raise_error(Shale::IncorrectMappingArgumentsError)
+      end
+    end
+
+    context 'when :to is not nil' do
+      it 'adds mapping to elements hash' do
+        obj = described_class.new
+        obj.map_element('foo', to: :bar)
+        expect(obj.elements).to eq('foo' => :bar)
+      end
+    end
+
+    context 'when :using is not nil' do
+      context 'when using: { from: } is nil' do
+        it 'raises an error' do
+          obj = described_class.new
+
+          expect do
+            obj.map_element('foo', using: { to: :foo })
+          end.to raise_error(Shale::IncorrectMappingArgumentsError)
+        end
+      end
+
+      context 'when using: { to: } is nil' do
+        it 'raises an error' do
+          obj = described_class.new
+
+          expect do
+            obj.map_element('foo', using: { from: :foo })
+          end.to raise_error(Shale::IncorrectMappingArgumentsError)
+        end
+      end
+
+      context 'when :using is correct' do
+        it 'adds mapping to elements hash' do
+          obj = described_class.new
+          obj.map_element('foo', using: { from: :foo, to: :bar })
+          expect(obj.elements).to eq('foo' => { from: :foo, to: :bar })
+        end
+      end
     end
   end
 
   describe '#map_attribute' do
-    it 'adds mapping to attributes hash' do
-      obj = described_class.new
-      obj.map_attribute('foo', to: :bar)
-      expect(obj.attributes).to eq('foo' => :bar)
+    context 'when :to and :using is nil' do
+      it 'raises an error' do
+        obj = described_class.new
+
+        expect do
+          obj.map_attribute('foo')
+        end.to raise_error(Shale::IncorrectMappingArgumentsError)
+      end
+    end
+
+    context 'when :to is not nil' do
+      it 'adds mapping to attributes hash' do
+        obj = described_class.new
+        obj.map_attribute('foo', to: :bar)
+        expect(obj.attributes).to eq('foo' => :bar)
+      end
+    end
+
+    context 'when :using is not nil' do
+      context 'when using: { from: } is nil' do
+        it 'raises an error' do
+          obj = described_class.new
+
+          expect do
+            obj.map_attribute('foo', using: { to: :foo })
+          end.to raise_error(Shale::IncorrectMappingArgumentsError)
+        end
+      end
+
+      context 'when using: { to: } is nil' do
+        it 'raises an error' do
+          obj = described_class.new
+
+          expect do
+            obj.map_attribute('foo', using: { from: :foo })
+          end.to raise_error(Shale::IncorrectMappingArgumentsError)
+        end
+      end
+
+      context 'when :using is correct' do
+        it 'adds mapping to attributes hash' do
+          obj = described_class.new
+          obj.map_attribute('foo', using: { from: :foo, to: :bar })
+          expect(obj.attributes).to eq('foo' => { from: :foo, to: :bar })
+        end
+      end
     end
   end
 

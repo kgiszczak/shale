@@ -1,11 +1,13 @@
 # frozen_string_literal: true
 
+require_relative 'base'
+
 module Shale
   module Mapping
     # Mapping for key/value serialization formats (Hash/JSON/YAML)
     #
     # @api private
-    class KeyValue
+    class KeyValue < Base
       # Return keys mapping hash
       #
       # @return [Hash]
@@ -17,6 +19,7 @@ module Shale
       #
       # @api private
       def initialize
+        super
         @keys = {}
       end
 
@@ -25,9 +28,12 @@ module Shale
       # @param [String] key Document's key
       # @param [Symbol] to Object's attribute
       #
+      # @raise [IncorrectMappingArgumentsError] when arguments are incorrect
+      #
       # @api private
-      def map(key, to:)
-        @keys[key] = to
+      def map(key, to: nil, using: nil)
+        validate_arguments(key, to, using)
+        @keys[key] = to || using
       end
 
       # @api private

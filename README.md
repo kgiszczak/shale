@@ -48,7 +48,7 @@ end
 ```
 
 - `default: -> { 'value' }` - add a default value to attribute (it must be a proc that returns value)
-- `collection: true` - indicated that a attribute is a collection
+- `collection: true` - indicates that a attribute is a collection
 
 ### Creating objects
 
@@ -327,6 +327,100 @@ DATA
 - `map_attribute` - map element's attribute to attribute
 - `map_content` - map first text node to attribute
 
+### Using methods to extract and generate data
+
+If you need full controll over extracting and generating data from/to document,
+you can use methods to do so:
+
+```ruby
+class Person < Shale::Mapper
+  attribute :hobbies, Shale::Type::String, collection: true
+  attribute :street, Shale::Type::String
+  attribute :city, Shale::Type::String
+
+  json do
+    map 'hobbies', using: { from: :hobbies_from_json, to: :hobbies_to_json }
+    map 'address', using: { from: :address_from_json, to: :address_to_json }
+  end
+
+  xml do
+    root 'Person'
+
+    map_attribute 'hobbies', using: { from: :hobbies_from_xml, to: :hobbies_to_xml }
+    map_element 'Address', using: { from: :address_from_xml, to: :address_to_xml }
+  end
+
+  def hobbies_from_json(value)
+    self.hobbies = value.split(',').map(&:strip)
+  end
+
+  def hobbies_to_json
+    hobbies.join(', ')
+  end
+
+  def address_from_json(value)
+    self.street = value['street']
+    self.city = value['city']
+  end
+
+  def address_to_json
+    { 'street' => street, 'city' => city }
+  end
+
+  def hobbies_from_xml(value)
+    self.hobbies = value.split(',').map(&:strip)
+  end
+
+  def hobbies_to_xml(element, doc)
+    doc.add_attribute(element, 'hobbies', hobbies.join(', '))
+  end
+
+  def address_from_xml(node)
+    self.street = node.children.find { |e| e.name == 'Street' }.text
+    self.city = node.children.find { |e| e.name == 'City' }.text
+  end
+
+  def address_to_xml(parent, doc)
+    street_element = doc.create_element('Street')
+    doc.add_text(street_element, street.to_s)
+
+    city_element = doc.create_element('City')
+    doc.add_text(city_element, city.to_s)
+
+    address_element = doc.create_element('Address')
+    doc.add_element(address_element, street_element)
+    doc.add_element(address_element, city_element)
+    doc.add_element(parent, address_element)
+  end
+end
+
+person = Person.from_json(<<~DATA)
+{
+  "hobbies": "Singing, Dancing, Running",
+  "address": {
+    "street": "Oxford Street",
+    "city": "London"
+  }
+}
+DATA
+
+person = Person.from_xml(<<~DATA)
+<Person hobbies="Singing, Dancing, Running">
+  <Address>
+    <Street>Oxford Street</Street>
+    <City>London</City>
+  </Address>
+</person>
+DATA
+
+# =>
+#
+# #<Person:0x00007f9bc3086d60
+#  @hobbies=["Singing", "Dancing", "Running"],
+#  @street="Oxford Street",
+#  @city="London">
+```
+
 ### Supported types
 
 Shale supports these types out of the box:
@@ -355,10 +449,10 @@ end
 ### Adapters
 
 Shale uses adapters for parsing and generating documents.
-By default Ruby's standard JSON parser is used for handing JSON documents, YAML for YAML and
+By default Ruby's standard JSON parser is used for handling JSON documents, YAML for YAML and
 REXML for XML.
 
-You can change it by providing your own adapter. For JSON and YAML adapter must implement
+You can change it by providing your own adapter. For JSON and YAML, adapter must implement
 `.load` and `.dump` class methods.
 
 ```ruby
@@ -369,15 +463,22 @@ Shale.json_adapter = MultiJson
 Shale.yaml_adapter = MyYamlAdapter
 ```
 
-For XML, other than REXML, Shale provides adapters for most popular Ruby XML parsers:
+For XML, Shale provides adapters for most popular Ruby XML parsers:
 
 ```ruby
 require 'shale'
 
+# REXML is used by default:
+
+require 'shale/adapter/rexml'
+Shale.xml_adapter = Shale::Adapter::REXML
+
+# if you want to use Nokogiri:
+
 require 'shale/adapter/nokogiri'
 Shale.xml_adapter = Shale::Adapter::Nokogiri
 
-# or if you want to use Ox
+# or if you want to use Ox:
 
 require 'shale/adapter/ox'
 Shale.xml_adapter = Shale::Adapter::Ox

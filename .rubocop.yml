@@ -31,6 +31,8 @@ Style/DocumentDynamicEvalDefinition:
   Enabled: false
 Style/Documentation:
   Enabled: false
+Style/GuardClause:
+  Enabled: false
 Style/HashEachMethods:
   Enabled: false
 Style/IfUnlessModifier:
