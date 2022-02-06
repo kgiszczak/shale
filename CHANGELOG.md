@@ -1,3 +1,8 @@
+## [0.2.1] - 2022-02-06
+
+### Fixed
+- Fix attribute declaration causing problems in some runtimes (e.g Opal)
+
 ## [0.2.0] - 2022-01-20
 
 ### Added

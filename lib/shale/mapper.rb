@@ -149,7 +149,7 @@ module Shale
         @xml_mapping.map_element(name.to_s, to: name)
 
         class_eval(<<-RUBY, __FILE__, __LINE__ + 1)
-          attr_reader name
+          attr_reader :#{name}
 
           def #{name}=(val)
             @#{name} = #{collection} ? val : #{type}.cast(val)
