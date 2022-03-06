@@ -1,3 +1,9 @@
+## [0.2.2] - 2022-03-06
+
+### Fixed
+- Fix handling of blank attributes in XML format
+- Fix incorrect types in README examples
+
 ## [0.2.1] - 2022-02-06
 
 ### Fixed
