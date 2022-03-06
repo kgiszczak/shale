@@ -234,10 +234,9 @@ module Shale
               next unless attribute
 
               value = instance.public_send(attribute.name)
+              next if value.nil?
 
-              if value && !value.empty?
-                doc.add_attribute(element, xml_attr, value)
-              end
+              doc.add_attribute(element, xml_attr, value)
             end
           end
 

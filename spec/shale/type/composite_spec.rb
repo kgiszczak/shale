@@ -308,6 +308,12 @@ RSpec.describe Shale::Type::Composite do
 
         expect(instance.to_xml).to eq(xml)
       end
+
+      it 'converts blank attributes to xml' do
+        instance = ShaleCompositeTesting::RootType.new(root_attr1: '')
+        expected = "<root_type attr1='' collection='[]'><element_using/></root_type>"
+        expect(instance.to_xml).to eq(expected)
+      end
     end
   end
 end
