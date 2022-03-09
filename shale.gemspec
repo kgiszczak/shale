@@ -10,12 +10,12 @@ Gem::Specification.new do |spec|
 
   spec.summary = 'Ruby object mapper and serializer for XML, JSON and YAML.'
   spec.description = 'Ruby object mapper and serializer for XML, JSON and YAML.'
-  spec.homepage = 'https://github.com/kgiszczak/shale'
+  spec.homepage = 'https://shalerb.org'
   spec.license = 'MIT'
 
   spec.metadata['allowed_push_host'] = 'https://rubygems.org'
 
-  spec.metadata['homepage_uri'] = 'https://github.com/kgiszczak/shale'
+  spec.metadata['homepage_uri'] = 'https://shalerb.org'
   spec.metadata['source_code_uri'] = 'https://github.com/kgiszczak/shale'
   spec.metadata['changelog_uri'] = 'https://github.com/kgiszczak/shale/blob/master/CHANGELOG.md'
   spec.metadata['bug_tracker_uri'] = 'https://github.com/kgiszczak/shale/issues'

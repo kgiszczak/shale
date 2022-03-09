@@ -26,6 +26,8 @@ $ gem install shale
 
 ## Usage
 
+Documentation with interactive examples is available at [Shale website](https://shalerb.org)
+
 ### Simple use case
 
 ```ruby
