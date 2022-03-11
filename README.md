@@ -26,7 +26,7 @@ $ gem install shale
 
 ## Usage
 
-Documentation with interactive examples is available at <a href="https://www.shalerb.org" target="_blank">Shale website</a>
+Documentation with interactive examples is available at [Shale website](https://www.shalerb.org)
 
 ### Simple use case
 
