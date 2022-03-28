@@ -41,6 +41,7 @@ module Shale
       #
       # @param [String] element Document's element
       # @param [Symbol] to Object's attribute
+      # @param [Hash] using
       #
       # @raise [IncorrectMappingArgumentsError] when arguments are incorrect
       #
@@ -54,6 +55,7 @@ module Shale
       #
       # @param [String] attribute Document's attribute
       # @param [Symbol] to Object's attribute
+      # @param [Hash] using
       #
       # @raise [IncorrectMappingArgumentsError] when arguments are incorrect
       #
