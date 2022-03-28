@@ -39,7 +39,8 @@ RSpec.describe Shale::Mapping::Xml do
       it 'adds mapping to elements hash' do
         obj = described_class.new
         obj.map_element('foo', to: :bar)
-        expect(obj.elements).to eq('foo' => :bar)
+        expect(obj.elements.keys).to eq(['foo'])
+        expect(obj.elements['foo'].attribute).to eq(:bar)
       end
     end
 
@@ -68,7 +69,9 @@ RSpec.describe Shale::Mapping::Xml do
         it 'adds mapping to elements hash' do
           obj = described_class.new
           obj.map_element('foo', using: { from: :foo, to: :bar })
-          expect(obj.elements).to eq('foo' => { from: :foo, to: :bar })
+          expect(obj.elements.keys).to eq(['foo'])
+          expect(obj.elements['foo'].method_from).to eq(:foo)
+          expect(obj.elements['foo'].method_to).to eq(:bar)
         end
       end
     end
@@ -89,7 +92,8 @@ RSpec.describe Shale::Mapping::Xml do
       it 'adds mapping to attributes hash' do
         obj = described_class.new
         obj.map_attribute('foo', to: :bar)
-        expect(obj.attributes).to eq('foo' => :bar)
+        expect(obj.attributes.keys).to eq(['foo'])
+        expect(obj.attributes['foo'].attribute).to eq(:bar)
       end
     end
 
@@ -118,7 +122,9 @@ RSpec.describe Shale::Mapping::Xml do
         it 'adds mapping to attributes hash' do
           obj = described_class.new
           obj.map_attribute('foo', using: { from: :foo, to: :bar })
-          expect(obj.attributes).to eq('foo' => { from: :foo, to: :bar })
+          expect(obj.attributes.keys).to eq(['foo'])
+          expect(obj.attributes['foo'].method_from).to eq(:foo)
+          expect(obj.attributes['foo'].method_to).to eq(:bar)
         end
       end
     end
@@ -154,17 +160,19 @@ RSpec.describe Shale::Mapping::Xml do
       duplicate.map_content(to: :content_dup)
       duplicate.root('root_dup')
 
-      expect(original.elements).to eq('element' => :element)
-      expect(original.attributes).to eq('attribute' => :attribute)
+      expect(original.elements.keys).to eq(['element'])
+      expect(original.elements['element'].attribute).to eq(:element)
+      expect(original.attributes.keys).to eq(['attribute'])
+      expect(original.attributes['attribute'].attribute).to eq(:attribute)
       expect(original.content).to eq(:content)
       expect(original.root).to eq('root')
 
-      expect(duplicate.elements).to(
-        eq('element' => :element, 'element_dup' => :element_dup)
-      )
-      expect(duplicate.attributes).to(
-        eq('attribute' => :attribute, 'attribute_dup' => :attribute_dup)
-      )
+      expect(duplicate.elements.keys).to eq(%w[element element_dup])
+      expect(duplicate.elements['element'].attribute).to eq(:element)
+      expect(duplicate.elements['element_dup'].attribute).to eq(:element_dup)
+      expect(duplicate.attributes.keys).to eq(%w[attribute attribute_dup])
+      expect(duplicate.attributes['attribute'].attribute).to eq(:attribute)
+      expect(duplicate.attributes['attribute_dup'].attribute).to eq(:attribute_dup)
       expect(duplicate.content).to eq(:content_dup)
       expect(duplicate.root).to eq('root_dup')
     end

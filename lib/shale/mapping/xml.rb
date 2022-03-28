@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative 'base'
+require_relative 'mapping'
 
 module Shale
   module Mapping
@@ -48,7 +49,7 @@ module Shale
       # @api private
       def map_element(element, to: nil, using: nil)
         validate_arguments(element, to, using)
-        @elements[element] = to || using
+        @elements[element] = Mapping.new(attribute: to, methods: using)
       end
 
       # Map document's attribute to object's attribute
@@ -62,7 +63,7 @@ module Shale
       # @api private
       def map_attribute(attribute, to: nil, using: nil)
         validate_arguments(attribute, to, using)
-        @attributes[attribute] = to || using
+        @attributes[attribute] = Mapping.new(attribute: to, methods: using)
       end
 
       # Map document's content to object's attribute

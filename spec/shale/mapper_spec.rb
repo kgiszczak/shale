@@ -68,69 +68,75 @@ RSpec.describe Shale::Mapper do
     end
 
     it 'copies hash_mapping from parent' do
-      expect(ShaleMapperTesting::Parent.hash_mapping.keys).to(
-        eq({ 'foo' => :foo, 'bar' => :bar, 'baz' => :baz, 'foo_int' => :foo_int })
+      expect(ShaleMapperTesting::Parent.hash_mapping.keys.keys).to eq(%w[foo bar baz foo_int])
+      expect(ShaleMapperTesting::Parent.hash_mapping.keys['foo'].attribute).to eq(:foo)
+      expect(ShaleMapperTesting::Parent.hash_mapping.keys['bar'].attribute).to eq(:bar)
+      expect(ShaleMapperTesting::Parent.hash_mapping.keys['baz'].attribute).to eq(:baz)
+      expect(ShaleMapperTesting::Parent.hash_mapping.keys['foo_int'].attribute).to eq(:foo_int)
+
+      expect(ShaleMapperTesting::Child.hash_mapping.keys.keys).to(
+        eq(%w[foo bar baz foo_int child_foo])
       )
-      expect(ShaleMapperTesting::Child.hash_mapping.keys).to(
-        eq({
-          'foo' => :foo,
-          'bar' => :bar,
-          'baz' => :baz,
-          'foo_int' => :foo_int,
-          'child_foo' => :child_foo,
-        })
-      )
+      expect(ShaleMapperTesting::Child.hash_mapping.keys['foo'].attribute).to eq(:foo)
+      expect(ShaleMapperTesting::Child.hash_mapping.keys['bar'].attribute).to eq(:bar)
+      expect(ShaleMapperTesting::Child.hash_mapping.keys['baz'].attribute).to eq(:baz)
+      expect(ShaleMapperTesting::Child.hash_mapping.keys['foo_int'].attribute).to eq(:foo_int)
+      expect(ShaleMapperTesting::Child.hash_mapping.keys['child_foo'].attribute).to eq(:child_foo)
     end
 
     it 'copies json_mapping from parent' do
-      expect(ShaleMapperTesting::Parent.json_mapping.keys).to(
-        eq({ 'foo' => :foo, 'bar' => :bar, 'baz' => :baz, 'foo_int' => :foo_int })
+      expect(ShaleMapperTesting::Parent.json_mapping.keys.keys).to eq(%w[foo bar baz foo_int])
+      expect(ShaleMapperTesting::Parent.json_mapping.keys['foo'].attribute).to eq(:foo)
+      expect(ShaleMapperTesting::Parent.json_mapping.keys['bar'].attribute).to eq(:bar)
+      expect(ShaleMapperTesting::Parent.json_mapping.keys['baz'].attribute).to eq(:baz)
+      expect(ShaleMapperTesting::Parent.json_mapping.keys['foo_int'].attribute).to eq(:foo_int)
+
+      expect(ShaleMapperTesting::Child.json_mapping.keys.keys).to(
+        eq(%w[foo bar baz foo_int child_foo])
       )
-      expect(ShaleMapperTesting::Child.json_mapping.keys).to(
-        eq({
-          'foo' => :foo,
-          'bar' => :bar,
-          'baz' => :baz,
-          'foo_int' => :foo_int,
-          'child_foo' => :child_foo,
-        })
-      )
+      expect(ShaleMapperTesting::Child.json_mapping.keys['foo'].attribute).to eq(:foo)
+      expect(ShaleMapperTesting::Child.json_mapping.keys['bar'].attribute).to eq(:bar)
+      expect(ShaleMapperTesting::Child.json_mapping.keys['baz'].attribute).to eq(:baz)
+      expect(ShaleMapperTesting::Child.json_mapping.keys['foo_int'].attribute).to eq(:foo_int)
+      expect(ShaleMapperTesting::Child.json_mapping.keys['child_foo'].attribute).to eq(:child_foo)
     end
 
     it 'copies yaml_mapping from parent' do
-      expect(ShaleMapperTesting::Parent.yaml_mapping.keys).to(
-        eq({ 'foo' => :foo, 'bar' => :bar, 'baz' => :baz, 'foo_int' => :foo_int })
+      expect(ShaleMapperTesting::Parent.yaml_mapping.keys.keys).to eq(%w[foo bar baz foo_int])
+      expect(ShaleMapperTesting::Parent.yaml_mapping.keys['foo'].attribute).to eq(:foo)
+      expect(ShaleMapperTesting::Parent.yaml_mapping.keys['bar'].attribute).to eq(:bar)
+      expect(ShaleMapperTesting::Parent.yaml_mapping.keys['baz'].attribute).to eq(:baz)
+      expect(ShaleMapperTesting::Parent.yaml_mapping.keys['foo_int'].attribute).to eq(:foo_int)
+
+      expect(ShaleMapperTesting::Child.yaml_mapping.keys.keys).to(
+        eq(%w[foo bar baz foo_int child_foo])
       )
-      expect(ShaleMapperTesting::Child.yaml_mapping.keys).to(
-        eq({
-          'foo' => :foo,
-          'bar' => :bar,
-          'baz' => :baz,
-          'foo_int' => :foo_int,
-          'child_foo' => :child_foo,
-        })
-      )
+      expect(ShaleMapperTesting::Child.yaml_mapping.keys['foo'].attribute).to eq(:foo)
+      expect(ShaleMapperTesting::Child.yaml_mapping.keys['bar'].attribute).to eq(:bar)
+      expect(ShaleMapperTesting::Child.yaml_mapping.keys['baz'].attribute).to eq(:baz)
+      expect(ShaleMapperTesting::Child.yaml_mapping.keys['foo_int'].attribute).to eq(:foo_int)
+      expect(ShaleMapperTesting::Child.yaml_mapping.keys['child_foo'].attribute).to eq(:child_foo)
     end
 
     it 'copies xml_mapping from parent' do
-      expect(ShaleMapperTesting::Parent.xml_mapping.elements).to(
-        eq({ 'foo' => :foo, 'bar' => :bar, 'baz' => :baz, 'foo_int' => :foo_int })
-      )
-
+      expect(ShaleMapperTesting::Parent.xml_mapping.elements.keys).to eq(%w[foo bar baz foo_int])
+      expect(ShaleMapperTesting::Parent.xml_mapping.elements['foo'].attribute).to eq(:foo)
+      expect(ShaleMapperTesting::Parent.xml_mapping.elements['bar'].attribute).to eq(:bar)
+      expect(ShaleMapperTesting::Parent.xml_mapping.elements['baz'].attribute).to eq(:baz)
+      expect(ShaleMapperTesting::Parent.xml_mapping.elements['foo_int'].attribute).to eq(:foo_int)
       expect(ShaleMapperTesting::Parent.xml_mapping.attributes).to eq({})
       expect(ShaleMapperTesting::Parent.xml_mapping.content).to eq(nil)
-      expect(ShaleMapperTesting::Parent.xml_mapping.root).to(
-        eq('shale_mapper_testing:parent')
-      )
+      expect(ShaleMapperTesting::Parent.xml_mapping.root).to eq('shale_mapper_testing:parent')
 
-      expect(ShaleMapperTesting::Child.xml_mapping.elements).to(
-        eq({
-          'foo' => :foo,
-          'bar' => :bar,
-          'baz' => :baz,
-          'foo_int' => :foo_int,
-          'child_foo' => :child_foo,
-        })
+      expect(ShaleMapperTesting::Child.xml_mapping.elements.keys).to(
+        eq(%w[foo bar baz foo_int child_foo])
+      )
+      expect(ShaleMapperTesting::Child.xml_mapping.elements['foo'].attribute).to eq(:foo)
+      expect(ShaleMapperTesting::Child.xml_mapping.elements['bar'].attribute).to eq(:bar)
+      expect(ShaleMapperTesting::Child.xml_mapping.elements['baz'].attribute).to eq(:baz)
+      expect(ShaleMapperTesting::Child.xml_mapping.elements['foo_int'].attribute).to eq(:foo_int)
+      expect(ShaleMapperTesting::Child.xml_mapping.elements['child_foo'].attribute).to(
+        eq(:child_foo)
       )
 
       expect(ShaleMapperTesting::Child.xml_mapping.attributes).to eq({})
@@ -188,62 +194,74 @@ RSpec.describe Shale::Mapper do
       end
 
       it 'default hash mapping' do
-        expect(ShaleMapperTesting::Parent.hash_mapping.keys).to(
-          eq({ 'foo' => :foo, 'bar' => :bar, 'baz' => :baz, 'foo_int' => :foo_int })
-        )
+        expect(ShaleMapperTesting::Parent.hash_mapping.keys.keys).to eq(%w[foo bar baz foo_int])
+        expect(ShaleMapperTesting::Parent.hash_mapping.keys['foo'].attribute).to eq(:foo)
+        expect(ShaleMapperTesting::Parent.hash_mapping.keys['bar'].attribute).to eq(:bar)
+        expect(ShaleMapperTesting::Parent.hash_mapping.keys['baz'].attribute).to eq(:baz)
+        expect(ShaleMapperTesting::Parent.hash_mapping.keys['foo_int'].attribute).to eq(:foo_int)
       end
 
       it 'default json mapping' do
-        expect(ShaleMapperTesting::Parent.json_mapping.keys).to(
-          eq({ 'foo' => :foo, 'bar' => :bar, 'baz' => :baz, 'foo_int' => :foo_int })
-        )
+        expect(ShaleMapperTesting::Parent.json_mapping.keys.keys).to eq(%w[foo bar baz foo_int])
+        expect(ShaleMapperTesting::Parent.json_mapping.keys['foo'].attribute).to eq(:foo)
+        expect(ShaleMapperTesting::Parent.json_mapping.keys['bar'].attribute).to eq(:bar)
+        expect(ShaleMapperTesting::Parent.json_mapping.keys['baz'].attribute).to eq(:baz)
+        expect(ShaleMapperTesting::Parent.json_mapping.keys['foo_int'].attribute).to eq(:foo_int)
       end
 
       it 'default yaml mapping' do
-        expect(ShaleMapperTesting::Parent.yaml_mapping.keys).to(
-          eq({ 'foo' => :foo, 'bar' => :bar, 'baz' => :baz, 'foo_int' => :foo_int })
-        )
+        expect(ShaleMapperTesting::Parent.yaml_mapping.keys.keys).to eq(%w[foo bar baz foo_int])
+        expect(ShaleMapperTesting::Parent.yaml_mapping.keys['foo'].attribute).to eq(:foo)
+        expect(ShaleMapperTesting::Parent.yaml_mapping.keys['bar'].attribute).to eq(:bar)
+        expect(ShaleMapperTesting::Parent.yaml_mapping.keys['baz'].attribute).to eq(:baz)
+        expect(ShaleMapperTesting::Parent.yaml_mapping.keys['foo_int'].attribute).to eq(:foo_int)
       end
 
       it 'default xml mapping' do
-        expect(ShaleMapperTesting::Parent.xml_mapping.elements).to(
-          eq({ 'foo' => :foo, 'bar' => :bar, 'baz' => :baz, 'foo_int' => :foo_int })
-        )
+        expect(ShaleMapperTesting::Parent.xml_mapping.elements.keys).to eq(%w[foo bar baz foo_int])
+
+        expect(ShaleMapperTesting::Parent.xml_mapping.elements['foo'].attribute).to eq(:foo)
+        expect(ShaleMapperTesting::Parent.xml_mapping.elements['bar'].attribute).to eq(:bar)
+        expect(ShaleMapperTesting::Parent.xml_mapping.elements['baz'].attribute).to eq(:baz)
+        expect(ShaleMapperTesting::Parent.xml_mapping.elements['foo_int'].attribute).to eq(:foo_int)
 
         expect(ShaleMapperTesting::Parent.xml_mapping.attributes).to eq({})
         expect(ShaleMapperTesting::Parent.xml_mapping.content).to eq(nil)
-        expect(ShaleMapperTesting::Parent.xml_mapping.root).to(
-          eq('shale_mapper_testing:parent')
-        )
+        expect(ShaleMapperTesting::Parent.xml_mapping.root).to eq('shale_mapper_testing:parent')
       end
     end
   end
 
   describe '.hash' do
     it 'declares custom Hash mapping' do
-      expect(ShaleMapperTesting::HashMapping.hash_mapping.keys).to eq({ 'bar' => :foo })
+      expect(ShaleMapperTesting::HashMapping.hash_mapping.keys.keys).to eq(['bar'])
+      expect(ShaleMapperTesting::HashMapping.hash_mapping.keys['bar'].attribute).to eq(:foo)
     end
   end
 
   describe '.json' do
     it 'declares custom Hash mapping' do
-      expect(ShaleMapperTesting::JsonMapping.json_mapping.keys).to eq({ 'bar' => :foo })
+      expect(ShaleMapperTesting::JsonMapping.json_mapping.keys.keys).to eq(['bar'])
+      expect(ShaleMapperTesting::JsonMapping.json_mapping.keys['bar'].attribute).to eq(:foo)
     end
   end
 
   describe '.yaml' do
     it 'declares custom Hash mapping' do
-      expect(ShaleMapperTesting::YamlMapping.yaml_mapping.keys).to eq({ 'bar' => :foo })
+      expect(ShaleMapperTesting::YamlMapping.yaml_mapping.keys.keys).to eq(['bar'])
+      expect(ShaleMapperTesting::YamlMapping.yaml_mapping.keys['bar'].attribute).to eq(:foo)
     end
   end
 
   describe '.xml' do
     it 'declares custom Hash mapping' do
-      expect(ShaleMapperTesting::XmlMapping.xml_mapping.elements).to(
-        eq({ 'bar' => :foo_element })
+      expect(ShaleMapperTesting::XmlMapping.xml_mapping.elements.keys).to eq(['bar'])
+      expect(ShaleMapperTesting::XmlMapping.xml_mapping.elements['bar'].attribute).to(
+        eq(:foo_element)
       )
-      expect(ShaleMapperTesting::XmlMapping.xml_mapping.attributes).to(
-        eq({ 'bar' => :foo_attribute })
+      expect(ShaleMapperTesting::XmlMapping.xml_mapping.attributes.keys).to eq(['bar'])
+      expect(ShaleMapperTesting::XmlMapping.xml_mapping.attributes['bar'].attribute).to(
+        eq(:foo_attribute)
       )
       expect(ShaleMapperTesting::XmlMapping.xml_mapping.content).to eq(:foo_content)
       expect(ShaleMapperTesting::XmlMapping.xml_mapping.root).to eq('foobar')

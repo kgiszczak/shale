@@ -25,7 +25,9 @@ RSpec.describe Shale::Mapping::KeyValue do
       it 'adds mapping to keys hash' do
         obj = described_class.new
         obj.map('foo', to: :bar)
-        expect(obj.keys).to eq('foo' => :bar)
+
+        expect(obj.keys.keys).to eq(['foo'])
+        expect(obj.keys['foo'].attribute).to eq(:bar)
       end
     end
 
@@ -54,7 +56,10 @@ RSpec.describe Shale::Mapping::KeyValue do
         it 'adds mapping to keys hash' do
           obj = described_class.new
           obj.map('foo', using: { from: :foo, to: :bar })
-          expect(obj.keys).to eq('foo' => { from: :foo, to: :bar })
+          expect(obj.keys.keys).to eq(['foo'])
+          expect(obj.keys['foo'].attribute).to eq(nil)
+          expect(obj.keys['foo'].method_from).to eq(:foo)
+          expect(obj.keys['foo'].method_to).to eq(:bar)
         end
       end
     end
@@ -68,8 +73,12 @@ RSpec.describe Shale::Mapping::KeyValue do
       duplicate = original.dup
       duplicate.map('baz', to: :qux)
 
-      expect(original.keys).to eq('foo' => :bar)
-      expect(duplicate.keys).to eq('foo' => :bar, 'baz' => :qux)
+      expect(original.keys.keys).to eq(['foo'])
+      expect(original.keys['foo'].attribute).to eq(:bar)
+
+      expect(duplicate.keys.keys).to eq(%w[foo baz])
+      expect(duplicate.keys['foo'].attribute).to eq(:bar)
+      expect(duplicate.keys['baz'].attribute).to eq(:qux)
     end
   end
 end

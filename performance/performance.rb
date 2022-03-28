@@ -28,7 +28,7 @@ Benchmark.ips do |x|
     JSON.parse(json)
   end
 
-  x.report('JSON parse') do
+  x.report('Oj parse') do
     Oj.load(json)
   end
 

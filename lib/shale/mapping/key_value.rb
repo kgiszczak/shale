@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative 'base'
+require_relative 'mapping'
 
 module Shale
   module Mapping
@@ -33,7 +34,7 @@ module Shale
       # @api private
       def map(key, to: nil, using: nil)
         validate_arguments(key, to, using)
-        @keys[key] = to || using
+        @keys[key] = Mapping.new(attribute: to, methods: using)
       end
 
       # @api private

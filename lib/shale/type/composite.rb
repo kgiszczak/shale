@@ -28,10 +28,10 @@ module Shale
                 mapping = mapping_keys[key]
                 next unless mapping
 
-                if mapping.is_a?(Hash)
-                  instance.send(mapping[:from], value)
+                if mapping.method_from
+                  instance.send(mapping.method_from, value)
                 else
-                  attribute = attributes[mapping]
+                  attribute = attributes[mapping.attribute]
                   next unless attribute
 
                   if value.nil?
@@ -64,11 +64,11 @@ module Shale
             def as_#{format}(instance)
               hash = {}
 
-              instance.class.#{format}_mapping.keys.each do |key, attr|
-                if attr.is_a?(Hash)
-                  hash[key] = instance.send(attr[:to])
+              instance.class.#{format}_mapping.keys.each do |key, mapping|
+                if mapping.method_to
+                  hash[key] = instance.send(mapping.method_to)
                 else
-                  attribute = instance.class.attributes[attr]
+                  attribute = instance.class.attributes[mapping.attribute]
                   next unless attribute
 
                   value = instance.public_send(attribute.name)
@@ -153,10 +153,10 @@ module Shale
             mapping = xml_mapping.attributes[key.to_s]
             next unless mapping
 
-            if mapping.is_a?(Hash)
-              instance.send(mapping[:from], value)
+            if mapping.method_from
+              instance.send(mapping.method_from, value)
             else
-              attribute = attributes[mapping]
+              attribute = attributes[mapping.attribute]
               next unless attribute
 
               if attribute.collection?
@@ -179,10 +179,10 @@ module Shale
             mapping = xml_mapping.elements[node.name]
             next unless mapping
 
-            if mapping.is_a?(Hash)
-              instance.send(mapping[:from], node)
+            if mapping.method_from
+              instance.send(mapping.method_from, node)
             else
-              attribute = attributes[mapping]
+              attribute = attributes[mapping.attribute]
               next unless attribute
 
               if attribute.collection?
@@ -227,10 +227,10 @@ module Shale
           element = doc.create_element(node_name)
 
           xml_mapping.attributes.each do |xml_attr, obj_attr|
-            if obj_attr.is_a?(Hash)
-              instance.send(obj_attr[:to], element, doc)
+            if obj_attr.method_to
+              instance.send(obj_attr.method_to, element, doc)
             else
-              attribute = instance.class.attributes[obj_attr]
+              attribute = instance.class.attributes[obj_attr.attribute]
               next unless attribute
 
               value = instance.public_send(attribute.name)
@@ -250,10 +250,10 @@ module Shale
           end
 
           xml_mapping.elements.each do |xml_name, obj_attr|
-            if obj_attr.is_a?(Hash)
-              instance.send(obj_attr[:to], element, doc)
+            if obj_attr.method_to
+              instance.send(obj_attr.method_to, element, doc)
             else
-              attribute = instance.class.attributes[obj_attr]
+              attribute = instance.class.attributes[obj_attr.attribute]
               next unless attribute
 
               value = instance.public_send(attribute.name)
