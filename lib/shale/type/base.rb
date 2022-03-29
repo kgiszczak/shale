@@ -30,7 +30,7 @@ module Shale
         # @return [any]
         #
         # @api private
-        def out_of_hash(value)
+        def of_hash(value)
           value
         end
 
@@ -52,7 +52,7 @@ module Shale
         # @return [any]
         #
         # @api private
-        def out_of_json(value)
+        def of_json(value)
           value
         end
 
@@ -74,7 +74,7 @@ module Shale
         # @return [any]
         #
         # @api private
-        def out_of_yaml(value)
+        def of_yaml(value)
           value
         end
 
@@ -96,7 +96,7 @@ module Shale
         # @return [String]
         #
         # @api private
-        def out_of_xml(node)
+        def of_xml(node)
           node.text
         end
 

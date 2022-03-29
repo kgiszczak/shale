@@ -19,7 +19,7 @@ module Shale
             # @return [Shale::Mapper]
             #
             # @api public
-            def out_of_#{format}(hash)
+            def of_#{format}(hash)
               instance = new
 
               mapping_keys = #{format}_mapping.keys
@@ -41,11 +41,11 @@ module Shale
 
                   if attribute.collection?
                     [*value].each do |val|
-                      val = val ? attribute.type.out_of_#{format}(val) : val
+                      val = val ? attribute.type.of_#{format}(val) : val
                       instance.public_send(attribute.name) << attribute.type.cast(val)
                     end
                   else
-                    val = attribute.type.out_of_#{format}(value)
+                    val = attribute.type.of_#{format}(value)
                     instance.public_send("\#{attribute.name}=", val)
                   end
                 end
@@ -91,7 +91,7 @@ module Shale
           RUBY
         end
 
-        alias from_hash out_of_hash
+        alias from_hash of_hash
 
         alias to_hash as_hash
 
@@ -103,7 +103,7 @@ module Shale
         #
         # @api public
         def from_json(json)
-          out_of_json(Shale.json_adapter.load(json))
+          of_json(Shale.json_adapter.load(json))
         end
 
         # Convert Object to JSON
@@ -125,7 +125,7 @@ module Shale
         #
         # @api public
         def from_yaml(yaml)
-          out_of_yaml(Shale.yaml_adapter.load(yaml))
+          of_yaml(Shale.yaml_adapter.load(yaml))
         end
 
         # Convert Object to YAML
@@ -146,7 +146,7 @@ module Shale
         # @return [Shale::Mapper]
         #
         # @api public
-        def out_of_xml(element)
+        def of_xml(element)
           instance = new
 
           element.attributes.each do |key, value|
@@ -171,7 +171,7 @@ module Shale
             attribute = attributes[xml_mapping.content]
 
             if attribute
-              instance.public_send("#{attribute.name}=", attribute.type.out_of_xml(element))
+              instance.public_send("#{attribute.name}=", attribute.type.of_xml(element))
             end
           end
 
@@ -186,10 +186,10 @@ module Shale
               next unless attribute
 
               if attribute.collection?
-                value = attribute.type.out_of_xml(node)
+                value = attribute.type.of_xml(node)
                 instance.public_send(attribute.name) << attribute.type.cast(value)
               else
-                instance.public_send("#{attribute.name}=", attribute.type.out_of_xml(node))
+                instance.public_send("#{attribute.name}=", attribute.type.of_xml(node))
               end
             end
           end
@@ -205,7 +205,7 @@ module Shale
         #
         # @api public
         def from_xml(xml)
-          out_of_xml(Shale.xml_adapter.load(xml))
+          of_xml(Shale.xml_adapter.load(xml))
         end
 
         # Convert Object to XML document

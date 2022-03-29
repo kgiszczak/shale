@@ -11,9 +11,9 @@ RSpec.describe Shale::Type::Base do
     end
   end
 
-  describe '.out_of_hash' do
+  describe '.of_hash' do
     it 'returns value' do
-      expect(described_class.out_of_hash(123)).to eq(123)
+      expect(described_class.of_hash(123)).to eq(123)
     end
   end
 
@@ -23,9 +23,9 @@ RSpec.describe Shale::Type::Base do
     end
   end
 
-  describe '.out_of_json' do
+  describe '.of_json' do
     it 'returns value' do
-      expect(described_class.out_of_json(123)).to eq(123)
+      expect(described_class.of_json(123)).to eq(123)
     end
   end
 
@@ -35,9 +35,9 @@ RSpec.describe Shale::Type::Base do
     end
   end
 
-  describe '.out_of_yaml' do
+  describe '.of_yaml' do
     it 'returns value' do
-      expect(described_class.out_of_yaml(123)).to eq(123)
+      expect(described_class.of_yaml(123)).to eq(123)
     end
   end
 
@@ -47,14 +47,14 @@ RSpec.describe Shale::Type::Base do
     end
   end
 
-  describe '.out_of_xml' do
+  describe '.of_xml' do
     it 'extracts text from XML node' do
       element = ::REXML::Element.new('name')
       element.add_text('foobar')
 
       node = Shale::Adapter::REXML::Node.new(element)
 
-      expect(described_class.out_of_xml(node)).to eq('foobar')
+      expect(described_class.of_xml(node)).to eq('foobar')
     end
   end
 
