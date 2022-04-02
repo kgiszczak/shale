@@ -24,6 +24,27 @@ module ShaleCompositeTesting
     end
   end
 
+  class ElementNamespaced < Shale::Mapper
+    attribute :attr1, Shale::Type::String
+    attribute :ns1_attr1, Shale::Type::String
+    attribute :ns2_attr1, Shale::Type::String
+    attribute :not_namespaced, Shale::Type::String
+    attribute :ns1_one, Shale::Type::String
+    attribute :ns2_one, Shale::Type::String
+
+    xml do
+      root 'element_namespaced'
+      namespace 'http://ns1.com', 'ns1'
+
+      map_attribute 'attr1', to: :attr1
+      map_attribute 'attr1', to: :ns1_attr1, namespace: 'http://ns1.com', prefix: 'ns1'
+      map_attribute 'attr1', to: :ns2_attr1, namespace: 'http://ns2.com', prefix: 'ns2'
+      map_element 'not_namespaced', to: :not_namespaced, namespace: nil, prefix: nil
+      map_element 'one', to: :ns1_one
+      map_element 'one', to: :ns2_one, namespace: 'http://ns2.com', prefix: 'ns2'
+    end
+  end
+
   class RootType < Shale::Mapper
     attribute :root_attr1, Shale::Type::String
     attribute :root_attr2, Shale::Type::String, collection: true
@@ -33,6 +54,7 @@ module ShaleCompositeTesting
     attribute :root_attr_composite, CompositeType
     attribute :root_attr_using, Shale::Type::String
     attribute :root_attr_attribute_using, Shale::Type::String
+    attribute :element_namespaced, ElementNamespaced
 
     hash do
       map 'root_attr1', to: :root_attr1
@@ -86,6 +108,10 @@ module ShaleCompositeTesting
         from: :root_attr_using_from_xml,
         to: :root_attr_using_to_xml,
       }
+      map_element 'element_namespaced',
+                  to: :element_namespaced,
+                  namespace: 'http://ns1.com',
+                  prefix: 'ns1'
     end
 
     def root_attr_using_from_hash(value)
@@ -267,14 +293,23 @@ RSpec.describe Shale::Type::Composite do
 
   context 'with xml mapping' do
     let(:xml) do
-      <<~XML.gsub(/>\s+/, '>')
-        <root_type attr1='foo' attribute_using='foo' collection='[&quot;collection&quot;]'>
+      <<~XML.gsub(/>\s+/, '>').gsub(/'\s+/, "' ")
+        <root_type attr1='foo'
+          attribute_using='foo'
+          collection='[&quot;collection&quot;]'
+          xmlns:ns1='http://ns1.com'
+          xmlns:ns2='http://ns2.com'>
           <element1>one</element1>
           <element1>two</element1>
           <element1>three</element1>
           <element_bool>false</element_bool>
           <element_composite>bar</element_composite>
           <element_using>foo_element_using</element_using>
+          <ns1:element_namespaced attr1='attr1' ns1:attr1='ns1 attr1' ns2:attr1='ns2 attr1'>
+            <not_namespaced>not namespaced</not_namespaced>
+            <ns1:one>ns1 element one</ns1:one>
+            <ns2:one>ns2 element one</ns2:one>
+          </ns1:element_namespaced>
         </root_type>
       XML
     end
@@ -290,6 +325,12 @@ RSpec.describe Shale::Type::Composite do
         expect(instance.root_attr_composite.composite_attr1).to eq('bar')
         expect(instance.root_attr_using).to eq('foo_element_using')
         expect(instance.root_attr_attribute_using).to eq('foo')
+        expect(instance.element_namespaced.attr1).to eq('attr1')
+        expect(instance.element_namespaced.ns1_attr1).to eq('ns1 attr1')
+        expect(instance.element_namespaced.ns2_attr1).to eq('ns2 attr1')
+        expect(instance.element_namespaced.not_namespaced).to eq('not namespaced')
+        expect(instance.element_namespaced.ns1_one).to eq('ns1 element one')
+        expect(instance.element_namespaced.ns2_one).to eq('ns2 element one')
       end
     end
 
@@ -303,7 +344,15 @@ RSpec.describe Shale::Type::Composite do
           root_bool: false,
           root_attr_composite: ShaleCompositeTesting::CompositeType.new(composite_attr1: 'bar'),
           root_attr_using: 'foo_element_using',
-          root_attr_attribute_using: 'foo'
+          root_attr_attribute_using: 'foo',
+          element_namespaced: ShaleCompositeTesting::ElementNamespaced.new(
+            attr1: 'attr1',
+            ns1_attr1: 'ns1 attr1',
+            ns2_attr1: 'ns2 attr1',
+            not_namespaced: 'not namespaced',
+            ns1_one: 'ns1 element one',
+            ns2_one: 'ns2 element one'
+          )
         )
 
         expect(instance.to_xml).to eq(xml)

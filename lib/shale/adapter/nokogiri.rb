@@ -45,18 +45,27 @@ module Shale
       #
       # @api private
       class Document
-        # Return Nokogiri document
-        #
-        # @return [::Nokogiri::XML::Document]
-        #
-        # @api private
-        attr_reader :doc
-
         # Initialize object
         #
         # @api private
         def initialize
           @doc = ::Nokogiri::XML::Document.new
+          @namespaces = {}
+        end
+
+        # Return Nokogiri document
+        #
+        # @return [::Nokogiri::XML::Document]
+        #
+        # @api private
+        def doc
+          if @doc.root
+            @namespaces.each do |prefix, namespace|
+              @doc.root.add_namespace(prefix, namespace)
+            end
+          end
+
+          @doc
         end
 
         # Create Nokogiri element
@@ -68,6 +77,16 @@ module Shale
         # @api private
         def create_element(name)
           ::Nokogiri::XML::Element.new(name, @doc)
+        end
+
+        # Add XML namespace to document
+        #
+        # @param [String] prefix
+        # @param [String] namespace
+        #
+        # @api private
+        def add_namespace(prefix, namespace)
+          @namespaces[prefix] = namespace if prefix && namespace
         end
 
         # Add attribute to Nokogiri element
@@ -115,7 +134,7 @@ module Shale
           @node = node
         end
 
-        # Return fully qualified name of the node in the format of
+        # Return name of the node in the format of
         # namespace:name when the node is namespaced or just name when it's not
         #
         # @return [String]
@@ -124,11 +143,11 @@ module Shale
         #   node.name # => Bar
         #
         # @example with namespace
-        #   node.name # => foo:Bar
+        #   node.name # => http://foo:Bar
         #
         # @api private
         def name
-          [@node.namespace&.prefix, @node.name].compact.join(':')
+          [@node.namespace&.href, @node.name].compact.join(':')
         end
 
         # Return all attributes associated with the node
@@ -138,7 +157,7 @@ module Shale
         # @api private
         def attributes
           @node.attribute_nodes.each_with_object({}) do |node, hash|
-            name = [node.namespace&.prefix, node.name].compact.join(':')
+            name = [node.namespace&.href, node.name].compact.join(':')
             hash[name] = node.value
           end
         end

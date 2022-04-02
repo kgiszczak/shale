@@ -44,12 +44,15 @@ module ShaleMapperTesting
 
   class XmlMapping < Shale::Mapper
     attribute :foo_element, Shale::Type::String
+    attribute :ns2_element, Shale::Type::String
     attribute :foo_attribute, Shale::Type::String
     attribute :foo_content, Shale::Type::String
 
     xml do
       root 'foobar'
+      namespace 'http://ns1.com', 'ns1'
       map_element 'bar', to: :foo_element
+      map_element 'ns2_bar', to: :ns2_element, namespace: 'http://ns2.com', prefix: 'ns2'
       map_attribute 'bar', to: :foo_attribute
       map_content to: :foo_content
     end
@@ -126,7 +129,7 @@ RSpec.describe Shale::Mapper do
       expect(ShaleMapperTesting::Parent.xml_mapping.elements['foo_int'].attribute).to eq(:foo_int)
       expect(ShaleMapperTesting::Parent.xml_mapping.attributes).to eq({})
       expect(ShaleMapperTesting::Parent.xml_mapping.content).to eq(nil)
-      expect(ShaleMapperTesting::Parent.xml_mapping.root).to eq('shale_mapper_testing:parent')
+      expect(ShaleMapperTesting::Parent.xml_mapping.prefixed_root).to eq('parent')
 
       expect(ShaleMapperTesting::Child.xml_mapping.elements.keys).to(
         eq(%w[foo bar baz foo_int child_foo])
@@ -141,9 +144,7 @@ RSpec.describe Shale::Mapper do
 
       expect(ShaleMapperTesting::Child.xml_mapping.attributes).to eq({})
       expect(ShaleMapperTesting::Child.xml_mapping.content).to eq(nil)
-      expect(ShaleMapperTesting::Child.xml_mapping.root).to(
-        eq('shale_mapper_testing:child')
-      )
+      expect(ShaleMapperTesting::Child.xml_mapping.prefixed_root).to eq('child')
     end
   end
 
@@ -227,7 +228,7 @@ RSpec.describe Shale::Mapper do
 
         expect(ShaleMapperTesting::Parent.xml_mapping.attributes).to eq({})
         expect(ShaleMapperTesting::Parent.xml_mapping.content).to eq(nil)
-        expect(ShaleMapperTesting::Parent.xml_mapping.root).to eq('shale_mapper_testing:parent')
+        expect(ShaleMapperTesting::Parent.xml_mapping.prefixed_root).to(eq('parent'))
       end
     end
   end
@@ -240,31 +241,34 @@ RSpec.describe Shale::Mapper do
   end
 
   describe '.json' do
-    it 'declares custom Hash mapping' do
+    it 'declares custom JSON mapping' do
       expect(ShaleMapperTesting::JsonMapping.json_mapping.keys.keys).to eq(['bar'])
       expect(ShaleMapperTesting::JsonMapping.json_mapping.keys['bar'].attribute).to eq(:foo)
     end
   end
 
   describe '.yaml' do
-    it 'declares custom Hash mapping' do
+    it 'declares custom YAML mapping' do
       expect(ShaleMapperTesting::YamlMapping.yaml_mapping.keys.keys).to eq(['bar'])
       expect(ShaleMapperTesting::YamlMapping.yaml_mapping.keys['bar'].attribute).to eq(:foo)
     end
   end
 
   describe '.xml' do
-    it 'declares custom Hash mapping' do
-      expect(ShaleMapperTesting::XmlMapping.xml_mapping.elements.keys).to eq(['bar'])
-      expect(ShaleMapperTesting::XmlMapping.xml_mapping.elements['bar'].attribute).to(
-        eq(:foo_element)
-      )
-      expect(ShaleMapperTesting::XmlMapping.xml_mapping.attributes.keys).to eq(['bar'])
-      expect(ShaleMapperTesting::XmlMapping.xml_mapping.attributes['bar'].attribute).to(
-        eq(:foo_attribute)
-      )
+    it 'declares custom XML mapping' do
+      elements = ShaleMapperTesting::XmlMapping.xml_mapping.elements
+      attributes = ShaleMapperTesting::XmlMapping.xml_mapping.attributes
+      namespace = ShaleMapperTesting::XmlMapping.xml_mapping.default_namespace
+
+      expect(elements.keys).to eq(%w[http://ns1.com:bar http://ns2.com:ns2_bar])
+      expect(elements['http://ns1.com:bar'].attribute).to eq(:foo_element)
+      expect(elements['http://ns2.com:ns2_bar'].attribute).to eq(:ns2_element)
+      expect(attributes.keys).to eq(['bar'])
+      expect(attributes['bar'].attribute).to eq(:foo_attribute)
       expect(ShaleMapperTesting::XmlMapping.xml_mapping.content).to eq(:foo_content)
-      expect(ShaleMapperTesting::XmlMapping.xml_mapping.root).to eq('foobar')
+      expect(ShaleMapperTesting::XmlMapping.xml_mapping.prefixed_root).to eq('ns1:foobar')
+      expect(namespace.name).to eq('http://ns1.com')
+      expect(namespace.prefix).to eq('ns1')
     end
   end
 

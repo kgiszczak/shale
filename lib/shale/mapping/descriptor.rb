@@ -2,7 +2,17 @@
 
 module Shale
   module Mapping
-    class Mapping
+    # Class representing attribute mapping
+    #
+    # @api private
+    class Descriptor
+      # Return mapping name
+      #
+      # @return [String]
+      #
+      # @api private
+      attr_reader :name
+
       # Return attribute name
       #
       # @return [Symbol]
@@ -26,11 +36,13 @@ module Shale
 
       # Initialize instance
       #
-      # @param [Symbol] attribute
-      # @param [Hash] methods
+      # @param [String] name
+      # @param [Symbol, nil] attribute
+      # @param [Hash, nil] methods
       #
       # @api private
-      def initialize(attribute:, methods:)
+      def initialize(name:, attribute:, methods:)
+        @name = name
         @attribute = attribute
 
         if methods

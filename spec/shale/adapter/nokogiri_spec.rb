@@ -33,8 +33,25 @@ RSpec.describe Shale::Adapter::Nokogiri::Document do
   subject(:doc) { described_class.new }
 
   describe '#doc' do
-    it 'returns Nokogiri::XML::Document instance' do
-      expect(doc.doc.class).to eq(::Nokogiri::XML::Document)
+    context 'without namespaces' do
+      it 'returns Nokogiri::XML::Document instance' do
+        el = doc.create_element('foo')
+        doc.add_element(doc.doc, el)
+
+        expect(doc.doc.class).to eq(::Nokogiri::XML::Document)
+        expect(doc.doc.root.namespaces).to eq({})
+      end
+    end
+
+    context 'with namespaces' do
+      it 'returns REXML::Document instance' do
+        el = doc.create_element('foo')
+        doc.add_element(doc.doc, el)
+        doc.add_namespace('foo', 'http://foo.com')
+
+        expect(doc.doc.class).to eq(::Nokogiri::XML::Document)
+        expect(doc.doc.root.namespaces).to eq({ 'xmlns:foo' => 'http://foo.com' })
+      end
     end
   end
 
@@ -43,6 +60,38 @@ RSpec.describe Shale::Adapter::Nokogiri::Document do
       el = doc.create_element('foo')
       expect(el.class).to eq(::Nokogiri::XML::Element)
       expect(el.name).to eq('foo')
+    end
+  end
+
+  describe '#add_namespace' do
+    context 'when prefix is nil' do
+      it 'does not add namespace to root element' do
+        el = doc.create_element('foo')
+        doc.add_element(doc.doc, el)
+        doc.add_namespace(nil, 'http://foo.com')
+
+        expect(doc.doc.root.namespaces).to eq({})
+      end
+    end
+
+    context 'when namespace is nil' do
+      it 'does not add namespace to root element' do
+        el = doc.create_element('foo')
+        doc.add_element(doc.doc, el)
+        doc.add_namespace('foo', nil)
+
+        expect(doc.doc.root.namespaces).to eq({})
+      end
+    end
+
+    context 'when prefix and namespace are set' do
+      it 'does not add namespace to root element' do
+        el = doc.create_element('foo')
+        doc.add_element(doc.doc, el)
+        doc.add_namespace('foo', 'http://foo.com')
+
+        expect(doc.doc.root.namespaces).to eq({ 'xmlns:foo' => 'http://foo.com' })
+      end
     end
   end
 
@@ -86,9 +135,11 @@ RSpec.describe Shale::Adapter::Nokogiri::Node do
     context 'with namespaced name' do
       it 'returns name of the node' do
         doc = ::Nokogiri::XML::Document.new
-        el = ::Nokogiri::XML::Element.new('foo:bar', doc)
+        el = ::Nokogiri::XML::Element.new('bar', doc)
+        el.add_namespace(nil, 'http://foo.com')
+
         node = described_class.new(el)
-        expect(node.name).to eq('foo:bar')
+        expect(node.name).to eq('http://foo.com:bar')
       end
     end
   end
@@ -97,13 +148,23 @@ RSpec.describe Shale::Adapter::Nokogiri::Node do
     it "returns node's attributes" do
       doc = ::Nokogiri::XML::Document.new
       el = ::Nokogiri::XML::Element.new('foo', doc)
+      el.add_namespace('ns1', 'http://ns1.com')
+      el.add_namespace('ns2', 'http://ns2.com')
+
       el['foo'] = 'foo-value'
       el['bar'] = 'bar-value'
       el['baz'] = 'baz-value'
+
+      el['ns1:foo'] = 'ns1-foo-value'
+      el['ns2:bar'] = 'ns2-bar-value'
+
       node = described_class.new(el)
+
       expect(node.attributes['foo']).to eq('foo-value')
       expect(node.attributes['bar']).to eq('bar-value')
       expect(node.attributes['baz']).to eq('baz-value')
+      expect(node.attributes['http://ns1.com:foo']).to eq('ns1-foo-value')
+      expect(node.attributes['http://ns2.com:bar']).to eq('ns2-bar-value')
     end
   end
 

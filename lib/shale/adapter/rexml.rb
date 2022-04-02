@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'rexml/document'
+require_relative '../utils'
 
 module Shale
   module Adapter
@@ -42,18 +43,27 @@ module Shale
       #
       # @api private
       class Document
-        # Return REXML document
-        #
-        # @return [::REXML::Document]
-        #
-        # @api private
-        attr_reader :doc
-
         # Initialize object
         #
         # @api private
         def initialize
           @doc = ::REXML::Document.new
+          @namespaces = {}
+        end
+
+        # Return REXML document
+        #
+        # @return [::REXML::Document]
+        #
+        # @api private
+        def doc
+          if @doc.root
+            @namespaces.each do |prefix, namespace|
+              @doc.root.add_namespace(prefix, namespace)
+            end
+          end
+
+          @doc
         end
 
         # Create REXML element
@@ -65,6 +75,16 @@ module Shale
         # @api private
         def create_element(name)
           ::REXML::Element.new(name)
+        end
+
+        # Add XML namespace to document
+        #
+        # @param [String] prefix
+        # @param [String] namespace
+        #
+        # @api private
+        def add_namespace(prefix, namespace)
+          @namespaces[prefix] = namespace if prefix && namespace
         end
 
         # Add attribute to REXML element
@@ -112,7 +132,7 @@ module Shale
           @node = node
         end
 
-        # Return fully qualified name of the node in the format of
+        # Return name of the node in the format of
         # namespace:name when the node is namespaced or just name when it's not
         #
         # @return [String]
@@ -121,11 +141,11 @@ module Shale
         #   node.name # => Bar
         #
         # @example with namespace
-        #   node.name # => foo:Bar
+        #   node.name # => http://foo:Bar
         #
         # @api private
         def name
-          @node.expanded_name
+          [Utils.presence(@node.namespace), @node.name].compact.join(':')
         end
 
         # Return all attributes associated with the node
@@ -134,7 +154,14 @@ module Shale
         #
         # @api private
         def attributes
-          @node.attributes
+          attributes = @node.attributes.values.map do |attribute|
+            attribute.is_a?(Hash) ? attribute.values : attribute
+          end.flatten
+
+          attributes.each_with_object({}) do |attribute, hash|
+            name = [Utils.presence(attribute.namespace), attribute.name].compact.join(':')
+            hash[name] = attribute.value
+          end
         end
 
         # Return node's element children

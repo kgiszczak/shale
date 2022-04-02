@@ -32,8 +32,25 @@ RSpec.describe Shale::Adapter::REXML::Document do
   subject(:doc) { described_class.new }
 
   describe '#doc' do
-    it 'returns REXML::Document instance' do
-      expect(doc.doc.class).to eq(::REXML::Document)
+    context 'without namespaces' do
+      it 'returns REXML::Document instance' do
+        el = doc.create_element('foo')
+        doc.add_element(doc.doc, el)
+
+        expect(doc.doc.class).to eq(::REXML::Document)
+        expect(doc.doc.root.namespaces).to eq({})
+      end
+    end
+
+    context 'with namespaces' do
+      it 'returns REXML::Document instance' do
+        el = doc.create_element('foo')
+        doc.add_element(doc.doc, el)
+        doc.add_namespace('foo', 'http://foo.com')
+
+        expect(doc.doc.class).to eq(::REXML::Document)
+        expect(doc.doc.root.namespaces).to eq({ 'foo' => 'http://foo.com' })
+      end
     end
   end
 
@@ -42,6 +59,38 @@ RSpec.describe Shale::Adapter::REXML::Document do
       el = doc.create_element('foo')
       expect(el.class).to eq(::REXML::Element)
       expect(el.name).to eq('foo')
+    end
+  end
+
+  describe '#add_namespace' do
+    context 'when prefix is nil' do
+      it 'does not add namespace to root element' do
+        el = doc.create_element('foo')
+        doc.add_element(doc.doc, el)
+        doc.add_namespace(nil, 'http://foo.com')
+
+        expect(doc.doc.root.namespaces).to eq({})
+      end
+    end
+
+    context 'when namespace is nil' do
+      it 'does not add namespace to root element' do
+        el = doc.create_element('foo')
+        doc.add_element(doc.doc, el)
+        doc.add_namespace('foo', nil)
+
+        expect(doc.doc.root.namespaces).to eq({})
+      end
+    end
+
+    context 'when prefix and namespace are set' do
+      it 'does not add namespace to root element' do
+        el = doc.create_element('foo')
+        doc.add_element(doc.doc, el)
+        doc.add_namespace('foo', 'http://foo.com')
+
+        expect(doc.doc.root.namespaces).to eq({ 'foo' => 'http://foo.com' })
+      end
     end
   end
 
@@ -83,9 +132,11 @@ RSpec.describe Shale::Adapter::REXML::Node do
 
     context 'with namespaced name' do
       it 'returns name of the node' do
-        el = ::REXML::Element.new('foo:bar')
+        el = ::REXML::Element.new('bar')
+        el.add_namespace(nil, 'http://foo.com')
+
         node = described_class.new(el)
-        expect(node.name).to eq('foo:bar')
+        expect(node.name).to eq('http://foo.com:bar')
       end
     end
   end
@@ -93,13 +144,23 @@ RSpec.describe Shale::Adapter::REXML::Node do
   describe '#attributes' do
     it "returns node's attributes" do
       el = ::REXML::Element.new('foo')
+      el.add_namespace('ns1', 'http://ns1.com')
+      el.add_namespace('ns2', 'http://ns2.com')
+
       el.add_attribute('foo', 'foo-value')
       el.add_attribute('bar', 'bar-value')
       el.add_attribute('baz', 'baz-value')
+
+      el.add_attribute('ns1:foo', 'ns1-foo-value')
+      el.add_attribute('ns2:bar', 'ns2-bar-value')
+
       node = described_class.new(el)
+
       expect(node.attributes['foo']).to eq('foo-value')
       expect(node.attributes['bar']).to eq('bar-value')
       expect(node.attributes['baz']).to eq('baz-value')
+      expect(node.attributes['http://ns1.com:foo']).to eq('ns1-foo-value')
+      expect(node.attributes['http://ns2.com:bar']).to eq('ns2-bar-value')
     end
   end
 

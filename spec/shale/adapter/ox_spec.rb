@@ -46,6 +46,13 @@ RSpec.describe Shale::Adapter::Ox::Document do
     end
   end
 
+  # make sure the method is defined and accepts two arguments
+  describe '#add_namespace' do
+    it 'does nothing' do
+      doc.add_namespace('foo', 'bar')
+    end
+  end
+
   describe '#add_attribute' do
     it 'adds attribute to element' do
       el = doc.create_element('foo')

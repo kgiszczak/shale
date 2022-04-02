@@ -66,6 +66,18 @@ module Shale
           ::Ox::Element.new(name)
         end
 
+        # Add XML namespace to document
+        #
+        # Ox doesn't support XML namespaces so this method does nothing.
+        #
+        # @param [String] prefix
+        # @param [String] namespace
+        #
+        # @api private
+        def add_namespace(prefix, namespace)
+          # :noop:
+        end
+
         # Add attribute to Ox element
         #
         # @param [::Ox::Element] element Ox element
@@ -111,8 +123,8 @@ module Shale
           @node = node
         end
 
-        # Return fully qualified name of the node in the format of
-        # namespace:name when the node is namespaced or just name when it's not
+        # Return name of the node in the format of
+        # prefix:name when the node is namespaced or just name when it's not
         #
         # @return [String]
         #

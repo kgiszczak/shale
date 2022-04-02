@@ -64,9 +64,9 @@ module Shale
             def as_#{format}(instance)
               hash = {}
 
-              instance.class.#{format}_mapping.keys.each do |key, mapping|
+              instance.class.#{format}_mapping.keys.each_value do |mapping|
                 if mapping.method_to
-                  hash[key] = instance.send(mapping.method_to)
+                  hash[mapping.name] = instance.send(mapping.method_to)
                 else
                   attribute = instance.class.attributes[mapping.attribute]
                   next unless attribute
@@ -74,14 +74,16 @@ module Shale
                   value = instance.public_send(attribute.name)
 
                   if value.nil?
-                    hash[key] = nil
+                    hash[mapping.name] = nil
                     next
                   end
 
                   if attribute.collection?
-                    hash[key] = [*value].map { |v| v ? attribute.type.as_#{format}(v) : v }
+                    hash[mapping.name] = [*value].map do |v|
+                      v ? attribute.type.as_#{format}(v) : v
+                    end
                   else
-                    hash[key] = attribute.type.as_#{format}(value)
+                    hash[mapping.name] = attribute.type.as_#{format}(value)
                   end
                 end
               end
@@ -220,23 +222,25 @@ module Shale
         def as_xml(instance, node_name = nil, doc = nil)
           unless doc
             doc = Shale.xml_adapter.create_document
-            doc.add_element(doc.doc, as_xml(instance, instance.class.xml_mapping.root, doc))
+            doc.add_element(doc.doc, as_xml(instance, xml_mapping.prefixed_root, doc))
             return doc.doc
           end
 
           element = doc.create_element(node_name)
+          doc.add_namespace(xml_mapping.default_namespace.prefix, xml_mapping.default_namespace.name)
 
-          xml_mapping.attributes.each do |xml_attr, obj_attr|
-            if obj_attr.method_to
-              instance.send(obj_attr.method_to, element, doc)
+          xml_mapping.attributes.each_value do |mapping|
+            if mapping.method_to
+              instance.send(mapping.method_to, element, doc)
             else
-              attribute = instance.class.attributes[obj_attr.attribute]
+              attribute = instance.class.attributes[mapping.attribute]
               next unless attribute
 
               value = instance.public_send(attribute.name)
               next if value.nil?
 
-              doc.add_attribute(element, xml_attr, value)
+              doc.add_namespace(mapping.namespace.prefix, mapping.namespace.name)
+              doc.add_attribute(element, mapping.prefixed_name, value)
             end
           end
 
@@ -249,23 +253,25 @@ module Shale
             end
           end
 
-          xml_mapping.elements.each do |xml_name, obj_attr|
-            if obj_attr.method_to
-              instance.send(obj_attr.method_to, element, doc)
+          xml_mapping.elements.each_value do |mapping|
+            if mapping.method_to
+              instance.send(mapping.method_to, element, doc)
             else
-              attribute = instance.class.attributes[obj_attr.attribute]
+              attribute = instance.class.attributes[mapping.attribute]
               next unless attribute
 
               value = instance.public_send(attribute.name)
               next if value.nil?
 
+              doc.add_namespace(mapping.namespace.prefix, mapping.namespace.name)
+
               if attribute.collection?
                 [*value].each do |v|
                   next if v.nil?
-                  doc.add_element(element, attribute.type.as_xml(v, xml_name, doc))
+                  doc.add_element(element, attribute.type.as_xml(v, mapping.prefixed_name, doc))
                 end
               else
-                doc.add_element(element, attribute.type.as_xml(value, xml_name, doc))
+                doc.add_element(element, attribute.type.as_xml(value, mapping.prefixed_name, doc))
               end
             end
           end
