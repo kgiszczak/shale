@@ -5,10 +5,10 @@ require_relative 'descriptor'
 
 module Shale
   module Mapping
-    # Mapping for key/value serialization formats (Hash/JSON/YAML)
+    # Mapping for dictionary serialization formats (Hash/JSON/YAML)
     #
     # @api private
-    class KeyValue < Base
+    class Dict < Base
       # Return keys mapping hash
       #
       # @return [Hash]

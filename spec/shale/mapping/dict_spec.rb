@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require 'shale/mapping/key_value'
+require 'shale/mapping/dict'
 
-RSpec.describe Shale::Mapping::KeyValue do
+RSpec.describe Shale::Mapping::Dict do
   describe '#keys' do
     it 'returns keys hash' do
       obj = described_class.new

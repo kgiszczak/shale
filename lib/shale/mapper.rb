@@ -3,7 +3,7 @@
 require_relative 'attribute'
 require_relative 'error'
 require_relative 'utils'
-require_relative 'mapping/key_value'
+require_relative 'mapping/dict'
 require_relative 'mapping/xml'
 require_relative 'type/composite'
 
@@ -44,9 +44,9 @@ module Shale
   # @api public
   class Mapper < Type::Composite
     @attributes = {}
-    @hash_mapping = Mapping::KeyValue.new
-    @json_mapping = Mapping::KeyValue.new
-    @yaml_mapping = Mapping::KeyValue.new
+    @hash_mapping = Mapping::Dict.new
+    @json_mapping = Mapping::Dict.new
+    @yaml_mapping = Mapping::Dict.new
     @xml_mapping = Mapping::Xml.new
 
     class << self
@@ -59,21 +59,21 @@ module Shale
 
       # Return Hash mapping object
       #
-      # @return [Shale::Mapping::KeyValue]
+      # @return [Shale::Mapping::Dict]
       #
       # @api public
       attr_reader :hash_mapping
 
       # Return JSON mapping object
       #
-      # @return [Shale::Mapping::KeyValue]
+      # @return [Shale::Mapping::Dict]
       #
       # @api public
       attr_reader :json_mapping
 
       # Return YAML mapping object
       #
-      # @return [Shale::Mapping::KeyValue]
+      # @return [Shale::Mapping::Dict]
       #
       # @api public
       attr_reader :yaml_mapping
