@@ -244,7 +244,6 @@ RSpec.describe Shale::Type::Composite do
   end
 
   context 'with yaml mapping' do
-    # rubocop:disable Layout/TrailingWhitespace
     let(:yaml) do
       <<~YAML
         ---
@@ -253,14 +252,13 @@ RSpec.describe Shale::Type::Composite do
         - one
         - two
         - three
-        root_attr3: 
+        root_attr3:
         root_bool: false
         root_attr_composite:
           composite_attr1: bar
         root_attr_using: using_foo
       YAML
     end
-    # rubocop:enable Layout/TrailingWhitespace
 
     describe '.from_yaml' do
       it 'maps yaml to object' do
