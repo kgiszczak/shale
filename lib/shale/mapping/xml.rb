@@ -1,15 +1,12 @@
 # frozen_string_literal: true
 
-require_relative 'base'
-require_relative 'xml_descriptor'
-require_relative 'xml_namespace'
+require_relative 'descriptor/xml'
+require_relative 'descriptor/xml_namespace'
+require_relative 'validator'
 
 module Shale
   module Mapping
-    class Xml < Base
-      # default value for not defined namespace
-      UNDEFINED = :undefined
-
+    class Xml
       # Return elements mapping hash
       #
       # @return [Hash]
@@ -33,7 +30,7 @@ module Shale
 
       # Return default namespace
       #
-      # @return [Shale::Mapping::XmlNamespace]
+      # @return [Shale::Mapping::Descriptor::XmlNamespace]
       #
       # @api private
       attr_reader :default_namespace
@@ -56,7 +53,7 @@ module Shale
         @attributes = {}
         @content = nil
         @root = ''
-        @default_namespace = XmlNamespace.new
+        @default_namespace = Descriptor::XmlNamespace.new
       end
 
       # Map element to attribute
@@ -70,11 +67,11 @@ module Shale
       # @raise [IncorrectMappingArgumentsError] when arguments are incorrect
       #
       # @api private
-      def map_element(element, to: nil, using: nil, namespace: UNDEFINED, prefix: UNDEFINED)
-        validate_arguments(element, to, using)
-        validate_namespace(element, namespace, prefix)
+      def map_element(element, to: nil, using: nil, namespace: :undefined, prefix: :undefined)
+        Validator.validate_arguments(element, to, using)
+        Validator.validate_namespace(element, namespace, prefix)
 
-        if namespace == UNDEFINED && prefix == UNDEFINED
+        if namespace == :undefined && prefix == :undefined
           nsp = default_namespace.name
           pfx = default_namespace.prefix
         else
@@ -84,11 +81,11 @@ module Shale
 
         namespaced_element = [nsp, element].compact.join(':')
 
-        @elements[namespaced_element] = XmlDescriptor.new(
+        @elements[namespaced_element] = Descriptor::Xml.new(
           name: element,
           attribute: to,
           methods: using,
-          namespace: XmlNamespace.new(nsp, pfx)
+          namespace: Descriptor::XmlNamespace.new(nsp, pfx)
         )
       end
 
@@ -104,16 +101,16 @@ module Shale
       #
       # @api private
       def map_attribute(attribute, to: nil, using: nil, namespace: nil, prefix: nil)
-        validate_arguments(attribute, to, using)
-        validate_namespace(attribute, namespace, prefix)
+        Validator.validate_arguments(attribute, to, using)
+        Validator.validate_namespace(attribute, namespace, prefix)
 
         namespaced_attribute = [namespace, attribute].compact.join(':')
 
-        @attributes[namespaced_attribute] = XmlDescriptor.new(
+        @attributes[namespaced_attribute] = Descriptor::Xml.new(
           name: attribute,
           attribute: to,
           methods: using,
-          namespace: XmlNamespace.new(namespace, prefix)
+          namespace: Descriptor::XmlNamespace.new(namespace, prefix)
         )
       end
 
@@ -155,29 +152,6 @@ module Shale
         @default_namespace = other.instance_variable_get('@default_namespace').dup
 
         super
-      end
-
-      private
-
-      # Validate correctness of namespace arguments
-      #
-      # @param [String] key
-      # @param [String, Symbol, nil] namespace
-      # @param [String, Symbol, nil] prefix
-      #
-      # @raise [IncorrectMappingArgumentsError] when arguments are incorrect
-      #
-      # @api private
-      def validate_namespace(key, namespace, prefix)
-        return if namespace == UNDEFINED && prefix == UNDEFINED
-
-        nsp = namespace == UNDEFINED ? nil : namespace
-        pfx = prefix == UNDEFINED ? nil : prefix
-
-        if (nsp && !pfx) || (!nsp && pfx)
-          msg = "both :namespace and :prefix arguments are required for mapping '#{key}'"
-          raise IncorrectMappingArgumentsError, msg
-        end
       end
     end
   end

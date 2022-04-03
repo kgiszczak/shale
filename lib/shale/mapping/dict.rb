@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
-require_relative 'base'
-require_relative 'descriptor'
+require_relative 'descriptor/dict'
+require_relative 'validator'
 
 module Shale
   module Mapping
     # Mapping for dictionary serialization formats (Hash/JSON/YAML)
     #
     # @api private
-    class Dict < Base
+    class Dict
       # Return keys mapping hash
       #
       # @return [Hash]
@@ -34,8 +34,8 @@ module Shale
       #
       # @api private
       def map(key, to: nil, using: nil)
-        validate_arguments(key, to, using)
-        @keys[key] = Descriptor.new(name: key, attribute: to, methods: using)
+        Validator.validate_arguments(key, to, using)
+        @keys[key] = Descriptor::Dict.new(name: key, attribute: to, methods: using)
       end
 
       # @api private

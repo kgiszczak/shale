@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require 'shale/mapping/xml_namespace'
+require 'shale/mapping/descriptor/xml_namespace'
 
-RSpec.describe Shale::Mapping::XmlNamespace do
+RSpec.describe Shale::Mapping::Descriptor::XmlNamespace do
   describe '#name' do
     it 'returns name' do
       obj = described_class.new('foo', 'bar')

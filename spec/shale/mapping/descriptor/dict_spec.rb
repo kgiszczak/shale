@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require 'shale/mapping/descriptor'
+require 'shale/mapping/descriptor/dict'
 
-RSpec.describe Shale::Mapping::Descriptor do
+RSpec.describe Shale::Mapping::Descriptor::Dict do
   describe '#name' do
     it 'returns name' do
       obj = described_class.new(name: 'foo', attribute: :bar, methods: nil)

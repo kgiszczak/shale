@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require 'shale/mapping/xml_descriptor'
-require 'shale/mapping/xml_namespace'
+require 'shale/mapping/descriptor/xml'
+require 'shale/mapping/descriptor/xml_namespace'
 
-RSpec.describe Shale::Mapping::XmlDescriptor do
+RSpec.describe Shale::Mapping::Descriptor::Xml do
   describe '#prefixed_name' do
     context 'when prefix is present' do
       it 'returns name prefixed by namespace prefix' do
@@ -11,7 +11,7 @@ RSpec.describe Shale::Mapping::XmlDescriptor do
           name: 'foo',
           attribute: :foo,
           methods: nil,
-          namespace: Shale::Mapping::XmlNamespace.new('http://bar.com', 'bar')
+          namespace: Shale::Mapping::Descriptor::XmlNamespace.new('http://bar.com', 'bar')
         )
 
         expect(obj.prefixed_name).to eq('bar:foo')
@@ -24,7 +24,7 @@ RSpec.describe Shale::Mapping::XmlDescriptor do
           name: 'foo',
           attribute: :foo,
           methods: nil,
-          namespace: Shale::Mapping::XmlNamespace.new
+          namespace: Shale::Mapping::Descriptor::XmlNamespace.new
         )
 
         expect(obj.prefixed_name).to eq('foo')
