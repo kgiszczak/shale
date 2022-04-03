@@ -284,7 +284,7 @@ RSpec.describe Shale::Type::Composite do
           root_attr_using: 'using_foo'
         )
 
-        expect(instance.to_yaml).to eq(yaml)
+        expect(instance.to_yaml.gsub(/ +$/, '')).to eq(yaml)
       end
     end
   end
