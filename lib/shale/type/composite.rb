@@ -111,12 +111,13 @@ module Shale
         # Convert Object to JSON
         #
         # @param [Shale::Type::Base] instance Object to convert
+        # @param [Array<Symbol>] options
         #
         # @return [String]
         #
         # @api public
-        def to_json(instance)
-          Shale.json_adapter.dump(as_json(instance))
+        def to_json(instance, *options)
+          Shale.json_adapter.dump(as_json(instance), *options)
         end
 
         # Convert YAML to Object
@@ -282,12 +283,13 @@ module Shale
         # Convert Object to XML
         #
         # @param [Shale::Type::Base] instance Object to convert
+        # @param [Array<Symbol>] options
         #
         # @return [String]
         #
         # @api public
-        def to_xml(instance)
-          Shale.xml_adapter.dump(as_xml(instance))
+        def to_xml(instance, *options)
+          Shale.xml_adapter.dump(as_xml(instance), *options)
         end
       end
 
@@ -302,11 +304,13 @@ module Shale
 
       # Convert Object to JSON
       #
+      # @param [Array<Symbol>] options
+      #
       # @return [String]
       #
       # @api public
-      def to_json
-        self.class.to_json(self)
+      def to_json(*options)
+        self.class.to_json(self, *options)
       end
 
       # Convert Object to YAML
@@ -320,11 +324,13 @@ module Shale
 
       # Convert Object to XML
       #
+      # @param [Array<Symbol>] options
+      #
       # @return [String]
       #
       # @api public
-      def to_xml
-        self.class.to_xml(self)
+      def to_xml(*options)
+        self.class.to_xml(self, *options)
       end
     end
   end

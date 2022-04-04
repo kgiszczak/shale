@@ -12,12 +12,55 @@ RSpec.describe Shale::Adapter::Ox do
   end
 
   describe '.dump' do
-    it 'generates XML document' do
-      el = ::Ox::Element.new('foo')
+    let(:doc) do
+      bar = ::Ox::Element.new('bar')
+      bar << 'Hello'
+      foo = ::Ox::Element.new('foo')
+      foo << bar
       doc = ::Ox::Document.new
-      doc << el
-      xml = described_class.dump(doc)
-      expect(xml).to eq("\n<foo/>\n")
+      doc << foo
+      doc
+    end
+
+    context 'with no params' do
+      it 'generates XML document' do
+        xml = described_class.dump(doc)
+        expect(xml).to eq('<foo><bar>Hello</bar></foo>')
+      end
+    end
+
+    context 'with :pretty param' do
+      it 'generates XML document and formats it' do
+        xml = described_class.dump(doc, :pretty)
+        expected = <<~XML
+          <foo>
+            <bar>Hello</bar>
+          </foo>
+        XML
+
+        expect(xml).to eq(expected)
+      end
+    end
+
+    context 'with :declaration param' do
+      it 'generates XML document with declaration' do
+        xml = described_class.dump(doc, :declaration)
+        expect(xml).to eq('<?xml version="1.0"?><foo><bar>Hello</bar></foo>')
+      end
+    end
+
+    context 'with :pretty and :declaration param' do
+      it 'generates XML document with declaration and formats it' do
+        xml = described_class.dump(doc, :pretty, :declaration)
+        expected = <<~XML
+          <?xml version="1.0"?>
+          <foo>
+            <bar>Hello</bar>
+          </foo>
+        XML
+
+        expect(xml).to eq(expected)
+      end
     end
   end
 

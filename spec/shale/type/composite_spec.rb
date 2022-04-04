@@ -202,13 +202,19 @@ RSpec.describe Shale::Type::Composite do
 
   context 'with json mapping' do
     let(:json) do
-      <<~JSON.gsub(/\s+/, '')
+      <<~JSON
         {
           "root_attr1": "foo",
-          "root_attr2": ["one", "two", "three"],
+          "root_attr2": [
+            "one",
+            "two",
+            "three"
+          ],
           "root_attr3": null,
           "root_bool": false,
-          "root_attr_composite": { "composite_attr1": "bar" },
+          "root_attr_composite": {
+            "composite_attr1": "bar"
+          },
           "root_attr_using": "using_foo"
         }
       JSON
@@ -228,17 +234,34 @@ RSpec.describe Shale::Type::Composite do
     end
 
     describe '.to_json' do
-      it 'converts objects to json' do
-        instance = ShaleCompositeTesting::RootType.new(
-          root_attr1: 'foo',
-          root_attr2: %w[one two three],
-          root_attr3: nil,
-          root_bool: false,
-          root_attr_composite: ShaleCompositeTesting::CompositeType.new(composite_attr1: 'bar'),
-          root_attr_using: 'using_foo'
-        )
+      context 'without params' do
+        it 'converts objects to json' do
+          instance = ShaleCompositeTesting::RootType.new(
+            root_attr1: 'foo',
+            root_attr2: %w[one two three],
+            root_attr3: nil,
+            root_bool: false,
+            root_attr_composite: ShaleCompositeTesting::CompositeType.new(composite_attr1: 'bar'),
+            root_attr_using: 'using_foo'
+          )
 
-        expect(instance.to_json).to eq(json)
+          expect(instance.to_json).to eq(json.gsub(/\s+/, ''))
+        end
+      end
+
+      context 'with :pretty param' do
+        it 'converts objects to json and formats it' do
+          instance = ShaleCompositeTesting::RootType.new(
+            root_attr1: 'foo',
+            root_attr2: %w[one two three],
+            root_attr3: nil,
+            root_bool: false,
+            root_attr_composite: ShaleCompositeTesting::CompositeType.new(composite_attr1: 'bar'),
+            root_attr_using: 'using_foo'
+          )
+
+          expect(instance.to_json(:pretty)).to eq(json.sub(/\n\z/, ''))
+        end
       end
     end
   end
@@ -291,19 +314,19 @@ RSpec.describe Shale::Type::Composite do
 
   context 'with xml mapping' do
     let(:xml) do
-      <<~XML.gsub(/>\s+/, '>').gsub(/'\s+/, "' ")
-        <root_type attr1='foo'
-          attribute_using='foo'
-          collection='[&quot;collection&quot;]'
-          xmlns:ns1='http://ns1.com'
-          xmlns:ns2='http://ns2.com'>
+      <<~XML
+        <root_type attr1="foo"
+          attribute_using="foo"
+          collection="[&quot;collection&quot;]"
+          xmlns:ns1="http://ns1.com"
+          xmlns:ns2="http://ns2.com">
           <element1>one</element1>
           <element1>two</element1>
           <element1>three</element1>
           <element_bool>false</element_bool>
           <element_composite>bar</element_composite>
           <element_using>foo_element_using</element_using>
-          <ns1:element_namespaced attr1='attr1' ns1:attr1='ns1 attr1' ns2:attr1='ns2 attr1'>
+          <ns1:element_namespaced attr1="attr1" ns1:attr1="ns1 attr1" ns2:attr1="ns2 attr1">
             <not_namespaced>not namespaced</not_namespaced>
             <ns1:one>ns1 element one</ns1:one>
             <ns2:one>ns2 element one</ns2:one>
@@ -333,33 +356,97 @@ RSpec.describe Shale::Type::Composite do
     end
 
     describe '.to_xml' do
-      it 'converts objects to xml' do
-        instance = ShaleCompositeTesting::RootType.new(
-          root_attr1: 'foo',
-          root_attr2: %w[one two three],
-          root_attr3: nil,
-          root_collection: ['collection'],
-          root_bool: false,
-          root_attr_composite: ShaleCompositeTesting::CompositeType.new(composite_attr1: 'bar'),
-          root_attr_using: 'foo_element_using',
-          root_attr_attribute_using: 'foo',
-          element_namespaced: ShaleCompositeTesting::ElementNamespaced.new(
-            attr1: 'attr1',
-            ns1_attr1: 'ns1 attr1',
-            ns2_attr1: 'ns2 attr1',
-            not_namespaced: 'not namespaced',
-            ns1_one: 'ns1 element one',
-            ns2_one: 'ns2 element one'
+      context 'without params' do
+        it 'converts objects to xml' do
+          instance = ShaleCompositeTesting::RootType.new(
+            root_attr1: 'foo',
+            root_attr2: %w[one two three],
+            root_attr3: nil,
+            root_collection: ['collection'],
+            root_bool: false,
+            root_attr_composite: ShaleCompositeTesting::CompositeType.new(composite_attr1: 'bar'),
+            root_attr_using: 'foo_element_using',
+            root_attr_attribute_using: 'foo',
+            element_namespaced: ShaleCompositeTesting::ElementNamespaced.new(
+              attr1: 'attr1',
+              ns1_attr1: 'ns1 attr1',
+              ns2_attr1: 'ns2 attr1',
+              not_namespaced: 'not namespaced',
+              ns1_one: 'ns1 element one',
+              ns2_one: 'ns2 element one'
+            )
           )
-        )
 
-        expect(instance.to_xml).to eq(xml)
+          expect(instance.to_xml).to eq(xml.gsub(/>\s+/, '>').gsub(/"\s+/, '" '))
+        end
+
+        it 'converts blank attributes to xml' do
+          instance = ShaleCompositeTesting::RootType.new(root_attr1: '')
+          expected = '<root_type attr1="" collection="[]"><element_using/></root_type>'
+          expect(instance.to_xml).to eq(expected)
+        end
       end
 
-      it 'converts blank attributes to xml' do
-        instance = ShaleCompositeTesting::RootType.new(root_attr1: '')
-        expected = "<root_type attr1='' collection='[]'><element_using/></root_type>"
-        expect(instance.to_xml).to eq(expected)
+      context 'with :pretty param' do
+        it 'converts objects to xml and formats it' do
+          instance = ShaleCompositeTesting::RootType.new(
+            root_attr1: 'foo',
+            root_bool: false,
+            root_attr_using: 'foo_element_using',
+            root_attr_attribute_using: 'foo'
+          )
+
+          xml = <<~XML.sub(/\n\z/, '')
+            <root_type attr1="foo" collection="[]" attribute_using="foo">
+              <element_bool>false</element_bool>
+              <element_using>foo_element_using</element_using>
+            </root_type>
+          XML
+
+          expect(instance.to_xml(:pretty)).to eq(xml)
+        end
+      end
+
+      context 'with :declaration param' do
+        it 'converts objects to xml with declaration' do
+          instance = ShaleCompositeTesting::RootType.new(
+            root_attr1: 'foo',
+            root_bool: false,
+            root_attr_using: 'foo_element_using',
+            root_attr_attribute_using: 'foo'
+          )
+
+          xml = <<~XML.gsub(/>\s+/, '>').gsub(/'\s+/, "' ")
+            <?xml version="1.0"?>
+            <root_type attr1="foo" attribute_using="foo" collection="[]">
+              <element_bool>false</element_bool>
+              <element_using>foo_element_using</element_using>
+            </root_type>
+          XML
+
+          expect(instance.to_xml(:declaration)).to eq(xml)
+        end
+      end
+
+      context 'with :pretty and :declaration param' do
+        it 'converts objects to xml with declaration and formats it' do
+          instance = ShaleCompositeTesting::RootType.new(
+            root_attr1: 'foo',
+            root_bool: false,
+            root_attr_using: 'foo_element_using',
+            root_attr_attribute_using: 'foo'
+          )
+
+          xml = <<~XML.sub(/\n\z/, '')
+            <?xml version="1.0"?>
+            <root_type attr1="foo" collection="[]" attribute_using="foo">
+              <element_bool>false</element_bool>
+              <element_using>foo_element_using</element_using>
+            </root_type>
+          XML
+
+          expect(instance.to_xml(:pretty, :declaration)).to eq(xml)
+        end
       end
     end
   end

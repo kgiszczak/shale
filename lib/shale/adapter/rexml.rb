@@ -24,12 +24,27 @@ module Shale
       # Serialize REXML document into XML
       #
       # @param [::REXML::Document] doc REXML document
+      # @param [Array<Symbol>] options
       #
       # @return [String]
       #
       # @api private
-      def self.dump(doc)
-        doc.to_s
+      def self.dump(doc, *options)
+        if options.include?(:declaration)
+          doc.add(::REXML::XMLDecl.new)
+        end
+
+        io = StringIO.new
+
+        if options.include?(:pretty)
+          formatter = ::REXML::Formatters::Pretty.new
+          formatter.compact = true
+        else
+          formatter = ::REXML::Formatters::Default.new
+        end
+
+        formatter.write(doc, io)
+        io.string
       end
 
       # Create Shale::Adapter::REXML::Document instance
@@ -47,7 +62,8 @@ module Shale
         #
         # @api private
         def initialize
-          @doc = ::REXML::Document.new
+          context = { attribute_quote: :quote, prologue_quote: :quote }
+          @doc = ::REXML::Document.new(nil, context)
           @namespaces = {}
         end
 
@@ -74,7 +90,7 @@ module Shale
         #
         # @api private
         def create_element(name)
-          ::REXML::Element.new(name)
+          ::REXML::Element.new(name, nil, attribute_quote: :quote)
         end
 
         # Add XML namespace to document

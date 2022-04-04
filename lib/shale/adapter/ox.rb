@@ -22,12 +22,24 @@ module Shale
       # Serialize Ox document into XML
       #
       # @param [::Ox::Document, ::Ox::Element] doc Ox document
+      # @param [Array<Symbol>] options
       #
       # @return [String]
       #
       # @api private
-      def self.dump(doc)
-        ::Ox.dump(doc)
+      def self.dump(doc, *options)
+        opts = { indent: -1, with_xml: false }
+
+        if options.include?(:pretty)
+          opts[:indent] = 2
+        end
+
+        if options.include?(:declaration)
+          doc[:version] = '1.0'
+          opts[:with_xml] = true
+        end
+
+        ::Ox.dump(doc, opts).sub(/\A\n/, '')
       end
 
       # Create Shale::Adapter::Ox::Document instance

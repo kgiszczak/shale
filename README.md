@@ -491,6 +491,36 @@ DATA
 #  @city="London">
 ```
 
+### Pretty printing and XML declaration
+
+If you need formatted output you can pass `:pretty` parameter to `#to_json` and `#to_xml`
+
+```ruby
+person.to_json(:pretty)
+
+# =>
+#
+# {
+#   "name": "John Doe",
+#   "address": {
+#     "city": "London"
+#   }
+# }
+```
+
+You can also add an XML declaration by passing `:declaration` to `#to_xml`
+
+```ruby
+person.to_xml(:pretty, :declaration)
+
+# =>
+#
+# <?xml version="1.0"?>
+# <Person>
+#   <Address city="London"/>
+# </Person>
+```
+
 ### Supported types
 
 Shale supports these types out of the box:
@@ -533,7 +563,7 @@ Shale.json_adapter = MultiJson
 Shale.yaml_adapter = MyYamlAdapter
 ```
 
-For XML, Shale provides adapters for most popular Ruby XML parsers:
+Shale provides adapters for most popular Ruby XML parsers:
 
 ```ruby
 require 'shale'

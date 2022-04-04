@@ -26,12 +26,29 @@ module Shale
       # Serialize Nokogiri document into XML
       #
       # @param [::Nokogiri::XML::Document] doc Nokogiri document
+      # @param [Array<Symbol>] options
       #
       # @return [String]
       #
       # @api private
-      def self.dump(doc)
-        doc.to_xml
+      def self.dump(doc, *options)
+        save_with = ::Nokogiri::XML::Node::SaveOptions::AS_XML
+
+        if options.include?(:pretty)
+          save_with |= ::Nokogiri::XML::Node::SaveOptions::FORMAT
+        end
+
+        unless options.include?(:declaration)
+          save_with |= ::Nokogiri::XML::Node::SaveOptions::NO_DECLARATION
+        end
+
+        result = doc.to_xml(save_with: save_with)
+
+        unless options.include?(:pretty)
+          result = result.sub(/\n/, '')
+        end
+
+        result
       end
 
       # Create Shale::Adapter::Nokogiri::Document instance
