@@ -384,7 +384,7 @@ class Person < Shale::Mapper
     map_element 'last_name', to: :last_name, namespace: 'http://ns2.com', prefix: 'ns2'
 
     map_attribute 'age', to: :age
-    map_attribute 'hobby', to: :age, namespace: 'http://ns1.com', prefix: 'ns1'
+    map_attribute 'hobby', to: :hobby, namespace: 'http://ns1.com', prefix: 'ns1'
   end
 end
 
