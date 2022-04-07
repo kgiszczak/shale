@@ -266,7 +266,7 @@ class Person < Shale::Mapper
   attribute :first_name, Shale::Type::String
   attribute :last_name, Shale::Type::String
 
-  hash do
+  hsh do
     map 'firstName', to: :first_name
     map 'lastName', to: :last_name
   end

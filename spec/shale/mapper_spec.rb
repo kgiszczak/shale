@@ -21,7 +21,7 @@ module ShaleMapperTesting
   class HashMapping < Shale::Mapper
     attribute :foo, Shale::Type::String
 
-    hash do
+    hsh do
       map 'bar', to: :foo
     end
   end
@@ -233,7 +233,7 @@ RSpec.describe Shale::Mapper do
     end
   end
 
-  describe '.hash' do
+  describe '.hsh' do
     it 'declares custom Hash mapping' do
       expect(ShaleMapperTesting::HashMapping.hash_mapping.keys.keys).to eq(['bar'])
       expect(ShaleMapperTesting::HashMapping.hash_mapping.keys['bar'].attribute).to eq(:foo)

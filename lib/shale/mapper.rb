@@ -167,7 +167,7 @@ module Shale
       #     attribute :last_name, Shale::Type::String
       #     attribute :age, Shale::Type::Integer
       #
-      #     yaml do
+      #     hsh do
       #       map 'firatName', to: :first_name
       #       map 'lastName', to: :last_name
       #       map 'age', to: :age
@@ -175,7 +175,7 @@ module Shale
       #   end
       #
       # @api public
-      def hash(&block)
+      def hsh(&block)
         @hash_mapping = @__hash_mapping_init.dup
         @hash_mapping.instance_eval(&block)
       end
@@ -190,7 +190,7 @@ module Shale
       #     attribute :last_name, Shale::Type::String
       #     attribute :age, Shale::Type::Integer
       #
-      #     yaml do
+      #     json do
       #       map 'firatName', to: :first_name
       #       map 'lastName', to: :last_name
       #       map 'age', to: :age

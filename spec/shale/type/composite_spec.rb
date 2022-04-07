@@ -6,7 +6,7 @@ module ShaleCompositeTesting
   class CompositeType < Shale::Mapper
     attribute :composite_attr1, Shale::Type::String
 
-    hash do
+    hsh do
       map 'composite_attr1', to: :composite_attr1
     end
 
@@ -56,7 +56,7 @@ module ShaleCompositeTesting
     attribute :root_attr_attribute_using, Shale::Type::String
     attribute :element_namespaced, ElementNamespaced
 
-    hash do
+    hsh do
       map 'root_attr1', to: :root_attr1
       map 'root_attr2', to: :root_attr2
       map 'root_attr3', to: :root_attr3
