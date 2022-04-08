@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative 'base'
+require_relative 'value'
 
 module Shale
   module Type
@@ -8,7 +8,7 @@ module Shale
     # It serves as a base type class for @see Shale::Mapper
     #
     # @api private
-    class Composite < Base
+    class Composite < Value
       class << self
         %i[hash json yaml].each do |format|
           class_eval(<<-RUBY, __FILE__, __LINE__ + 1)
@@ -56,7 +56,7 @@ module Shale
 
             # Convert Object to Hash using Hash/JSON/YAML mapping
             #
-            # @param [Shale::Type::Base] instance Object to convert
+            # @param [Shale::Mapper] instance Object to convert
             #
             # @return [Hash]
             #
@@ -110,7 +110,7 @@ module Shale
 
         # Convert Object to JSON
         #
-        # @param [Shale::Type::Base] instance Object to convert
+        # @param [Shale::Mapper] instance Object to convert
         # @param [Array<Symbol>] options
         #
         # @return [String]
@@ -133,7 +133,7 @@ module Shale
 
         # Convert Object to YAML
         #
-        # @param [Shale::Type::Base] instance Object to convert
+        # @param [Shale::Mapper] instance Object to convert
         #
         # @return [String]
         #
@@ -213,7 +213,7 @@ module Shale
 
         # Convert Object to XML document
         #
-        # @param [Shale::Type::Base] instance Object to convert
+        # @param [Shale::Mapper] instance Object to convert
         # @param [String, nil] node_name XML node name
         # @param [Shale::Adapter::<xml adapter>::Document, nil] doc Object to convert
         #
@@ -282,7 +282,7 @@ module Shale
 
         # Convert Object to XML
         #
-        # @param [Shale::Type::Base] instance Object to convert
+        # @param [Shale::Mapper] instance Object to convert
         # @param [Array<Symbol>] options
         #
         # @return [String]

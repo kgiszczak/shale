@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
 require 'date'
-require_relative 'base'
+require_relative 'value'
 
 module Shale
   module Type
     # Cast value to Date
     #
     # @api public
-    class Date < Base
+    class Date < Value
       # @param [any] value Value to cast
       #
       # @return [Date, nil]

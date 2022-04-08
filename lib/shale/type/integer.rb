@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
-require_relative 'base'
+require_relative 'value'
 
 module Shale
   module Type
     # Cast value to Integer
     #
     # @api public
-    class Integer < Base
+    class Integer < Value
       # @param [#to_i, nil] value Value to cast
       #
       # @return [Integer, nil]

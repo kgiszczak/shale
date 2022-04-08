@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
-require_relative 'base'
+require_relative 'value'
 
 module Shale
   module Type
     # Cast value to Float
     #
     # @api public
-    class Float < Base
+    class Float < Value
       # @param [#to_f, String, nil] value Value to cast
       #
       # @return [Float, nil]

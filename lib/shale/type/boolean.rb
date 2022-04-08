@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
-require_relative 'base'
+require_relative 'value'
 
 module Shale
   module Type
     # Cast value to Boolean
     #
     # @api public
-    class Boolean < Base
+    class Boolean < Value
       FALSE_VALUES = [
         false,
         0,

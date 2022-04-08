@@ -23,7 +23,7 @@ module Shale
     # Initialize Attribute object
     #
     # @param [Symbol] name Name of the attribute
-    # @param [Shale::Type::Base] type Type of the attribute
+    # @param [Shale::Type::Value] type Type of the attribute
     # @param [Boolean] collection Is this attribute a collection
     # @param [Proc] default Default value
     #

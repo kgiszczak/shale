@@ -108,7 +108,7 @@ module Shale
       # Define attribute on class
       #
       # @param [Symbol] name Name of the attribute
-      # @param [Shale::Type::Base] type Type of the attribute
+      # @param [Shale::Type::Value] type Type of the attribute
       # @param [Boolean] collection Is the attribute a collection
       # @param [Proc] default Default value for the attribute
       #

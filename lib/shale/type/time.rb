@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
 require 'time'
-require_relative 'base'
+require_relative 'value'
 
 module Shale
   module Type
     # Cast value to Time
     #
     # @api public
-    class Time < Base
+    class Time < Value
       # @param [any] value Value to cast
       #
       # @return [Time, nil]

@@ -5,12 +5,12 @@ module Shale
     # Base class for all types
     #
     # @example
-    #   class MyType < Shale::Type::Base
+    #   class MyType < Shale::Type::Value
     #     ... overwrite methods as needed
     #   end
     #
     # @api public
-    class Base
+    class Value
       class << self
         # Cast raw value to a type. Base form just returns whatever it receives
         #

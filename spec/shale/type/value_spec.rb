@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require 'shale/type/base'
+require 'shale/type/value'
 require 'shale/adapter/rexml'
 require 'rexml/document'
 
-RSpec.describe Shale::Type::Base do
+RSpec.describe Shale::Type::Value do
   describe '.cast' do
     it 'returns value' do
       expect(described_class.cast(123)).to eq(123)

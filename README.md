@@ -534,12 +534,12 @@ Shale supports these types out of the box:
 
 ### Writing your own type
 
-To add your own type extend it from `Shale::Type::Base` and implement `.cast` class method.
+To add your own type extend it from `Shale::Type::Value` and implement `.cast` class method.
 
 ```ruby
-require 'shale/type/base'
+require 'shale/type/value'
 
-class MyIntegerType < Shale::Type::Base
+class MyIntegerType < Shale::Type::Value
   def self.cast(value)
     value.to_i
   end

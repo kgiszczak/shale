@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
-require_relative 'base'
+require_relative 'value'
 
 module Shale
   module Type
     # Cast value to String
     #
     # @api public
-    class String < Base
+    class String < Value
       # @param [#to_s, nil] value Value to cast
       #
       # @return [String, nil]
