@@ -35,4 +35,53 @@ RSpec.describe Shale::Type::Date do
       end
     end
   end
+
+  describe '.as_json' do
+    context 'when value is nil' do
+      it 'returns nil' do
+        expect(described_class.as_json(nil)).to eq(nil)
+      end
+    end
+
+    context 'when value is present' do
+      it 'returns ISO formatted date' do
+        date = Date.new(2021, 1, 1)
+        expect(described_class.as_json(date)).to eq('2021-01-01')
+      end
+    end
+  end
+
+  describe '.as_yaml' do
+    context 'when value is nil' do
+      it 'returns nil' do
+        expect(described_class.as_yaml(nil)).to eq(nil)
+      end
+    end
+
+    context 'when value is present' do
+      it 'returns ISO formatted date' do
+        date = Date.new(2021, 1, 1)
+        expect(described_class.as_yaml(date)).to eq('2021-01-01')
+      end
+    end
+  end
+
+  describe '.as_xml' do
+    context 'when value is nil' do
+      it 'converts text to XML node' do
+        doc = Shale::Adapter::REXML.create_document
+        res = described_class.as_xml(nil, 'foobar', doc).to_s
+        expect(res).to eq('<foobar/>')
+      end
+    end
+
+    context 'when value is present' do
+      it 'converts text to XML node' do
+        date = Date.new(2021, 1, 1)
+        doc = Shale::Adapter::REXML.create_document
+        res = described_class.as_xml(date, 'foobar', doc).to_s
+        expect(res).to eq('<foobar>2021-01-01</foobar>')
+      end
+    end
+  end
 end
