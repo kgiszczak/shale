@@ -2,16 +2,17 @@
 
 require 'yaml'
 
-require 'shale/mapper'
-require 'shale/adapter/json'
-require 'shale/adapter/rexml'
-require 'shale/type/boolean'
-require 'shale/type/date'
-require 'shale/type/float'
-require 'shale/type/integer'
-require 'shale/type/string'
-require 'shale/type/time'
-require 'shale/version'
+require_relative 'shale/mapper'
+require_relative 'shale/adapter/json'
+require_relative 'shale/adapter/rexml'
+require_relative 'shale/type/boolean'
+require_relative 'shale/type/date'
+require_relative 'shale/type/float'
+require_relative 'shale/type/integer'
+require_relative 'shale/type/string'
+require_relative 'shale/type/time'
+require_relative 'shale/schema'
+require_relative 'shale/version'
 
 # Main library namespace
 #
@@ -82,6 +83,18 @@ module Shale
     #
     # @api public
     attr_writer :xml_adapter
+
+    # Reader for accessing Shale::Schema module
+    #
+    # return [Schema]
+    #
+    # @example
+    #   Shale.schema.to_json(Person)
+    #
+    # @api public
+    def schema
+      Schema
+    end
 
     # Return JSON adapter. By default Shale::Adapter::JSON is used
     #

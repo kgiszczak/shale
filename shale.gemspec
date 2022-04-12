@@ -22,5 +22,9 @@ Gem::Specification.new do |spec|
 
   spec.files = Dir['CHANGELOG.md', 'LICENSE.txt', 'README.md', 'shale.gemspec', 'lib/**/*']
   spec.require_paths = ['lib']
+
+  spec.bindir = 'exe'
+  spec.executables = 'shaleb'
+
   spec.required_ruby_version = '>= 2.6.0'
 end

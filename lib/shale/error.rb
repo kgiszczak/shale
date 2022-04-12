@@ -36,4 +36,10 @@ module Shale
   # @api private
   class IncorrectMappingArgumentsError < StandardError
   end
+
+  # Error for passing incorrect arguments to schema generation function
+  #
+  # @api private
+  class NotAShaleMapperError < StandardError
+  end
 end

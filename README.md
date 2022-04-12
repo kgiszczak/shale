@@ -24,6 +24,30 @@ Or install it yourself as:
 $ gem install shale
 ```
 
+## Contents
+
+* [Simple use case](#user-content-simple-use-case)
+* [Creating objects](#creating-objects)
+* [Converting JSON to object](#converting-json-to-object)
+* [Converting object to JSON](#converting-object-to-json)
+* [Converting YAML to object](#converting-yaml-to-object)
+* [Converting object to YAML](#converting-object-to-yaml)
+* [Converting Hash to object](#converting-hash-to-object)
+* [Converting object to Hash](#converting-object-to-hash)
+* [Converting XML to object](#converting-xml-to-object)
+* [Converting object to XML](#converting-object-to-xml)
+* [Mapping JSON keys to object attributes](#mapping-json-keys-to-object-attributes)
+* [Mapping YAML keys to object attributes](#mapping-yaml-keys-to-object-attributes)
+* [Mapping Hash keys to object attributes](#mapping-hash-keys-to-object-attributes)
+* [Mapping XML elements and attributes to object attributes](#mapping-xml-elements-and-attributes-to-object-attributes)
+* [Using XML namespaces](#using-xml-namespaces)
+* [Using methods to extract and generate data](#using-methods-to-extract-and-generate-data)
+* [Pretty printing and XML declaration](#pretty-printing-and-xml-declaration)
+* [Supported types](#supported-types)
+* [Writing your own type](#writing-your-own-type)
+* [Adapters](#adapters)
+* [Generating JSON Schema](#generating-json-schema)
+
 ## Usage
 
 Documentation with interactive examples is available at [Shale website](https://www.shalerb.org)
@@ -582,6 +606,61 @@ Shale.xml_adapter = Shale::Adapter::Nokogiri
 
 require 'shale/adapter/ox'
 Shale.xml_adapter = Shale::Adapter::Ox
+```
+
+### Generating JSON Schema
+
+To generate JSON Schema from you Shale data model use:
+
+```ruby
+require 'shale'
+
+Shale.schema.to_json(Person, id: 'My ID', description: 'My description', pretty: true)
+
+# =>
+#
+# {
+#   "$schema": "https://json-schema.org/draft/2020-12/schema",
+#   "id": "My ID",
+#   "description": "My description",
+#   "$ref": "#/$defs/Person",
+#   "$defs": {
+#     "Address": {
+#       "type": [
+#         "object",
+#         "null"
+#       ],
+#       "properties": {
+#         "city": {
+#           "type": [
+#             "string",
+#             "null"
+#           ]
+#         }
+#       }
+#     },
+#     "Person": {
+#       "type": "object",
+#       "properties": {
+#         "name": {
+#           "type": [
+#             "string",
+#             "null"
+#           ]
+#         },
+#         "address": {
+#           "$ref": "#/$defs/Address"
+#         }
+#       }
+#     }
+#   }
+# }
+```
+
+You can also use a command line tool to do it:
+
+```
+$ shaleb -i data_model.rb -c Person -p
 ```
 
 ## Contributing

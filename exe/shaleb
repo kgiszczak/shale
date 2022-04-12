@@ -1,0 +1,54 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'optparse'
+
+base_path = File.expand_path('../lib', __dir__)
+
+if File.exist?(base_path)
+  require_relative '../lib/shale/schema'
+else
+  require 'shale/schema'
+end
+
+params = {}
+
+ARGV << '-h' if ARGV.empty?
+
+OptionParser.new do |opts|
+  opts.banner = "Usage: shaleb [options]\nexample: shaleb -i data_model.rb -c MyRoot"
+
+  opts.on('-i INPUT', '--input', 'Input file')
+  opts.on('-o OUTPUT', '--output', 'Output file (defaults to STDOUT)')
+  opts.on('-c CLASS', '--class CLASS', 'Shale model class name')
+  opts.on('-p', '--pretty', 'Pretty print generated schema')
+
+  opts.on('-v', '--version', 'Show version') do
+    puts "shaleb version #{Shale::VERSION}"
+    exit
+  end
+end.parse!(into: params)
+
+input_path = File.expand_path(params[:input], Dir.pwd)
+
+unless File.exist?(input_path)
+  puts "File '#{input_path}' does not exist"
+  exit
+end
+
+unless params[:class]
+  puts 'Model class is required'
+  exit
+end
+
+require input_path
+
+klass = Object.const_get(params[:class])
+schema = Shale::Schema.to_json(klass, pretty: params[:pretty])
+
+if params[:output]
+  output_path = File.expand_path(params[:output], Dir.pwd)
+  File.write(output_path, schema)
+else
+  puts schema
+end
