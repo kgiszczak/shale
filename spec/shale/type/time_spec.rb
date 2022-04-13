@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'shale/adapter/rexml'
 require 'shale/type/time'
 
 RSpec.describe Shale::Type::Time do
@@ -47,7 +48,7 @@ RSpec.describe Shale::Type::Time do
 
     context 'when value is present' do
       it 'returns ISO formatted time' do
-        time = Time.new(2021, 1, 1, 10, 10, 10)
+        time = Time.new(2021, 1, 1, 10, 10, 10, '+01:00')
         expect(described_class.as_json(time)).to eq('2021-01-01T10:10:10+01:00')
       end
     end
@@ -62,7 +63,7 @@ RSpec.describe Shale::Type::Time do
 
     context 'when value is present' do
       it 'returns ISO formatted time' do
-        time = Time.new(2021, 1, 1, 10, 10, 10)
+        time = Time.new(2021, 1, 1, 10, 10, 10, '+01:00')
         expect(described_class.as_yaml(time)).to eq('2021-01-01T10:10:10+01:00')
       end
     end
@@ -79,7 +80,7 @@ RSpec.describe Shale::Type::Time do
 
     context 'when value is present' do
       it 'converts text to XML node' do
-        time = Time.new(2021, 1, 1, 10, 10, 10)
+        time = Time.new(2021, 1, 1, 10, 10, 10, '+01:00')
         doc = Shale::Adapter::REXML.create_document
         res = described_class.as_xml(time, 'foobar', doc).to_s
         expect(res).to eq('<foobar>2021-01-01T10:10:10+01:00</foobar>')

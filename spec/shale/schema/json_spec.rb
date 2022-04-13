@@ -34,7 +34,9 @@ module ShaleSchemaJSONTesting
     attribute :floeat_default, Shale::Type::Float, default: -> { 1.0 }
     attribute :integer_default, Shale::Type::Integer, default: -> { 1 }
     attribute :string_default, Shale::Type::String, default: -> { 'string' }
-    attribute :time_default, Shale::Type::Time, default: -> { Time.new(2021, 1, 1, 10, 10, 10) }
+    attribute :time_default,
+      Shale::Type::Time,
+      default: -> { Time.new(2021, 1, 1, 10, 10, 10, '+01:00') }
     attribute :value_default, Shale::Type::Value, default: -> { 'value' }
 
     attribute :boolean_collection, Shale::Type::Boolean, collection: true

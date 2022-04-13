@@ -109,9 +109,9 @@ module ShaleCompositeTesting
         to: :root_attr_using_to_xml,
       }
       map_element 'element_namespaced',
-                  to: :element_namespaced,
-                  namespace: 'http://ns1.com',
-                  prefix: 'ns1'
+        to: :element_namespaced,
+        namespace: 'http://ns1.com',
+        prefix: 'ns1'
     end
 
     def root_attr_using_from_hash(value)
