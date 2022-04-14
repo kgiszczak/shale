@@ -192,7 +192,7 @@ module Shale
           attribute = type.attributes[mapping.attribute]
           next unless attribute
 
-          if mapper_type?(attribute.type)
+          if mapper_type?(attribute.type) && !types.include?(attribute.type)
             types += collect_composite_types(attribute.type)
           end
         end

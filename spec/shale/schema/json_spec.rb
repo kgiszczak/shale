@@ -49,6 +49,7 @@ module ShaleSchemaJSONTesting
 
     attribute :branch_one, BranchOne
     attribute :branch_two, BranchTwo
+    attribute :circular_dependency, Root
   end
 end
 
@@ -165,6 +166,9 @@ RSpec.describe Shale::Schema::JSON do
             },
             'branch_two' => {
               '$ref' => '#/$defs/ShaleSchemaJSONTesting_BranchTwo',
+            },
+            'circular_dependency' => {
+              '$ref' => '#/$defs/ShaleSchemaJSONTesting_Root',
             },
           },
         },
