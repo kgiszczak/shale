@@ -176,6 +176,13 @@ RSpec.describe Shale::Schema::JSON do
     }
   end
 
+  describe 'json_types' do
+    it 'registers new type' do
+      described_class.register_json_type('foo', 'bar')
+      expect(described_class.get_json_type('foo')).to eq('bar')
+    end
+  end
+
   describe '#as_schema' do
     context 'when incorrect argument' do
       it 'raises error' do

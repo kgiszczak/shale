@@ -613,9 +613,9 @@ Shale.xml_adapter = Shale::Adapter::Ox
 To generate JSON Schema from you Shale data model use:
 
 ```ruby
-require 'shale'
+require 'shale/schema'
 
-Shale.schema.to_json(Person, id: 'My ID', description: 'My description', pretty: true)
+Shale::Schema.to_json(Person, id: 'My ID', description: 'My description', pretty: true)
 
 # =>
 #
@@ -661,6 +661,25 @@ You can also use a command line tool to do it:
 
 ```
 $ shaleb -i data_model.rb -c Person -p
+```
+
+If you want to convert your own types to JSON Schema types use:
+
+```ruby
+require 'shale'
+require 'shale/schema'
+
+class MyEmailType < Shale::Type::Value
+  ...
+end
+
+class MyEmailJSONType < Shale::Schema::JSON::Base
+  def as_type
+    { 'type' => 'string', 'format' => 'email' }
+  end
+end
+
+Shale::Schema::JSON.register_json_type(MyEmailType, MyEmailJSONType)
 ```
 
 ## Contributing

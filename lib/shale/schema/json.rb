@@ -1,36 +1,58 @@
 # frozen_string_literal: true
 
 require_relative '../../shale'
+require_relative 'json/schema'
+require_relative 'json/boolean'
+require_relative 'json/collection'
+require_relative 'json/date'
+require_relative 'json/float'
+require_relative 'json/integer'
+require_relative 'json/object'
+require_relative 'json/ref'
+require_relative 'json/string'
+require_relative 'json/time'
 
 module Shale
   module Schema
-    # Module for handling JSON schema
+    # Class for handling JSON schema
     #
     # @api private
     class JSON
-      # JSON type wrapper
-      # @api private
-      JsonType = Struct.new(:type, :format)
+      @json_types = Hash.new(Shale::Schema::JSON::String)
 
-      # Default JSON type
-      # @api private
-      DEFAULT_TYPE = JsonType.new('string')
+      # Register Shale to JSON type mapping
+      #
+      # @param [Shale::Type::Value] shale_type
+      # @param [Shale::Schema::JSON::Base] json_type
+      #
+      # @example
+      #   Shale::Schema::JSON.register_json_type(Shale::Type::String, MyCustomJsonType)
+      #
+      # @api public
+      def self.register_json_type(shale_type, json_type)
+        @json_types[shale_type] = json_type
+      end
 
-      # Shale to JSON type mapping
+      # Return JSON type for given Shale type
+      #
+      # @param [Shale::Type::Value] shale_type
+      #
+      # @return [Shale::Schema::JSON::Base]
+      #
+      # @example
+      #   Shale::Schema::JSON.get_json_type(Shale::Type::String)
+      #   # => Shale::Schema::JSON::String
+      #
       # @api private
-      TYPE_MAPPING = {
-        Type::Boolean => JsonType.new('boolean'),
-        Type::Date => JsonType.new('string', 'date'),
-        Type::Float => JsonType.new('number'),
-        Type::Integer => JsonType.new('integer'),
-        Type::String => JsonType.new('string'),
-        Type::Time => JsonType.new('string', 'date-time'),
-        Type::Value => JsonType.new('string'),
-      }.freeze
+      def self.get_json_type(shale_type)
+        @json_types[shale_type]
+      end
 
-      # JSON Schema dialect (aka version)
-      # @api private
-      DIALECT = 'https://json-schema.org/draft/2020-12/schema'
+      register_json_type(Shale::Type::Boolean, Shale::Schema::JSON::Boolean)
+      register_json_type(Shale::Type::Date, Shale::Schema::JSON::Date)
+      register_json_type(Shale::Type::Float, Shale::Schema::JSON::Float)
+      register_json_type(Shale::Type::Integer, Shale::Schema::JSON::Integer)
+      register_json_type(Shale::Type::Time, Shale::Schema::JSON::Time)
 
       # Generate JSON Schema from Shale model and return it as a Ruby Hash
       #
@@ -52,22 +74,36 @@ module Shale
         end
 
         types = collect_composite_types(klass)
-          .uniq
-          .sort { |a, b| a.name <=> b.name }
-
-        defs = {}
+        objects = []
 
         types.each do |type|
-          defs[schematize(type.name)] = defs_for_type(klass, type)
+          properties = []
+
+          type.json_mapping.keys.values.each do |mapping|
+            attribute = type.attributes[mapping.attribute]
+            next unless attribute
+
+            if mapper_type?(attribute.type)
+              json_type = Ref.new(mapping.name, attribute.type.name)
+            else
+              json_klass = self.class.get_json_type(attribute.type)
+
+              if attribute.default && !attribute.collection?
+                value = attribute.type.cast(attribute.default.call)
+                default = attribute.type.as_json(value)
+              end
+
+              json_type = json_klass.new(mapping.name, default: default)
+            end
+
+            json_type = Collection.new(json_type) if attribute.collection?
+            properties << json_type
+          end
+
+          objects << Object.new(type.name, properties)
         end
 
-        {
-          '$schema' => DIALECT,
-          'id' => id,
-          'description' => description,
-          '$ref' => "#/$defs/#{schematize(klass.name)}",
-          '$defs' => defs,
-        }.compact
+        Schema.new(objects, id: id, description: description).as_json
       end
 
       # Generate JSON Schema from Shale model
@@ -91,81 +127,6 @@ module Shale
       end
 
       private
-
-      # Return JSON Schema definitions
-      #
-      # @param [Shale::Mapper] root_klass
-      # @param [Shale::Mapper] type
-      #
-      # @return [Hash]
-      #
-      # @api private
-      def defs_for_type(root_klass, type)
-        props = {}
-
-        type.json_mapping.keys.values.each do |mapping|
-          attribute = type.attributes[mapping.attribute]
-          next unless attribute
-
-          props[mapping.name] = props_for_attribute(attribute)
-        end
-
-        {
-          'type' => root_klass == type ? 'object' : %w[object null],
-          'properties' => props,
-        }
-      end
-
-      # Return JSON Schema type properties
-      #
-      # @param [Shale::Attribute] attribute
-      #
-      # @return [Hash]
-      #
-      # @api private
-      def props_for_attribute(attribute)
-        prop = {}
-
-        if mapper_type?(attribute.type)
-          prop = { '$ref' => "#/$defs/#{schematize(attribute.type.name)}" }
-        else
-          maped_type = to_json_type(attribute.type)
-          json_type = [maped_type.type, 'null']
-
-          if attribute.collection?
-            json_type = maped_type.type
-          elsif attribute.default
-            type_casted_value = attribute.type.cast(attribute.default.call)
-            default = attribute.type.as_json(type_casted_value)
-          end
-
-          prop = {
-            'type' => json_type,
-            'format' => maped_type.format,
-            'default' => default,
-          }.compact
-        end
-
-        if attribute.collection?
-          prop = {
-            'type' => 'array',
-            'items' => prop,
-          }
-        end
-
-        prop
-      end
-
-      # Get JSON type from Shale type
-      #
-      # @param [Shale::Type::Value] type
-      #
-      # @return [JsonType]
-      #
-      # @api private
-      def to_json_type(type)
-        TYPE_MAPPING.fetch(type, DEFAULT_TYPE)
-      end
 
       # Check it type inherits from Shale::Mapper
       #
@@ -197,18 +158,7 @@ module Shale
           end
         end
 
-        types
-      end
-
-      # Convert Ruby class name to identifier accepted by JSON Schema
-      #
-      # @param [String] word
-      #
-      # @return [String]
-      #
-      # @api private
-      def schematize(word)
-        word.gsub('::', '_')
+        types.uniq
       end
     end
   end

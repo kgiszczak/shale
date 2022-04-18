@@ -47,10 +47,4 @@ RSpec.describe Shale do
       end
     end
   end
-
-  describe '.schema' do
-    it 'returns Shale::Schema module' do
-      expect(described_class.schema).to eq(Shale::Schema)
-    end
-  end
 end
