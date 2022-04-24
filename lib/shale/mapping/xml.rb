@@ -35,6 +35,15 @@ module Shale
       # @api private
       attr_reader :default_namespace
 
+      # Return unprefixed root
+      #
+      # @return [String]
+      #
+      # @api private
+      def unprefixed_root
+        @root
+      end
+
       # Return prefixed root
       #
       # @return [String]

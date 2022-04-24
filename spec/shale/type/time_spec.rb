@@ -69,6 +69,21 @@ RSpec.describe Shale::Type::Time do
     end
   end
 
+  describe '.as_xml_value' do
+    context 'when value is nil' do
+      it 'returns nil' do
+        expect(described_class.as_xml_value(nil)).to eq(nil)
+      end
+    end
+
+    context 'when value is present' do
+      it 'returns ISO formatted time' do
+        time = Time.new(2021, 1, 1, 10, 10, 10, '+01:00')
+        expect(described_class.as_xml_value(time)).to eq('2021-01-01T10:10:10+01:00')
+      end
+    end
+  end
+
   describe '.as_xml' do
     context 'when value is nil' do
       it 'converts text to XML node' do

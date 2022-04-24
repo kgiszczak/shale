@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'shale/adapter/rexml'
 require 'shale/type/date'
 
 RSpec.describe Shale::Type::Date do
@@ -62,6 +63,21 @@ RSpec.describe Shale::Type::Date do
       it 'returns ISO formatted date' do
         date = Date.new(2021, 1, 1)
         expect(described_class.as_yaml(date)).to eq('2021-01-01')
+      end
+    end
+  end
+
+  describe '.as_xml_value' do
+    context 'when value is nil' do
+      it 'returns nil' do
+        expect(described_class.as_xml_value(nil)).to eq(nil)
+      end
+    end
+
+    context 'when value is present' do
+      it 'returns ISO formatted date' do
+        date = Date.new(2021, 1, 1)
+        expect(described_class.as_xml_value(date)).to eq('2021-01-01')
       end
     end
   end

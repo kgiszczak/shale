@@ -103,13 +103,24 @@ module Shale
         # Convert value to form accepted by XML document
         #
         # @param [#to_s] value Value to convert to XML
+        #
+        # @return [String]
+        #
+        # @api private
+        def as_xml_value(value)
+          value.to_s
+        end
+
+        # Convert value to XML element
+        #
+        # @param [#to_s] value Value to convert to XML
         # @param [String] name Name of the element
         # @param [Shale::Adapter::<XML adapter>::Document] doc Document
         #
         # @api private
         def as_xml(value, name, doc)
           element = doc.create_element(name)
-          doc.add_text(element, value.to_s)
+          doc.add_text(element, as_xml_value(value))
           element
         end
       end

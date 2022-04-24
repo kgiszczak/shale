@@ -50,14 +50,12 @@ module Shale
       # Use ISO 8601 format in XML document
       #
       # @param [Time] value Value to convert to XML
-      # @param [String] name Name of the element
-      # @param [Shale::Adapter::<XML adapter>::Document] doc Document
+      #
+      # @return [String]
       #
       # @api private
-      def self.as_xml(value, name, doc)
-        element = doc.create_element(name)
-        doc.add_text(element, value&.iso8601)
-        element
+      def self.as_xml_value(value)
+        value&.iso8601
       end
     end
   end

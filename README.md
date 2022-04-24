@@ -682,6 +682,72 @@ end
 Shale::Schema::JSON.register_json_type(MyEmailType, MyEmailJSONType)
 ```
 
+### Generating XML Schema
+
+To generate XML Schema from you Shale data model use:
+
+```ruby
+require 'shale/schema'
+
+Shale::Schema.to_xml(Person, pretty: true)
+
+# =>
+#
+# {
+#   'schema0.xsd' => '
+#     <xs:schema
+#       elementFormDefault="qualified"
+#       attributeFormDefault="qualified"
+#       xmlns:xs="http://www.w3.org/2001/XMLSchema"
+#       xmlns:foo="http://foo.com"
+#     >
+#       <xs:import namespace="http://foo.com" schemaLocation="schema1.xsd"/>
+#       <xs:element name="person" type="Person"/>
+#       <xs:complexType name="Person">
+#         <xs:sequence>
+#           <xs:element name="name" type="xs:string" minOccurs="0"/>
+#           <xs:element ref="foo:address" minOccurs="0"/>
+#         </xs:sequence>
+#       </xs:complexType>
+#     </xs:schema>',
+#
+#   'schema1.xsd' => '
+#     <xs:schema
+#       elementFormDefault="qualified"
+#       attributeFormDefault="qualified"
+#       targetNamespace="http://foo.com"
+#       xmlns:xs="http://www.w3.org/2001/XMLSchema"
+#       xmlns:foo="http://foo.com"
+#     >
+#       <xs:element name="address" type="foo:Address"/>
+#       <xs:complexType name="Address">
+#         <xs:sequence>
+#           <xs:element name="city" type="xs:string" minOccurs="0"/>
+#         </xs:sequence>
+#       </xs:complexType>
+#     </xs:schema>'
+# }
+```
+
+You can also use a command line tool to do it:
+
+```
+$ shaleb -i data_model.rb -c Person -p -f xml
+```
+
+If you want to convert your own types to XML Schema types use:
+
+```ruby
+require 'shale'
+require 'shale/schema'
+
+class MyEmailType < Shale::Type::Value
+  ...
+end
+
+Shale::Schema::XML.register_xml_type(MyEmailType, 'myEmailXMLType')
+```
+
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/kgiszczak/shale.

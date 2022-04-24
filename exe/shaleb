@@ -21,6 +21,7 @@ OptionParser.new do |opts|
   opts.on('-i INPUT', '--input', 'Input file')
   opts.on('-o OUTPUT', '--output', 'Output file (defaults to STDOUT)')
   opts.on('-c CLASS', '--class CLASS', 'Shale model class name')
+  opts.on('-f FORMAT', '--format FORMAT', 'Schema format: JSON (default), XML')
   opts.on('-p', '--pretty', 'Pretty print generated schema')
 
   opts.on('-v', '--version', 'Show version') do
@@ -44,11 +45,31 @@ end
 require input_path
 
 klass = Object.const_get(params[:class])
-schema = Shale::Schema.to_json(klass, pretty: params[:pretty])
 
-if params[:output]
-  output_path = File.expand_path(params[:output], Dir.pwd)
-  File.write(output_path, schema)
+if params[:format] == 'xml'
+  if params[:output]
+    base_name = File.basename(params[:output], File.extname(params[:output]))
+    schemas = Shale::Schema.to_xml(klass, base_name, pretty: params[:pretty])
+
+    schemas.map do |name, xml|
+      File.write(File.expand_path(name, Dir.pwd), xml)
+    end
+  else
+    schemas = Shale::Schema.to_xml(klass, pretty: params[:pretty])
+
+    output = schemas.map do |name, xml|
+      "<!-- #{name} -->\n#{xml}\n"
+    end.join("\n")
+
+    puts output
+  end
 else
-  puts schema
+  schema = Shale::Schema.to_json(klass, pretty: params[:pretty])
+
+  if params[:output]
+    output_path = File.expand_path(params[:output], Dir.pwd)
+    File.write(output_path, schema)
+  else
+    puts schema
+  end
 end

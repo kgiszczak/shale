@@ -58,6 +58,12 @@ RSpec.describe Shale::Type::Value do
     end
   end
 
+  describe '.as_xml_value' do
+    it 'returns string value' do
+      expect(described_class.as_xml_value(123)).to eq('123')
+    end
+  end
+
   describe '.as_xml' do
     it 'converts text to XML node' do
       doc = Shale::Adapter::REXML.create_document

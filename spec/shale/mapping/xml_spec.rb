@@ -45,11 +45,23 @@ RSpec.describe Shale::Mapping::Xml do
     end
   end
 
-  describe '#prefixed_root' do
-    it 'returns default namespace' do
+  describe '#unprefixed_root' do
+    it 'returns root name' do
       obj = described_class.new
-      expect(obj.default_namespace.name).to eq(nil)
-      expect(obj.default_namespace.prefix).to eq(nil)
+      obj.root 'foo'
+      obj.namespace 'http://bar.com', 'bar'
+
+      expect(obj.unprefixed_root).to eq('foo')
+    end
+  end
+
+  describe '#prefixed_root' do
+    it 'returns prefixed root name' do
+      obj = described_class.new
+      obj.root 'foo'
+      obj.namespace 'http://bar.com', 'bar'
+
+      expect(obj.prefixed_root).to eq('bar:foo')
     end
   end
 

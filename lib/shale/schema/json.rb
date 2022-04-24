@@ -16,7 +16,7 @@ module Shale
   module Schema
     # Class for handling JSON schema
     #
-    # @api private
+    # @api public
     class JSON
       @json_types = Hash.new(Shale::Schema::JSON::String)
 
@@ -67,7 +67,7 @@ module Shale
       # @example
       #   Shale::Schema::JSON.new.as_schema(Person)
       #
-      # @api private
+      # @api public
       def as_schema(klass, id: nil, description: nil)
         unless mapper_type?(klass)
           raise NotAShaleMapperError, "JSON Shema can't be generated for '#{klass}' type"
@@ -118,7 +118,7 @@ module Shale
       # @example
       #   Shale::Schema::JSON.new.to_schema(Person)
       #
-      # @api private
+      # @api public
       def to_schema(klass, id: nil, description: nil, pretty: false)
         schema = as_schema(klass, id: id, description: description)
         options = pretty ? :pretty : nil
@@ -130,7 +130,7 @@ module Shale
 
       # Check it type inherits from Shale::Mapper
       #
-      # @param [Shale::Mapper] type
+      # @param [Class] type
       #
       # @return [true, false]
       #

@@ -23,7 +23,7 @@ module ShaleSchemaJSONTesting
   class Root < Shale::Mapper
     attribute :boolean, Shale::Type::Boolean
     attribute :date, Shale::Type::Date
-    attribute :floeat, Shale::Type::Float
+    attribute :float, Shale::Type::Float
     attribute :integer, Shale::Type::Integer
     attribute :string, Shale::Type::String
     attribute :time, Shale::Type::Time
@@ -31,7 +31,7 @@ module ShaleSchemaJSONTesting
 
     attribute :boolean_default, Shale::Type::Boolean, default: -> { true }
     attribute :date_default, Shale::Type::Date, default: -> { Date.new(2021, 1, 1) }
-    attribute :floeat_default, Shale::Type::Float, default: -> { 1.0 }
+    attribute :float_default, Shale::Type::Float, default: -> { 1.0 }
     attribute :integer_default, Shale::Type::Integer, default: -> { 1 }
     attribute :string_default, Shale::Type::String, default: -> { 'string' }
     attribute :time_default,
@@ -41,7 +41,7 @@ module ShaleSchemaJSONTesting
 
     attribute :boolean_collection, Shale::Type::Boolean, collection: true
     attribute :date_collection, Shale::Type::Date, collection: true
-    attribute :floeat_collection, Shale::Type::Float, collection: true
+    attribute :float_collection, Shale::Type::Float, collection: true
     attribute :integer_collection, Shale::Type::Integer, collection: true
     attribute :string_collection, Shale::Type::String, collection: true
     attribute :time_collection, Shale::Type::Time, collection: true
@@ -87,7 +87,7 @@ RSpec.describe Shale::Schema::JSON do
               'type' => %w[string null],
               'format' => 'date',
             },
-            'floeat' => {
+            'float' => {
               'type' => %w[number null],
             },
             'integer' => {
@@ -112,7 +112,7 @@ RSpec.describe Shale::Schema::JSON do
               'format' => 'date',
               'default' => '2021-01-01',
             },
-            'floeat_default' => {
+            'float_default' => {
               'type' => %w[number null],
               'default' => 1.0,
             },
@@ -141,7 +141,7 @@ RSpec.describe Shale::Schema::JSON do
               'type' => 'array',
               'items' => { 'type' => 'string', 'format' => 'date' },
             },
-            'floeat_collection' => {
+            'float_collection' => {
               'type' => 'array',
               'items' => { 'type' => 'number' },
             },
@@ -206,7 +206,7 @@ RSpec.describe Shale::Schema::JSON do
       end
     end
 
-    context 'without correct arguments' do
+    context 'with correct arguments' do
       it 'generates JSON schema' do
         schema = described_class.new.as_schema(
           ShaleSchemaJSONTesting::Root,
