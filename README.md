@@ -47,6 +47,7 @@ $ gem install shale
 * [Writing your own type](#writing-your-own-type)
 * [Adapters](#adapters)
 * [Generating JSON Schema](#generating-json-schema)
+* [Generating XML Schema](#generating-xml-schema)
 
 ## Usage
 
