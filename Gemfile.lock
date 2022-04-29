@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    shale (0.2.2)
+    shale (0.3.0)
 
 GEM
   remote: https://rubygems.org/

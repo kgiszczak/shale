@@ -1,3 +1,16 @@
+## [0.3.0] - 2022-04-29
+
+### Added
+- Support for XML namespaces
+- Add option to pretty print JSON and XML and to include XML declaration
+- Add support for generating JSON and XML Schema
+
+### Changed
+- Various fixes to documentation
+- Rename `hash` -> `hsh` (`hash` is used internally by Ruby)
+- Rename `Shale::Type::Base` -> `Shale::Type::Value`
+- Use ISO 8601 format for date and time in JSON, YAML and XML
+
 ## [0.2.2] - 2022-03-06
 
 ### Fixed
