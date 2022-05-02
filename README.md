@@ -616,13 +616,13 @@ To generate JSON Schema from you Shale data model use:
 ```ruby
 require 'shale/schema'
 
-Shale::Schema.to_json(Person, id: 'My ID', description: 'My description', pretty: true)
+Shale::Schema.to_json(Person, id: 'http://foo.bar/schema/person', description: 'My description', pretty: true)
 
 # =>
 #
 # {
 #   "$schema": "https://json-schema.org/draft/2020-12/schema",
-#   "id": "My ID",
+#   "id": "http://foo.bar/schema/person",
 #   "description": "My description",
 #   "$ref": "#/$defs/Person",
 #   "$defs": {
