@@ -35,7 +35,7 @@ module Shale
         def as_json
           schema = {
             '$schema' => DIALECT,
-            'id' => @id,
+            '$id' => @id,
             'description' => @description,
           }
 
