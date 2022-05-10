@@ -1,3 +1,8 @@
+## [0.3.1] - 2022-04-29
+
+### Changed
+- Rename `id` -> `$id` and add info about supported JSON Schema dialect
+
 ## [0.3.0] - 2022-04-29
 
 ### Added
