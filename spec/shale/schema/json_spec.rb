@@ -57,7 +57,7 @@ RSpec.describe Shale::Schema::JSON do
   let(:expected_schema_hash) do
     {
       '$schema' => 'https://json-schema.org/draft/2020-12/schema',
-      'id' => 'My ID',
+      '$id' => 'My ID',
       'description' => 'My description',
       '$ref' => '#/$defs/ShaleSchemaJSONTesting_Root',
       '$defs' => {

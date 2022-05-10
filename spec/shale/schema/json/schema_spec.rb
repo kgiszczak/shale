@@ -10,7 +10,7 @@ RSpec.describe Shale::Schema::JSON::Schema do
         schema = described_class.new([], id: 'foo', description: 'bar')
         expected = {
           '$schema' => 'https://json-schema.org/draft/2020-12/schema',
-          'id' => 'foo',
+          '$id' => 'foo',
           'description' => 'bar',
         }
 
