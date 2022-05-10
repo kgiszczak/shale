@@ -1,6 +1,8 @@
 # Shale
 
-Shale is a object mapper and serializer for JSON, YAML and XML.
+Shale is a Ruby object mapper and serializer for JSON, YAML and XML.
+It allows you to parse JSON, YAML and XML data and convert it into Ruby data structures,
+as well as serialize data structures into JSON, YAML or XML.
 
 ## Installation
 
