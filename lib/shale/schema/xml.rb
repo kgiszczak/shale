@@ -93,7 +93,8 @@ module Shale
         )
         schemas[default_namespace.name].add_child(root_element)
 
-        composites = collect_composite_types(klass, klass.xml_mapping.default_namespace.name)
+        composites = []
+        collect_composite_types(composites, klass, klass.xml_mapping.default_namespace.name)
 
         composites.each do |composite|
           type = composite[:type]
@@ -245,14 +246,13 @@ module Shale
 
       # Collect recursively Shale::Mapper types
       #
+      # @param [Array<Shale::Mapper>] types
       # @param [Shale::Mapper] type
       # @param [String, nil] namespace
       #
-      # @return [Array<Hash<Symbol, String>>]
-      #
       # @api private
-      def collect_composite_types(type, namespace)
-        types = [{ type: type, namespace: namespace }]
+      def collect_composite_types(types, type, namespace)
+        types << { type: type, namespace: namespace }
 
         type.xml_mapping.elements.values.each do |mapping|
           attribute = type.attributes[mapping.attribute]
@@ -262,11 +262,9 @@ module Shale
           is_included = types.include?({ type: attribute.type, namespace: namespace })
 
           if is_mapper && !is_included
-            types += collect_composite_types(attribute.type, mapping.namespace.name)
+            collect_composite_types(types, attribute.type, mapping.namespace.name)
           end
         end
-
-        types.uniq
       end
 
       # Convert Ruby class name to XML Schema name

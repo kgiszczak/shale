@@ -103,6 +103,17 @@ module ShaleSchemaXMLTesting
       map_element 'circular_dependency', to: :circular_dependency
     end
   end
+
+  class CircularDependencyB < Shale::Mapper
+  end
+
+  class CircularDependencyA < Shale::Mapper
+    attribute :circular_dependency_b, CircularDependencyB
+  end
+
+  class CircularDependencyB
+    attribute :circular_dependency_a, CircularDependencyA
+  end
 end
 
 RSpec.describe Shale::Schema::XML do
@@ -164,6 +175,24 @@ RSpec.describe Shale::Schema::XML do
     DATA
   end
 
+  let(:expected_schema_circular) do
+    <<~DATA.gsub(/\n\z/, '')
+      <xs:schema elementFormDefault="qualified" attributeFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+        <xs:element name="circular_dependency_a" type="ShaleSchemaXMLTesting_CircularDependencyA"/>
+        <xs:complexType name="ShaleSchemaXMLTesting_CircularDependencyA">
+          <xs:sequence>
+            <xs:element name="circular_dependency_b" type="ShaleSchemaXMLTesting_CircularDependencyB" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+        <xs:complexType name="ShaleSchemaXMLTesting_CircularDependencyB">
+          <xs:sequence>
+            <xs:element name="circular_dependency_a" type="ShaleSchemaXMLTesting_CircularDependencyA" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:schema>
+    DATA
+  end
+
   describe 'xml_types' do
     it 'registers new type' do
       described_class.register_xml_type('foo', 'bar')
@@ -206,6 +235,18 @@ RSpec.describe Shale::Schema::XML do
 
         expect(schema0).to eq(expected_schema0)
         expect(schema1).to eq(expected_schema1)
+      end
+    end
+
+    context 'with classes depending on each other' do
+      it 'generates XML schema' do
+        schemas = described_class.new.as_schemas(
+          ShaleSchemaXMLTesting::CircularDependencyA
+        )
+
+        schema0 = Shale.xml_adapter.dump(schemas[0].as_xml, :pretty)
+
+        expect(schema0).to eq(expected_schema_circular)
       end
     end
   end

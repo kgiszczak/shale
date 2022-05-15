@@ -73,7 +73,8 @@ module Shale
           raise NotAShaleMapperError, "JSON Shema can't be generated for '#{klass}' type"
         end
 
-        types = collect_composite_types(klass)
+        types = []
+        collect_composite_types(types, klass)
         objects = []
 
         types.each do |type|
@@ -141,24 +142,21 @@ module Shale
 
       # Collect recursively Shale::Mapper types
       #
+      # @param [Array<Shale::Mapper>] types
       # @param [Shale::Mapper] type
       #
-      # @return [Array<Shale::Mapper>]
-      #
       # @api private
-      def collect_composite_types(type)
-        types = [type]
+      def collect_composite_types(types, type)
+        types << type
 
         type.json_mapping.keys.values.each do |mapping|
           attribute = type.attributes[mapping.attribute]
           next unless attribute
 
           if mapper_type?(attribute.type) && !types.include?(attribute.type)
-            types += collect_composite_types(attribute.type)
+            collect_composite_types(types, attribute.type)
           end
         end
-
-        types.uniq
       end
     end
   end

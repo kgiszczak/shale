@@ -51,6 +51,17 @@ module ShaleSchemaJSONTesting
     attribute :branch_two, BranchTwo
     attribute :circular_dependency, Root
   end
+
+  class CircularDependencyB < Shale::Mapper
+  end
+
+  class CircularDependencyA < Shale::Mapper
+    attribute :circular_dependency_b, CircularDependencyB
+  end
+
+  class CircularDependencyB
+    attribute :circular_dependency_a, CircularDependencyA
+  end
 end
 
 RSpec.describe Shale::Schema::JSON do
@@ -176,6 +187,31 @@ RSpec.describe Shale::Schema::JSON do
     }
   end
 
+  let(:expected_circular_schema_hash) do
+    {
+      '$schema' => 'https://json-schema.org/draft/2020-12/schema',
+      '$ref' => '#/$defs/ShaleSchemaJSONTesting_CircularDependencyA',
+      '$defs' => {
+        'ShaleSchemaJSONTesting_CircularDependencyA' => {
+          'type' => 'object',
+          'properties' => {
+            'circular_dependency_b' => {
+              '$ref' => '#/$defs/ShaleSchemaJSONTesting_CircularDependencyB',
+            },
+          },
+        },
+        'ShaleSchemaJSONTesting_CircularDependencyB' => {
+          'type' => %w[object null],
+          'properties' => {
+            'circular_dependency_a' => {
+              '$ref' => '#/$defs/ShaleSchemaJSONTesting_CircularDependencyA',
+            },
+          },
+        },
+      },
+    }
+  end
+
   describe 'json_types' do
     it 'registers new type' do
       described_class.register_json_type('foo', 'bar')
@@ -215,6 +251,16 @@ RSpec.describe Shale::Schema::JSON do
         )
 
         expect(schema).to eq(expected_schema_hash)
+      end
+    end
+
+    context 'with classes depending on each other' do
+      it 'generates JSON schema' do
+        schema = described_class.new.as_schema(
+          ShaleSchemaJSONTesting::CircularDependencyA
+        )
+
+        expect(schema).to eq(expected_circular_schema_hash)
       end
     end
   end
