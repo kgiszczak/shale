@@ -5,7 +5,7 @@ require_relative 'complex_type'
 
 module Shale
   module Schema
-    class XML
+    class XMLGenerator
       class Schema
         # XML Schema namespace
         # @api private
@@ -43,10 +43,10 @@ module Shale
 
         # Add child element to XML Schema
         #
-        # @param [Shale::Schema::XML::Import,
-        #         Shale::Schema::XML::Element,
-        #         Shale::Schema::XML::Attribute,
-        #         Shale::Schema::XML::ComplesType] child
+        # @param [Shale::Schema::XMLGenerator::Import,
+        #         Shale::Schema::XMLGenerator::Element,
+        #         Shale::Schema::XMLGenerator::Attribute,
+        #         Shale::Schema::XMLGenerator::ComplesType] child
         #
         # @api private
         def add_child(child)

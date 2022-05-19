@@ -2,7 +2,7 @@
 
 module Shale
   module Schema
-    class XML
+    class XMLGenerator
       # Class representing XML Schema <import> element
       #
       # @api private

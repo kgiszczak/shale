@@ -1,20 +1,20 @@
 # frozen_string_literal: true
 
 require_relative '../../shale'
-require_relative 'xml/complex_type'
-require_relative 'xml/import'
-require_relative 'xml/ref_attribute'
-require_relative 'xml/ref_element'
-require_relative 'xml/schema'
-require_relative 'xml/typed_attribute'
-require_relative 'xml/typed_element'
+require_relative 'xml_generator/complex_type'
+require_relative 'xml_generator/import'
+require_relative 'xml_generator/ref_attribute'
+require_relative 'xml_generator/ref_element'
+require_relative 'xml_generator/schema'
+require_relative 'xml_generator/typed_attribute'
+require_relative 'xml_generator/typed_element'
 
 module Shale
   module Schema
-    # Class for handling XML schema
+    # Class for generating XML schema
     #
     # @api public
-    class XML
+    class XMLGenerator
       # XML Schema default name
       # @api private
       DEFAULT_SCHEMA_NAME = 'schema'
@@ -27,7 +27,7 @@ module Shale
       # @param [String] xml_type
       #
       # @example
-      #   Shale::Schema::XML.register_xml_type(Shale::Type::String, 'myType')
+      #   Shale::Schema::XMLGenerator.register_xml_type(Shale::Type::String, 'myType')
       #
       # @api public
       def self.register_xml_type(shale_type, xml_type)
@@ -41,7 +41,7 @@ module Shale
       # @return [String]
       #
       # @example
-      #   Shale::Schema::XML.get_xml_type(Shale::Type::String)
+      #   Shale::Schema::XMLGenerator.get_xml_type(Shale::Type::String)
       #   # => 'string'
       #
       # @api private
@@ -56,17 +56,17 @@ module Shale
       register_xml_type(Shale::Type::Time, 'dateTime')
 
       # Generate XML Schema from Shale model and return
-      # it as a Shale::Schema::XML::Schema array
+      # it as a Shale::Schema::XMLGenerator::Schema array
       #
       # @param [Shale::Mapper] klass
       # @param [String, nil] base_name
       #
       # @raise [NotAShaleMapperError] when attribute is not a Shale model
       #
-      # @return [Array<Shale::Schema::XML::Schema>]
+      # @return [Array<Shale::Schema::XMLGenerator::Schema>]
       #
       # @example
-      #   Shale::Schema::XML.new.as_schemas(Person)
+      #   Shale::Schema::XMLGenerator.new.as_schemas(Person)
       #
       # @api public
       def as_schemas(klass, base_name = nil)
@@ -215,7 +215,7 @@ module Shale
       # @return [Hash<String, String>]
       #
       # @example
-      #   Shale::Schema::XML.new.to_schemas(Person)
+      #   Shale::Schema::XMLGenerator.new.to_schemas(Person)
       #
       # @api public
       def to_schemas(klass, base_name = nil, pretty: false, declaration: false)

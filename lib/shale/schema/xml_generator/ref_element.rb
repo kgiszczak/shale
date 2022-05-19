@@ -1,23 +1,25 @@
 # frozen_string_literal: true
 
-require_relative 'attribute'
+require_relative 'element'
 
 module Shale
   module Schema
-    class XML
-      # Class representing XML Schema <attribute ref=""> element
+    class XMLGenerator
+      # Class representing XML Schema <element ref=""> element
       # with a reference
       #
       # @api private
-      class RefAttribute < Attribute
-        # Initialize RefAttribute object
+      class RefElement < Element
+        # Initialize RefElement object
         #
         # @param [String] ref
         # @param [String, nil] default
+        # @param [true, false] collection
+        # @param [true, false] required
         #
         # @api private
-        def initialize(ref:, default: nil)
-          super(default)
+        def initialize(ref:, default: nil, collection: false, required: false)
+          super(default, collection, required)
           @ref = ref
         end
 

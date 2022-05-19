@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require_relative 'schema/json_generator'
-require_relative 'schema/xml'
+require_relative 'schema/xml_generator'
 
 module Shale
   # Module for handling JSON and XML schema
@@ -41,7 +41,7 @@ module Shale
     #
     # @api public
     def self.to_xml(klass, base_name = nil, pretty: false, declaration: false)
-      XML.new.to_schemas(klass, base_name, pretty: pretty, declaration: declaration)
+      XMLGenerator.new.to_schemas(klass, base_name, pretty: pretty, declaration: declaration)
     end
   end
 end

@@ -750,7 +750,7 @@ class MyEmailType < Shale::Type::Value
   ...
 end
 
-Shale::Schema::XML.register_xml_type(MyEmailType, 'myEmailXMLType')
+Shale::Schema::XMLGenerator.register_xml_type(MyEmailType, 'myEmailXMLType')
 ```
 
 ## Contributing

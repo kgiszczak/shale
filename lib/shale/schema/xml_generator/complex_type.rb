@@ -5,7 +5,7 @@ require_relative 'element'
 
 module Shale
   module Schema
-    class XML
+    class XMLGenerator
       # Class representing XML Schema <complexType> element
       #
       # @api private
@@ -20,7 +20,10 @@ module Shale
         # Initialize ComplexType object
         #
         # @param [String] name
-        # @param [Array<Shale::Schema::XML::Element, Shale::Schema::XML::Attribute>] children
+        # @param [Array<
+        #   Shale::Schema::XMLGenerator::Element,
+        #   Shale::Schema::XMLGenerator::Attribute
+        # >] children
         # @param [true, false] mixed
         #
         # @api private

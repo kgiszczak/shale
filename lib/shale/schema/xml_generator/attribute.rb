@@ -2,7 +2,7 @@
 
 module Shale
   module Schema
-    class XML
+    class XMLGenerator
       # Class representing XML Schema <attribute> element.
       # Serves as a base class for TypedAttribute and RefAttribute
       #

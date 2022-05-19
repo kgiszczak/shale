@@ -1,15 +1,15 @@
 # frozen_string_literal: true
 
-require_relative 'attribute'
+require_relative 'element'
 
 module Shale
   module Schema
-    class XML
-      # Class representing XML Schema <attribute name="" type=""> element
+    class XMLGenerator
+      # Class representing XML Schema <element mame="" type=""> element
       # with a name and a type
       #
       # @api private
-      class TypedAttribute < Attribute
+      class TypedElement < Element
         # Return name
         #
         # @return [String]
@@ -17,20 +17,20 @@ module Shale
         # @api private
         attr_reader :name
 
-        # Initialize TypedAttribute object
+        # Initialize TypedElement object
         #
         # @param [String] name
         # @param [String] type
         # @param [String, nil] default
+        # @param [true, false] collection
+        # @param [true, false] required
         #
         # @api private
-        def initialize(name:, type:, default: nil)
-          super(default)
+        def initialize(name:, type:, default: nil, collection: false, required: false)
+          super(default, collection, required)
           @name = name
           @type = type
         end
-
-        private
 
         # Return attributes as Ruby Hash
         #

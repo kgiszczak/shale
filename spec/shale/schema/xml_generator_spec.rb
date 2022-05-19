@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require 'shale/schema/xml'
+require 'shale/schema/xml_generator'
 require 'shale/error'
 
-module ShaleSchemaXMLTesting
+module ShaleSchemaXMLGeneratorTesting
   class BaseNameTesting < Shale::Mapper
     attribute :foo, Shale::Type::String
     attribute :bar, Shale::Type::String
@@ -116,18 +116,18 @@ module ShaleSchemaXMLTesting
   end
 end
 
-RSpec.describe Shale::Schema::XML do
+RSpec.describe Shale::Schema::XMLGenerator do
   let(:expected_schema0) do
     <<~DATA.gsub(/\n\z/, '')
       <xs:schema elementFormDefault="qualified" attributeFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:foo="http://foo.com">
         <xs:import namespace="http://foo.com" schemaLocation="schema1.xsd"/>
-        <xs:element name="root" type="ShaleSchemaXMLTesting_Root"/>
-        <xs:complexType name="ShaleSchemaXMLTesting_BranchOne">
+        <xs:element name="root" type="ShaleSchemaXMLGeneratorTesting_Root"/>
+        <xs:complexType name="ShaleSchemaXMLGeneratorTesting_BranchOne">
           <xs:sequence>
             <xs:element name="One" type="xs:string" minOccurs="0"/>
           </xs:sequence>
         </xs:complexType>
-        <xs:complexType name="ShaleSchemaXMLTesting_Root" mixed="true">
+        <xs:complexType name="ShaleSchemaXMLGeneratorTesting_Root" mixed="true">
           <xs:sequence>
             <xs:element name="boolean" type="xs:boolean" minOccurs="0"/>
             <xs:element name="date" type="xs:date" minOccurs="0"/>
@@ -150,9 +150,9 @@ RSpec.describe Shale::Schema::XML do
             <xs:element name="string_collection" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="time_collection" type="xs:dateTime" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="value_collection" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="branch_one" type="ShaleSchemaXMLTesting_BranchOne" minOccurs="0"/>
+            <xs:element name="branch_one" type="ShaleSchemaXMLGeneratorTesting_BranchOne" minOccurs="0"/>
             <xs:element ref="foo:branch_two" minOccurs="0"/>
-            <xs:element name="circular_dependency" type="ShaleSchemaXMLTesting_Root" minOccurs="0"/>
+            <xs:element name="circular_dependency" type="ShaleSchemaXMLGeneratorTesting_Root" minOccurs="0"/>
           </xs:sequence>
           <xs:attribute name="attribute_one" type="xs:string"/>
           <xs:attribute ref="foo:attribute_two"/>
@@ -164,9 +164,9 @@ RSpec.describe Shale::Schema::XML do
   let(:expected_schema1) do
     <<~DATA.gsub(/\n\z/, '')
       <xs:schema elementFormDefault="qualified" attributeFormDefault="qualified" targetNamespace="http://foo.com" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:foo="http://foo.com">
-        <xs:element name="branch_two" type="foo:ShaleSchemaXMLTesting_BranchTwo"/>
+        <xs:element name="branch_two" type="foo:ShaleSchemaXMLGeneratorTesting_BranchTwo"/>
         <xs:attribute name="attribute_two" type="xs:string"/>
-        <xs:complexType name="ShaleSchemaXMLTesting_BranchTwo">
+        <xs:complexType name="ShaleSchemaXMLGeneratorTesting_BranchTwo">
           <xs:sequence>
             <xs:element name="Two" type="xs:string" minOccurs="0"/>
           </xs:sequence>
@@ -178,15 +178,15 @@ RSpec.describe Shale::Schema::XML do
   let(:expected_schema_circular) do
     <<~DATA.gsub(/\n\z/, '')
       <xs:schema elementFormDefault="qualified" attributeFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
-        <xs:element name="circular_dependency_a" type="ShaleSchemaXMLTesting_CircularDependencyA"/>
-        <xs:complexType name="ShaleSchemaXMLTesting_CircularDependencyA">
+        <xs:element name="circular_dependency_a" type="ShaleSchemaXMLGeneratorTesting_CircularDependencyA"/>
+        <xs:complexType name="ShaleSchemaXMLGeneratorTesting_CircularDependencyA">
           <xs:sequence>
-            <xs:element name="circular_dependency_b" type="ShaleSchemaXMLTesting_CircularDependencyB" minOccurs="0"/>
+            <xs:element name="circular_dependency_b" type="ShaleSchemaXMLGeneratorTesting_CircularDependencyB" minOccurs="0"/>
           </xs:sequence>
         </xs:complexType>
-        <xs:complexType name="ShaleSchemaXMLTesting_CircularDependencyB">
+        <xs:complexType name="ShaleSchemaXMLGeneratorTesting_CircularDependencyB">
           <xs:sequence>
-            <xs:element name="circular_dependency_a" type="ShaleSchemaXMLTesting_CircularDependencyA" minOccurs="0"/>
+            <xs:element name="circular_dependency_a" type="ShaleSchemaXMLGeneratorTesting_CircularDependencyA" minOccurs="0"/>
           </xs:sequence>
         </xs:complexType>
       </xs:schema>
@@ -211,7 +211,7 @@ RSpec.describe Shale::Schema::XML do
 
     context 'without base_name' do
       it 'generates schema with default name' do
-        schemas = described_class.new.as_schemas(ShaleSchemaXMLTesting::BaseNameTesting)
+        schemas = described_class.new.as_schemas(ShaleSchemaXMLGeneratorTesting::BaseNameTesting)
         expect(schemas.map(&:name)).to eq(['schema0.xsd', 'schema1.xsd'])
       end
     end
@@ -219,7 +219,7 @@ RSpec.describe Shale::Schema::XML do
     context 'without base_name' do
       it 'generates schema with name' do
         schemas = described_class.new.as_schemas(
-          ShaleSchemaXMLTesting::BaseNameTesting,
+          ShaleSchemaXMLGeneratorTesting::BaseNameTesting,
           'foo'
         )
         expect(schemas.map(&:name)).to eq(['foo0.xsd', 'foo1.xsd'])
@@ -228,7 +228,7 @@ RSpec.describe Shale::Schema::XML do
 
     context 'with correct arguments' do
       it 'generates XML schema' do
-        schemas = described_class.new.as_schemas(ShaleSchemaXMLTesting::Root)
+        schemas = described_class.new.as_schemas(ShaleSchemaXMLGeneratorTesting::Root)
 
         schema0 = Shale.xml_adapter.dump(schemas[0].as_xml, :pretty)
         schema1 = Shale.xml_adapter.dump(schemas[1].as_xml, :pretty)
@@ -241,7 +241,7 @@ RSpec.describe Shale::Schema::XML do
     context 'with classes depending on each other' do
       it 'generates XML schema' do
         schemas = described_class.new.as_schemas(
-          ShaleSchemaXMLTesting::CircularDependencyA
+          ShaleSchemaXMLGeneratorTesting::CircularDependencyA
         )
 
         schema0 = Shale.xml_adapter.dump(schemas[0].as_xml, :pretty)
@@ -254,9 +254,9 @@ RSpec.describe Shale::Schema::XML do
   describe '#to_schema' do
     context 'with pretty param' do
       it 'genrates XML document' do
-        schemas = described_class.new.as_schemas(ShaleSchemaXMLTesting::BranchOne)
+        schemas = described_class.new.as_schemas(ShaleSchemaXMLGeneratorTesting::BranchOne)
         schemas_xml = described_class.new.to_schemas(
-          ShaleSchemaXMLTesting::BranchOne,
+          ShaleSchemaXMLGeneratorTesting::BranchOne,
           pretty: true
         )
 
@@ -267,9 +267,9 @@ RSpec.describe Shale::Schema::XML do
 
     context 'with declaration param' do
       it 'genrates XML document' do
-        schemas = described_class.new.as_schemas(ShaleSchemaXMLTesting::BranchOne)
+        schemas = described_class.new.as_schemas(ShaleSchemaXMLGeneratorTesting::BranchOne)
         schemas_xml = described_class.new.to_schemas(
-          ShaleSchemaXMLTesting::BranchOne,
+          ShaleSchemaXMLGeneratorTesting::BranchOne,
           declaration: true
         )
 
@@ -280,8 +280,8 @@ RSpec.describe Shale::Schema::XML do
 
     context 'without pretty and declaration param' do
       it 'genrates XML document' do
-        schemas = described_class.new.as_schemas(ShaleSchemaXMLTesting::BranchOne)
-        schemas_xml = described_class.new.to_schemas(ShaleSchemaXMLTesting::BranchOne)
+        schemas = described_class.new.as_schemas(ShaleSchemaXMLGeneratorTesting::BranchOne)
+        schemas_xml = described_class.new.to_schemas(ShaleSchemaXMLGeneratorTesting::BranchOne)
 
         expected = Shale.xml_adapter.dump(schemas[0].as_xml)
         expect(schemas_xml.values[0]).to eq(expected)

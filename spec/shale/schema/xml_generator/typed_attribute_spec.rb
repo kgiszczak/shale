@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 require 'shale'
-require 'shale/schema/xml/typed_attribute'
+require 'shale/schema/xml_generator/typed_attribute'
 
-RSpec.describe Shale::Schema::XML::TypedAttribute do
+RSpec.describe Shale::Schema::XMLGenerator::TypedAttribute do
   describe '#name' do
     it 'returns name' do
       expect(described_class.new(name: 'foo', type: 'string').name).to eq('foo')

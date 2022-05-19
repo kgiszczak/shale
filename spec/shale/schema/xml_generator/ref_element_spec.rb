@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 require 'shale'
-require 'shale/schema/xml/ref_element'
+require 'shale/schema/xml_generator/ref_element'
 
-RSpec.describe Shale::Schema::XML::RefElement do
+RSpec.describe Shale::Schema::XMLGenerator::RefElement do
   describe '#as_xml' do
     context 'with default' do
       it 'returns XML node' do

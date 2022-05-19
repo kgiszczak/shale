@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 require 'shale'
-require 'shale/schema/xml/complex_type'
-require 'shale/schema/xml/typed_attribute'
-require 'shale/schema/xml/typed_element'
+require 'shale/schema/xml_generator/complex_type'
+require 'shale/schema/xml_generator/typed_attribute'
+require 'shale/schema/xml_generator/typed_element'
 
-RSpec.describe Shale::Schema::XML::ComplexType do
+RSpec.describe Shale::Schema::XMLGenerator::ComplexType do
   describe '#name' do
     it 'returns namespace' do
       expect(described_class.new('foo').name).to eq('foo')
@@ -38,8 +38,8 @@ RSpec.describe Shale::Schema::XML::ComplexType do
         doc = Shale.xml_adapter.create_document
 
         children = [
-          Shale::Schema::XML::TypedElement.new(name: 'foo', type: 'string'),
-          Shale::Schema::XML::TypedAttribute.new(name: 'bar', type: 'string'),
+          Shale::Schema::XMLGenerator::TypedElement.new(name: 'foo', type: 'string'),
+          Shale::Schema::XMLGenerator::TypedAttribute.new(name: 'bar', type: 'string'),
         ]
         el = described_class.new('foo', children).as_xml(doc)
 

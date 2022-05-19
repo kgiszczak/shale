@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 require 'shale'
-require 'shale/schema/xml/import'
+require 'shale/schema/xml_generator/import'
 
-RSpec.describe Shale::Schema::XML::Import do
+RSpec.describe Shale::Schema::XMLGenerator::Import do
   describe '#namespace' do
     it 'returns namespace' do
       expect(described_class.new('foo', 'bar').namespace).to eq('foo')
