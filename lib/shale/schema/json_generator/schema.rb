@@ -2,7 +2,7 @@
 
 module Shale
   module Schema
-    class JSON
+    class JSONGenerator
       # Class representing JSON schema
       #
       # @api private
@@ -13,7 +13,7 @@ module Shale
 
         # Initialize Schema object
         #
-        # @param [Array<Shale::Schema::JSON::Base>] types
+        # @param [Array<Shale::Schema::JSONGenerator::Base>] types
         # @param [String, nil] id
         # @param [String, nil] description
         #
@@ -29,7 +29,7 @@ module Shale
         # @return [Hash]
         #
         # @example
-        #   Shale::Schema::JSON::Schema.new(types).as_json
+        #   Shale::Schema::JSONGenerator::Schema.new(types).as_json
         #
         # @api private
         def as_json

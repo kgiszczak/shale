@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative 'schema/json'
+require_relative 'schema/json_generator'
 require_relative 'schema/xml'
 
 module Shale
@@ -23,7 +23,7 @@ module Shale
     #
     # @api public
     def self.to_json(klass, id: nil, description: nil, pretty: false)
-      JSON.new.to_schema(klass, id: id, description: description, pretty: pretty)
+      JSONGenerator.new.to_schema(klass, id: id, description: description, pretty: pretty)
     end
 
     # Generate XML Schema from Shale model

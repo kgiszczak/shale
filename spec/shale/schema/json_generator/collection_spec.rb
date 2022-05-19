@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require 'shale/schema/json/boolean'
-require 'shale/schema/json/collection'
+require 'shale/schema/json_generator/boolean'
+require 'shale/schema/json_generator/collection'
 
-RSpec.describe Shale::Schema::JSON::Collection do
-  let(:type) { Shale::Schema::JSON::Boolean.new('foo') }
+RSpec.describe Shale::Schema::JSONGenerator::Collection do
+  let(:type) { Shale::Schema::JSONGenerator::Boolean.new('foo') }
 
   describe '#name' do
     it 'returns name of the wrapped type' do

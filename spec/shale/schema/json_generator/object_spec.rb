@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-require 'shale/schema/json/boolean'
-require 'shale/schema/json/object'
+require 'shale/schema/json_generator/boolean'
+require 'shale/schema/json_generator/object'
 
-RSpec.describe Shale::Schema::JSON::Object do
+RSpec.describe Shale::Schema::JSONGenerator::Object do
   let(:types) do
-    [Shale::Schema::JSON::Boolean.new('bar')]
+    [Shale::Schema::JSONGenerator::Boolean.new('bar')]
   end
 
   describe '#as_type' do

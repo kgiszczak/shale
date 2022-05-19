@@ -4,7 +4,7 @@ require_relative 'base'
 
 module Shale
   module Schema
-    class JSON
+    class JSONGenerator
       # Class representing JSON Schema float type
       #
       # @api private

@@ -4,18 +4,18 @@ require_relative 'base'
 
 module Shale
   module Schema
-    class JSON
-      # Class representing JSON Schema integer type
+    class JSONGenerator
+      # Class representing JSON Schema date type
       #
       # @api private
-      class Integer < Base
+      class Date < Base
         # Return JSON Schema fragment as Ruby Hash
         #
         # @return [Hash]
         #
         # @api private
         def as_type
-          { 'type' => 'integer' }
+          { 'type' => 'string', 'format' => 'date' }
         end
       end
     end

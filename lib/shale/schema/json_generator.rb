@@ -1,32 +1,32 @@
 # frozen_string_literal: true
 
 require_relative '../../shale'
-require_relative 'json/schema'
-require_relative 'json/boolean'
-require_relative 'json/collection'
-require_relative 'json/date'
-require_relative 'json/float'
-require_relative 'json/integer'
-require_relative 'json/object'
-require_relative 'json/ref'
-require_relative 'json/string'
-require_relative 'json/time'
+require_relative 'json_generator/schema'
+require_relative 'json_generator/boolean'
+require_relative 'json_generator/collection'
+require_relative 'json_generator/date'
+require_relative 'json_generator/float'
+require_relative 'json_generator/integer'
+require_relative 'json_generator/object'
+require_relative 'json_generator/ref'
+require_relative 'json_generator/string'
+require_relative 'json_generator/time'
 
 module Shale
   module Schema
-    # Class for handling JSON schema
+    # Class for generating JSON schema
     #
     # @api public
-    class JSON
-      @json_types = Hash.new(Shale::Schema::JSON::String)
+    class JSONGenerator
+      @json_types = Hash.new(Shale::Schema::JSONGenerator::String)
 
       # Register Shale to JSON type mapping
       #
       # @param [Shale::Type::Value] shale_type
-      # @param [Shale::Schema::JSON::Base] json_type
+      # @param [Shale::Schema::JSONGenerator::Base] json_type
       #
       # @example
-      #   Shale::Schema::JSON.register_json_type(Shale::Type::String, MyCustomJsonType)
+      #   Shale::Schema::JSONGenerator.register_json_type(Shale::Type::String, MyCustomJsonType)
       #
       # @api public
       def self.register_json_type(shale_type, json_type)
@@ -37,10 +37,10 @@ module Shale
       #
       # @param [Shale::Type::Value] shale_type
       #
-      # @return [Shale::Schema::JSON::Base]
+      # @return [Shale::Schema::JSONGenerator::Base]
       #
       # @example
-      #   Shale::Schema::JSON.get_json_type(Shale::Type::String)
+      #   Shale::Schema::JSONGenerator.get_json_type(Shale::Type::String)
       #   # => Shale::Schema::JSON::String
       #
       # @api private
@@ -48,11 +48,11 @@ module Shale
         @json_types[shale_type]
       end
 
-      register_json_type(Shale::Type::Boolean, Shale::Schema::JSON::Boolean)
-      register_json_type(Shale::Type::Date, Shale::Schema::JSON::Date)
-      register_json_type(Shale::Type::Float, Shale::Schema::JSON::Float)
-      register_json_type(Shale::Type::Integer, Shale::Schema::JSON::Integer)
-      register_json_type(Shale::Type::Time, Shale::Schema::JSON::Time)
+      register_json_type(Shale::Type::Boolean, Shale::Schema::JSONGenerator::Boolean)
+      register_json_type(Shale::Type::Date, Shale::Schema::JSONGenerator::Date)
+      register_json_type(Shale::Type::Float, Shale::Schema::JSONGenerator::Float)
+      register_json_type(Shale::Type::Integer, Shale::Schema::JSONGenerator::Integer)
+      register_json_type(Shale::Type::Time, Shale::Schema::JSONGenerator::Time)
 
       # Generate JSON Schema from Shale model and return it as a Ruby Hash
       #
@@ -65,7 +65,7 @@ module Shale
       # @return [Hash]
       #
       # @example
-      #   Shale::Schema::JSON.new.as_schema(Person)
+      #   Shale::Schema::JSONGenerator.new.as_schema(Person)
       #
       # @api public
       def as_schema(klass, id: nil, description: nil)
@@ -117,7 +117,7 @@ module Shale
       # @return [String]
       #
       # @example
-      #   Shale::Schema::JSON.new.to_schema(Person)
+      #   Shale::Schema::JSONGenerator.new.to_schema(Person)
       #
       # @api public
       def to_schema(klass, id: nil, description: nil, pretty: false)

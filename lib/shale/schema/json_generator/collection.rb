@@ -2,14 +2,14 @@
 
 module Shale
   module Schema
-    class JSON
+    class JSONGenerator
       # Class representing array type in JSON Schema
       #
       # @api private
       class Collection
         # Initialize Collection object
         #
-        # @param [Shale::Schema::JSON::Base] type
+        # @param [Shale::Schema::JSONGenerator::Base] type
         #
         # @api private
         def initialize(type)

@@ -4,18 +4,23 @@ require_relative 'base'
 
 module Shale
   module Schema
-    class JSON
-      # Class representing JSON Schema string type
+    class JSONGenerator
+      # Class representing JSON Schema reference
       #
       # @api private
-      class String < Base
+      class Ref < Base
+        def initialize(name, type)
+          super(name)
+          @type = type.gsub('::', '_')
+        end
+
         # Return JSON Schema fragment as Ruby Hash
         #
         # @return [Hash]
         #
         # @api private
         def as_type
-          { 'type' => 'string' }
+          { '$ref' => "#/$defs/#{@type}" }
         end
       end
     end

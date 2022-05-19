@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require 'shale/schema/json'
+require 'shale/schema/json_generator'
 require 'shale/error'
 
-module ShaleSchemaJSONTesting
+module ShaleSchemaJSONGeneratorTesting
   class BranchOne < Shale::Mapper
     attribute :one, Shale::Type::String
 
@@ -64,15 +64,15 @@ module ShaleSchemaJSONTesting
   end
 end
 
-RSpec.describe Shale::Schema::JSON do
+RSpec.describe Shale::Schema::JSONGenerator do
   let(:expected_schema_hash) do
     {
       '$schema' => 'https://json-schema.org/draft/2020-12/schema',
       '$id' => 'My ID',
       'description' => 'My description',
-      '$ref' => '#/$defs/ShaleSchemaJSONTesting_Root',
+      '$ref' => '#/$defs/ShaleSchemaJSONGeneratorTesting_Root',
       '$defs' => {
-        'ShaleSchemaJSONTesting_BranchOne' => {
+        'ShaleSchemaJSONGeneratorTesting_BranchOne' => {
           'type' => %w[object null],
           'properties' => {
             'One' => {
@@ -80,7 +80,7 @@ RSpec.describe Shale::Schema::JSON do
             },
           },
         },
-        'ShaleSchemaJSONTesting_BranchTwo' => {
+        'ShaleSchemaJSONGeneratorTesting_BranchTwo' => {
           'type' => %w[object null],
           'properties' => {
             'Two' => {
@@ -88,7 +88,7 @@ RSpec.describe Shale::Schema::JSON do
             },
           },
         },
-        'ShaleSchemaJSONTesting_Root' => {
+        'ShaleSchemaJSONGeneratorTesting_Root' => {
           'type' => 'object',
           'properties' => {
             'boolean' => {
@@ -173,13 +173,13 @@ RSpec.describe Shale::Schema::JSON do
               'items' => { 'type' => 'string' },
             },
             'branch_one' => {
-              '$ref' => '#/$defs/ShaleSchemaJSONTesting_BranchOne',
+              '$ref' => '#/$defs/ShaleSchemaJSONGeneratorTesting_BranchOne',
             },
             'branch_two' => {
-              '$ref' => '#/$defs/ShaleSchemaJSONTesting_BranchTwo',
+              '$ref' => '#/$defs/ShaleSchemaJSONGeneratorTesting_BranchTwo',
             },
             'circular_dependency' => {
-              '$ref' => '#/$defs/ShaleSchemaJSONTesting_Root',
+              '$ref' => '#/$defs/ShaleSchemaJSONGeneratorTesting_Root',
             },
           },
         },
@@ -190,21 +190,21 @@ RSpec.describe Shale::Schema::JSON do
   let(:expected_circular_schema_hash) do
     {
       '$schema' => 'https://json-schema.org/draft/2020-12/schema',
-      '$ref' => '#/$defs/ShaleSchemaJSONTesting_CircularDependencyA',
+      '$ref' => '#/$defs/ShaleSchemaJSONGeneratorTesting_CircularDependencyA',
       '$defs' => {
-        'ShaleSchemaJSONTesting_CircularDependencyA' => {
+        'ShaleSchemaJSONGeneratorTesting_CircularDependencyA' => {
           'type' => 'object',
           'properties' => {
             'circular_dependency_b' => {
-              '$ref' => '#/$defs/ShaleSchemaJSONTesting_CircularDependencyB',
+              '$ref' => '#/$defs/ShaleSchemaJSONGeneratorTesting_CircularDependencyB',
             },
           },
         },
-        'ShaleSchemaJSONTesting_CircularDependencyB' => {
+        'ShaleSchemaJSONGeneratorTesting_CircularDependencyB' => {
           'type' => %w[object null],
           'properties' => {
             'circular_dependency_a' => {
-              '$ref' => '#/$defs/ShaleSchemaJSONTesting_CircularDependencyA',
+              '$ref' => '#/$defs/ShaleSchemaJSONGeneratorTesting_CircularDependencyA',
             },
           },
         },
@@ -230,14 +230,14 @@ RSpec.describe Shale::Schema::JSON do
 
     context 'without id' do
       it 'generates schema without id' do
-        schema = described_class.new.as_schema(ShaleSchemaJSONTesting::Root)
+        schema = described_class.new.as_schema(ShaleSchemaJSONGeneratorTesting::Root)
         expect(schema['id']).to eq(nil)
       end
     end
 
     context 'without description' do
       it 'generates schema without description' do
-        schema = described_class.new.as_schema(ShaleSchemaJSONTesting::Root)
+        schema = described_class.new.as_schema(ShaleSchemaJSONGeneratorTesting::Root)
         expect(schema['description']).to eq(nil)
       end
     end
@@ -245,7 +245,7 @@ RSpec.describe Shale::Schema::JSON do
     context 'with correct arguments' do
       it 'generates JSON schema' do
         schema = described_class.new.as_schema(
-          ShaleSchemaJSONTesting::Root,
+          ShaleSchemaJSONGeneratorTesting::Root,
           id: 'My ID',
           description: 'My description'
         )
@@ -257,7 +257,7 @@ RSpec.describe Shale::Schema::JSON do
     context 'with classes depending on each other' do
       it 'generates JSON schema' do
         schema = described_class.new.as_schema(
-          ShaleSchemaJSONTesting::CircularDependencyA
+          ShaleSchemaJSONGeneratorTesting::CircularDependencyA
         )
 
         expect(schema).to eq(expected_circular_schema_hash)
@@ -269,7 +269,7 @@ RSpec.describe Shale::Schema::JSON do
     context 'with pretty param' do
       it 'genrates JSON document' do
         schema = described_class.new.to_schema(
-          ShaleSchemaJSONTesting::Root,
+          ShaleSchemaJSONGeneratorTesting::Root,
           id: 'My ID',
           description: 'My description',
           pretty: true
@@ -282,7 +282,7 @@ RSpec.describe Shale::Schema::JSON do
     context 'without pretty param' do
       it 'genrates JSON document' do
         schema = described_class.new.to_schema(
-          ShaleSchemaJSONTesting::Root,
+          ShaleSchemaJSONGeneratorTesting::Root,
           id: 'My ID',
           description: 'My description'
         )

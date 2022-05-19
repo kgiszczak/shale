@@ -4,7 +4,7 @@ require_relative 'base'
 
 module Shale
   module Schema
-    class JSON
+    class JSONGenerator
       # Class representing JSON Schema object type
       #
       # @api private
@@ -12,7 +12,10 @@ module Shale
         # Initialize object
         #
         # @param [String] name
-        # @param [Array<Shale::Schema::JSON::Base, Shale::Schema::JSON::Collection>] properties
+        # @param [
+        #   Array<Shale::Schema::JSONGenerator::Base,
+        #   Shale::Schema::JSONGenerator::Collection>
+        # ] properties
         #
         # @api private
         def initialize(name, properties)

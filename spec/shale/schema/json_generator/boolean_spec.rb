@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-require 'shale/schema/json/float'
+require 'shale/schema/json_generator/boolean'
 
-RSpec.describe Shale::Schema::JSON::Float do
+RSpec.describe Shale::Schema::JSONGenerator::Boolean do
   describe '#as_type' do
     it 'returns JSON Schema fragment as Hash' do
-      expected = { 'type' => 'number' }
+      expected = { 'type' => 'boolean' }
       expect(described_class.new('foo').as_type).to eq(expected)
     end
   end

@@ -4,18 +4,18 @@ require_relative 'base'
 
 module Shale
   module Schema
-    class JSON
-      # Class representing JSON Schema boolean type
+    class JSONGenerator
+      # Class representing JSON Schema string type
       #
       # @api private
-      class Boolean < Base
+      class String < Base
         # Return JSON Schema fragment as Ruby Hash
         #
         # @return [Hash]
         #
         # @api private
         def as_type
-          { 'type' => 'boolean' }
+          { 'type' => 'string' }
         end
       end
     end

@@ -613,9 +613,9 @@ Shale.xml_adapter = Shale::Adapter::Ox
 
 ### Generating JSON Schema
 
-To generate JSON Schema from you Shale data model use:
-
 :warning: Shale only supports **[Draft 2020-12](https://json-schema.org/draft/2020-12/schema)** JSON Schema
+
+To generate JSON Schema from you Shale data model use:
 
 ```ruby
 require 'shale/schema'
@@ -678,13 +678,13 @@ class MyEmailType < Shale::Type::Value
   ...
 end
 
-class MyEmailJSONType < Shale::Schema::JSON::Base
+class MyEmailJSONType < Shale::Schema::JSONGenerator::Base
   def as_type
     { 'type' => 'string', 'format' => 'email' }
   end
 end
 
-Shale::Schema::JSON.register_json_type(MyEmailType, MyEmailJSONType)
+Shale::Schema::JSONGenerator.register_json_type(MyEmailType, MyEmailJSONType)
 ```
 
 ### Generating XML Schema

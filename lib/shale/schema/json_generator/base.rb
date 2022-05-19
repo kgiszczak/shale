@@ -2,7 +2,7 @@
 
 module Shale
   module Schema
-    class JSON
+    class JSONGenerator
       # Base class for JSON Schema types
       #
       # @api private
