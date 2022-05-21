@@ -128,6 +128,7 @@ DATA
 
 ```ruby
 person.to_json
+
 # =>
 #
 # {
@@ -166,6 +167,7 @@ DATA
 
 ```ruby
 person.to_yaml
+
 # =>
 #
 # ---
@@ -203,6 +205,7 @@ person = Person.from_hash(
 
 ```ruby
 person.to_hash
+
 # =>
 #
 # {
@@ -239,6 +242,7 @@ DATA
 
 ```ruby
 person.to_xml
+
 # =>
 #
 # <person>
@@ -258,7 +262,7 @@ person.to_xml
 
 ### Mapping JSON keys to object attributes
 
-By default keys are named the same as attributes. To use custom key names use:
+By default keys are named the same as attributes. To use custom keys use:
 
 ```ruby
 class Person < Shale::Mapper
@@ -302,7 +306,7 @@ end
 
 ### Mapping XML elements and attributes to object attributes
 
-XML is more complcated format than JSON or YAML. To map elements, attributes and content use:
+XML is more complicated format than JSON or YAML. To map elements, attributes and content use:
 
 ```ruby
 class Address < Shale::Mapper
@@ -358,8 +362,6 @@ DATA
 
 ### Using XML namespaces
 
-:warning: **Ox doesn't support XML namespaces**
-
 To map namespaced elements and attributes use `namespace` and `prefix` properties on
 `map_element` and `map_attribute`
 
@@ -387,7 +389,7 @@ DATA
 ```
 
 To define default namespace for all elements use `namespace` declaration
-(this will define namespace only on elements, if you want to define namespace on an attribute
+(this will define namespace on elements only, if you want to define namespace on an attribute
 explicitly declare it on `map_attribute`).
 
 ```ruby
@@ -592,6 +594,8 @@ Shale.yaml_adapter = MyYamlAdapter
 
 Shale provides adapters for most popular Ruby XML parsers:
 
+:warning: **Ox doesn't support XML namespaces**
+
 ```ruby
 require 'shale'
 
@@ -613,14 +617,19 @@ Shale.xml_adapter = Shale::Adapter::Ox
 
 ### Generating JSON Schema
 
-:warning: Shale only supports **[Draft 2020-12](https://json-schema.org/draft/2020-12/schema)** JSON Schema
+:warning: Only **[Draft 2020-12](https://json-schema.org/draft/2020-12/schema)** JSON Schema is supported
 
-To generate JSON Schema from you Shale data model use:
+To generate JSON Schema from your Shale data model use:
 
 ```ruby
 require 'shale/schema'
 
-Shale::Schema.to_json(Person, id: 'http://foo.bar/schema/person', description: 'My description', pretty: true)
+Shale::Schema.to_json(
+  Person,
+  id: 'http://foo.bar/schema/person',
+  description: 'My description',
+  pretty: true
+)
 
 # =>
 #
