@@ -41,7 +41,7 @@ module Shale
           return str.to_s unless /[A-Z-]|::/.match?(str)
           word = str.to_s.gsub('::', '/')
           word = word.gsub(/([A-Z]+)(?=[A-Z][a-z])|([a-z\d])(?=[A-Z])/) do
-            (Regexp.last_match(1) || Regexp.last_match(2)) << '_'
+            "#{Regexp.last_match(1) || Regexp.last_match(2)}_"
           end
           word = word.tr('-', '_')
           word.downcase
