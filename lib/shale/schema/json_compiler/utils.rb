@@ -19,15 +19,13 @@ module Shale
         def self.classify(str)
           str = str.to_s.sub(/.*\./, '')
 
-          str = str.sub(/^[a-z\d]*/) { |match| match.capitalize! || match }
+          str = str.sub(/^[a-z\d]*/) { |match| match.capitalize || match }
 
-          str.gsub!(%r{(?:_|(/))([a-z\d]*)}i) do
+          str.gsub(%r{(?:_|(/))([a-z\d]*)}i) do
             word = Regexp.last_match(2)
-            substituted = word.capitalize! || word
+            substituted = word.capitalize || word
             Regexp.last_match(1) ? "::#{substituted}" : substituted
           end
-
-          str
         end
 
         # Convert string to snake case
@@ -42,12 +40,11 @@ module Shale
         def self.snake_case(str)
           return str.to_s unless /[A-Z-]|::/.match?(str)
           word = str.to_s.gsub('::', '/')
-          word.gsub!(/([A-Z]+)(?=[A-Z][a-z])|([a-z\d])(?=[A-Z])/) do
+          word = word.gsub(/([A-Z]+)(?=[A-Z][a-z])|([a-z\d])(?=[A-Z])/) do
             (Regexp.last_match(1) || Regexp.last_match(2)) << '_'
           end
-          word.tr!('-', '_')
-          word.downcase!
-          word
+          word = word.tr('-', '_')
+          word.downcase
         end
       end
     end
