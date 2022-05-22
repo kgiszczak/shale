@@ -49,6 +49,7 @@ $ gem install shale
 * [Writing your own type](#writing-your-own-type)
 * [Adapters](#adapters)
 * [Generating JSON Schema](#generating-json-schema)
+* [Compiling JSON Schema into Shale model](#compiling-json-schema-into-shale-model)
 * [Generating XML Schema](#generating-xml-schema)
 
 ## Usage
@@ -674,7 +675,7 @@ Shale::Schema.to_json(
 You can also use a command line tool to do it:
 
 ```
-$ shaleb -i data_model.rb -c Person -p
+$ shaleb -i data_model.rb -r Person -p
 ```
 
 If you want to convert your own types to JSON Schema types use:
@@ -694,6 +695,76 @@ class MyEmailJSONType < Shale::Schema::JSONGenerator::Base
 end
 
 Shale::Schema::JSONGenerator.register_json_type(MyEmailType, MyEmailJSONType)
+```
+
+### Compiling JSON Schema into Shale model
+
+:warning: Only **[Draft 2020-12](https://json-schema.org/draft/2020-12/schema)** JSON Schema is supported
+
+To generate Shale data model from JSON Schema use:
+
+```ruby
+require 'shale/schema'
+
+schema = <<~SCHEMA
+{
+  "type": "object",
+  "properties": {
+    "firstName": { "type": "string" },
+    "lastName": { "type": "string" },
+    "address": {
+      "type": "object",
+      "properties": {
+        "street": { "type": "string" },
+        "city": { "type": "string" }
+      }
+    }
+  }
+}
+SCHEMA
+
+Shale::Schema.from_json([schema], root_name: 'Person')
+
+# =>
+#
+# {
+#   "address" => "
+#     require 'shale'
+#
+#     class Address < Shale::Mapper
+#       attribute :street, Shale::Type::String
+#       attribute :city, Shale::Type::String
+#
+#       json do
+#         map 'street', to: :street
+#         map 'city', to: :city
+#       end
+#     end
+#   ",
+#   "person" => "
+#     require 'shale'
+#
+#     require_relative 'address'
+#
+#     class Person < Shale::Mapper
+#       attribute :first_name, Shale::Type::String
+#       attribute :last_name, Shale::Type::String
+#       attribute :address, Address
+#
+#       json do
+#         map 'firstName', to: :first_name
+#         map 'lastName', to: :last_name
+#         map 'address', to: :address
+#       end
+#     end
+#   "
+# }
+```
+
+You can also use a command line tool to do it:
+
+```
+$ shaleb -c -i schema.json -r Person
 ```
 
 ### Generating XML Schema
@@ -746,7 +817,7 @@ Shale::Schema.to_xml(Person, pretty: true)
 You can also use a command line tool to do it:
 
 ```
-$ shaleb -i data_model.rb -c Person -p -f xml
+$ shaleb -i data_model.rb -r Person -p -f xml
 ```
 
 If you want to convert your own types to XML Schema types use:

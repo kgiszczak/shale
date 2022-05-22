@@ -38,6 +38,39 @@ RSpec.describe Shale::Schema do
     end
   end
 
+  describe '.from_json' do
+    let(:schema) do
+      <<~DATA
+        {
+          "type": "object",
+          "properties": {
+            "name": { "type": "string" }
+          }
+        }
+      DATA
+    end
+
+    let(:expected_shale_model) do
+      <<~DATA
+        require 'shale'
+
+        class Foo < Shale::Mapper
+          attribute :name, Shale::Type::String
+
+          json do
+            map 'name', to: :name
+          end
+        end
+      DATA
+    end
+
+    it 'generates Shale models' do
+      models = described_class.from_json([schema], root_name: 'foo')
+      expect(models.length).to eq(1)
+      expect(models).to eq({ 'foo' => expected_shale_model })
+    end
+  end
+
   describe '.to_xml' do
     let(:expected_xml_schema) do
       schema = <<~DATA.gsub(/\n\z/, '')

@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative 'schema/json_generator'
+require_relative 'schema/json_compiler'
 require_relative 'schema/xml_generator'
 
 module Shale
@@ -24,6 +25,22 @@ module Shale
     # @api public
     def self.to_json(klass, id: nil, description: nil, pretty: false)
       JSONGenerator.new.to_schema(klass, id: id, description: description, pretty: pretty)
+    end
+
+    # Generate Shale model from JSON Schema
+    #
+    # @param [Array<String>] schemas
+    # @param [String, nil] root_name
+    #
+    # @return [Array<String>]
+    #
+    # @example
+    #   Shale::Schema.from_json([json_schema1, json_schema2], root_name: 'foobar')
+    #   # => [model1, model2, model3]
+    #
+    # @api public
+    def self.from_json(schemas, root_name: nil)
+      JSONCompiler.new.to_models(schemas, root_name: root_name)
     end
 
     # Generate XML Schema from Shale model

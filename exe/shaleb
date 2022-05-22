@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
+require 'fileutils'
 require 'optparse'
 
 base_path = File.expand_path('../lib', __dir__)
@@ -16,11 +17,17 @@ params = {}
 ARGV << '-h' if ARGV.empty?
 
 OptionParser.new do |opts|
-  opts.banner = "Usage: shaleb [options]\nexample: shaleb -i data_model.rb -c MyRoot"
+  opts.banner = <<~BANNER
+    Usage: shaleb [options]
+    example generate schema from Shale model: shaleb -g -i data_model.rb -c MyRoot
+    example generate Shale model from schema: shaleb -c -i schema1.json,schema2.json -c MyRoot
+  BANNER
 
-  opts.on('-i INPUT', '--input', 'Input file')
-  opts.on('-o OUTPUT', '--output', 'Output file (defaults to STDOUT)')
-  opts.on('-c CLASS', '--class CLASS', 'Shale model class name')
+  opts.on('-g', '--generate', 'generate schema from Shale model')
+  opts.on('-c', '--compile', 'compile schema into Shale model')
+  opts.on('-i INPUT', '--input', Array, 'Input file')
+  opts.on('-o OUTPUT', '--output', 'Output (defaults to STDOUT)')
+  opts.on('-r ROOT', '--root ROOT', 'Shale model class name')
   opts.on('-f FORMAT', '--format FORMAT', 'Schema format: JSON (default), XML')
   opts.on('-p', '--pretty', 'Pretty print generated schema')
 
@@ -30,46 +37,87 @@ OptionParser.new do |opts|
   end
 end.parse!(into: params)
 
-input_path = File.expand_path(params[:input], Dir.pwd)
+if params[:compile]
+  unless params[:input]
+    puts 'Input file is required: shaleb -c -i schema1.json,schema2.json'
+    exit
+  end
 
-unless File.exist?(input_path)
-  puts "File '#{input_path}' does not exist"
-  exit
-end
+  schemas = params[:input].map do |file|
+    path = File.expand_path(file, Dir.pwd)
 
-unless params[:class]
-  puts 'Model class is required'
-  exit
-end
+    if File.exist?(path)
+      File.read(path)
+    else
+      puts "File '#{path}' does not exist"
+      exit
+    end
+  end
 
-require input_path
+  models = Shale::Schema.from_json(schemas, root_name: params[:root])
 
-klass = Object.const_get(params[:class])
-
-if params[:format] == 'xml'
   if params[:output]
-    base_name = File.basename(params[:output], File.extname(params[:output]))
-    schemas = Shale::Schema.to_xml(klass, base_name, pretty: params[:pretty])
+    dir = File.expand_path(params[:output], Dir.pwd)
+    FileUtils.mkdir_p(dir) unless File.directory?(dir)
 
-    schemas.map do |name, xml|
-      File.write(File.expand_path(name, Dir.pwd), xml)
+    models.each do |name, model|
+      output_path = File.join(dir, "#{name}.rb")
+      File.write(output_path, model)
     end
   else
-    schemas = Shale::Schema.to_xml(klass, pretty: params[:pretty])
-
-    output = schemas.map do |name, xml|
-      "<!-- #{name} -->\n#{xml}\n"
+    output = models.map do |name, model|
+      "# --- #{name}.rb ---\n#{model}\n"
     end.join("\n")
 
     puts output
   end
 else
-  schema = Shale::Schema.to_json(klass, pretty: params[:pretty])
+  unless params[:input]
+    puts 'Input file is required: shaleb -i model.rb -r MyClass'
+    exit
+  end
 
-  if params[:output]
-    output_path = File.expand_path(params[:output], Dir.pwd)
-    File.write(output_path, schema)
+  input_path = File.expand_path(params[:input][0], Dir.pwd)
+
+  unless File.exist?(input_path)
+    puts "File '#{input_path}' does not exist"
+    exit
+  end
+
+  unless params[:root]
+    puts 'Model class is required: shaleb -i model.rb -r MyClass'
+    exit
+  end
+
+  require input_path
+
+  klass = Object.const_get(params[:root])
+
+  if params[:format] == 'xml'
+    if params[:output]
+      base_name = File.basename(params[:output], File.extname(params[:output]))
+      schemas = Shale::Schema.to_xml(klass, base_name, pretty: params[:pretty])
+
+      schemas.map do |name, xml|
+        File.write(File.expand_path(name, Dir.pwd), xml)
+      end
+    else
+      schemas = Shale::Schema.to_xml(klass, pretty: params[:pretty])
+
+      output = schemas.map do |name, xml|
+        "<!-- #{name} -->\n#{xml}\n"
+      end.join("\n")
+
+      puts output
+    end
   else
-    puts schema
+    schema = Shale::Schema.to_json(klass, pretty: params[:pretty])
+
+    if params[:output]
+      output_path = File.expand_path(params[:output], Dir.pwd)
+      File.write(output_path, schema)
+    else
+      puts schema
+    end
   end
 end
