@@ -69,6 +69,7 @@ RSpec.describe Shale::Schema::JSONGenerator do
     {
       '$schema' => 'https://json-schema.org/draft/2020-12/schema',
       '$id' => 'My ID',
+      'title' => 'My title',
       'description' => 'My description',
       '$ref' => '#/$defs/ShaleSchemaJSONGeneratorTesting_Root',
       '$defs' => {
@@ -235,6 +236,13 @@ RSpec.describe Shale::Schema::JSONGenerator do
       end
     end
 
+    context 'without title' do
+      it 'generates schema without title' do
+        schema = described_class.new.as_schema(ShaleSchemaJSONGeneratorTesting::Root)
+        expect(schema['title']).to eq(nil)
+      end
+    end
+
     context 'without description' do
       it 'generates schema without description' do
         schema = described_class.new.as_schema(ShaleSchemaJSONGeneratorTesting::Root)
@@ -247,6 +255,7 @@ RSpec.describe Shale::Schema::JSONGenerator do
         schema = described_class.new.as_schema(
           ShaleSchemaJSONGeneratorTesting::Root,
           id: 'My ID',
+          title: 'My title',
           description: 'My description'
         )
 
@@ -271,6 +280,7 @@ RSpec.describe Shale::Schema::JSONGenerator do
         schema = described_class.new.to_schema(
           ShaleSchemaJSONGeneratorTesting::Root,
           id: 'My ID',
+          title: 'My title',
           description: 'My description',
           pretty: true
         )
@@ -284,6 +294,7 @@ RSpec.describe Shale::Schema::JSONGenerator do
         schema = described_class.new.to_schema(
           ShaleSchemaJSONGeneratorTesting::Root,
           id: 'My ID',
+          title: 'My title',
           description: 'My description'
         )
 

@@ -68,7 +68,7 @@ module Shale
       #   Shale::Schema::JSONGenerator.new.as_schema(Person)
       #
       # @api public
-      def as_schema(klass, id: nil, description: nil)
+      def as_schema(klass, id: nil, title: nil, description: nil)
         unless mapper_type?(klass)
           raise NotAShaleMapperError, "JSON Shema can't be generated for '#{klass}' type"
         end
@@ -104,7 +104,7 @@ module Shale
           objects << Object.new(type.name, properties)
         end
 
-        Schema.new(objects, id: id, description: description).as_json
+        Schema.new(objects, id: id, title: title, description: description).as_json
       end
 
       # Generate JSON Schema from Shale model
@@ -120,8 +120,8 @@ module Shale
       #   Shale::Schema::JSONGenerator.new.to_schema(Person)
       #
       # @api public
-      def to_schema(klass, id: nil, description: nil, pretty: false)
-        schema = as_schema(klass, id: id, description: description)
+      def to_schema(klass, id: nil, title: nil, description: nil, pretty: false)
+        schema = as_schema(klass, id: id, title: title, description: description)
         options = pretty ? :pretty : nil
 
         Shale.json_adapter.dump(schema, options)

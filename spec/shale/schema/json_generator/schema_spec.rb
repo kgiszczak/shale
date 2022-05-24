@@ -5,13 +5,14 @@ require 'shale/schema/json_generator/schema'
 
 RSpec.describe Shale::Schema::JSONGenerator::Schema do
   describe '#as_json' do
-    context 'when id and description are not empty' do
+    context 'when id, title and description are not empty' do
       it 'returns JSON Schema fragment as Hash' do
-        schema = described_class.new([], id: 'foo', description: 'bar')
+        schema = described_class.new([], id: 'foo', title: 'bar', description: 'baz')
         expected = {
           '$schema' => 'https://json-schema.org/draft/2020-12/schema',
           '$id' => 'foo',
-          'description' => 'bar',
+          'title' => 'bar',
+          'description' => 'baz',
         }
 
         expect(schema.as_json).to eq(expected)

@@ -18,9 +18,10 @@ module Shale
         # @param [String, nil] description
         #
         # @api private
-        def initialize(types, id: nil, description: nil)
+        def initialize(types, id: nil, title: nil, description: nil)
           @types = types
           @id = id
+          @title = title
           @description = description
         end
 
@@ -36,6 +37,7 @@ module Shale
           schema = {
             '$schema' => DIALECT,
             '$id' => @id,
+            'title' => @title,
             'description' => @description,
           }
 

@@ -23,8 +23,14 @@ module Shale
     #   # => JSON schema
     #
     # @api public
-    def self.to_json(klass, id: nil, description: nil, pretty: false)
-      JSONGenerator.new.to_schema(klass, id: id, description: description, pretty: pretty)
+    def self.to_json(klass, id: nil, title: nil, description: nil, pretty: false)
+      JSONGenerator.new.to_schema(
+        klass,
+        id: id,
+        title: title,
+        description: description,
+        pretty: pretty
+      )
     end
 
     # Generate Shale model from JSON Schema
