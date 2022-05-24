@@ -113,7 +113,7 @@ RSpec.describe Shale::Schema::JSONGenerator do
               'format' => 'date-time',
             },
             'value' => {
-              'type' => %w[string null],
+              'type' => %w[boolean integer number object string null],
             },
             'boolean_default' => {
               'type' => %w[boolean null],
@@ -142,7 +142,7 @@ RSpec.describe Shale::Schema::JSONGenerator do
               'default' => '2021-01-01T10:10:10+01:00',
             },
             'value_default' => {
-              'type' => %w[string null],
+              'type' => %w[boolean integer number object string null],
               'default' => 'value',
             },
             'boolean_collection' => {
@@ -171,7 +171,7 @@ RSpec.describe Shale::Schema::JSONGenerator do
             },
             'value_collection' => {
               'type' => 'array',
-              'items' => { 'type' => 'string' },
+              'items' => { 'type' => %w[boolean integer number object string] },
             },
             'branch_one' => {
               '$ref' => '#/$defs/ShaleSchemaJSONGeneratorTesting_BranchOne',

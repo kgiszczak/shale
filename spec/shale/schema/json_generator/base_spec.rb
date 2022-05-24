@@ -14,6 +14,12 @@ module ShaleSchemaJSONGeneratorBaseTesting
       { 'foo' => 'test-type' }
     end
   end
+
+  class TypeMultipleValues < Shale::Schema::JSONGenerator::Base
+    def as_type
+      { 'type' => %w[test-type1 test-type2 test-type3] }
+    end
+  end
 end
 
 RSpec.describe Shale::Schema::JSONGenerator::Base do
@@ -58,6 +64,15 @@ RSpec.describe Shale::Schema::JSONGenerator::Base do
           type.nullable = true
 
           expect(type.as_json).to eq({ 'type' => %w[test-type null], 'default' => 'foo' })
+        end
+      end
+
+      context 'when has multiple values' do
+        it 'returns JSON Schema fragment as Hash' do
+          type = ShaleSchemaJSONGeneratorBaseTesting::TypeMultipleValues.new('foo')
+          type.nullable = true
+
+          expect(type.as_json).to eq({ 'type' => %w[test-type1 test-type2 test-type3 null] })
         end
       end
     end

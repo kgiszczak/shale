@@ -11,6 +11,7 @@ require_relative 'json_generator/object'
 require_relative 'json_generator/ref'
 require_relative 'json_generator/string'
 require_relative 'json_generator/time'
+require_relative 'json_generator/value'
 
 module Shale
   module Schema
@@ -53,6 +54,7 @@ module Shale
       register_json_type(Shale::Type::Float, Shale::Schema::JSONGenerator::Float)
       register_json_type(Shale::Type::Integer, Shale::Schema::JSONGenerator::Integer)
       register_json_type(Shale::Type::Time, Shale::Schema::JSONGenerator::Time)
+      register_json_type(Shale::Type::Value, Shale::Schema::JSONGenerator::Value)
 
       # Generate JSON Schema from Shale model and return it as a Ruby Hash
       #

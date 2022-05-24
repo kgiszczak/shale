@@ -30,7 +30,7 @@ module Shale
         # @api private
         def as_json
           type = as_type
-          type['type'] = [type['type'], 'null'] if type['type'] && @nullable
+          type['type'] = [*type['type'], 'null'] if type['type'] && @nullable
           type['default'] = @default unless @default.nil?
 
           type
