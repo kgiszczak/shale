@@ -135,21 +135,21 @@ RSpec.describe Shale::Schema::XMLGenerator do
             <xs:element name="integer" type="xs:integer" minOccurs="0"/>
             <xs:element name="string" type="xs:string" minOccurs="0"/>
             <xs:element name="time" type="xs:dateTime" minOccurs="0"/>
-            <xs:element name="value" type="xs:string" minOccurs="0"/>
+            <xs:element name="value" type="xs:anyType" minOccurs="0"/>
             <xs:element name="boolean_default" type="xs:boolean" minOccurs="0" default="true"/>
             <xs:element name="date_default" type="xs:date" minOccurs="0" default="2021-01-01"/>
             <xs:element name="float_default" type="xs:decimal" minOccurs="0" default="1.0"/>
             <xs:element name="integer_default" type="xs:integer" minOccurs="0" default="1"/>
             <xs:element name="string_default" type="xs:string" minOccurs="0" default="string"/>
             <xs:element name="time_default" type="xs:dateTime" minOccurs="0" default="2021-01-01T10:10:10+01:00"/>
-            <xs:element name="value_default" type="xs:string" minOccurs="0" default="value"/>
+            <xs:element name="value_default" type="xs:anyType" minOccurs="0" default="value"/>
             <xs:element name="boolean_collection" type="xs:boolean" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="date_collection" type="xs:date" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="float_collection" type="xs:decimal" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="integer_collection" type="xs:integer" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="string_collection" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="time_collection" type="xs:dateTime" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="value_collection" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="value_collection" type="xs:anyType" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="branch_one" type="ShaleSchemaXMLGeneratorTesting_BranchOne" minOccurs="0"/>
             <xs:element ref="foo:branch_two" minOccurs="0"/>
             <xs:element name="circular_dependency" type="ShaleSchemaXMLGeneratorTesting_Root" minOccurs="0"/>

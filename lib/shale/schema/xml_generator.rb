@@ -54,6 +54,7 @@ module Shale
       register_xml_type(Shale::Type::Float, 'decimal')
       register_xml_type(Shale::Type::Integer, 'integer')
       register_xml_type(Shale::Type::Time, 'dateTime')
+      register_xml_type(Shale::Type::Value, 'anyType')
 
       # Generate XML Schema from Shale model and return
       # it as a Shale::Schema::XMLGenerator::Schema array
