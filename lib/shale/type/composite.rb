@@ -35,18 +35,15 @@ module Shale
                   next unless attribute
 
                   if value.nil?
-                    instance.public_send("\#{attribute.name}=", nil)
-                    next
-                  end
-
-                  if attribute.collection?
+                    instance.send(attribute.setter, nil)
+                  elsif attribute.collection?
                     [*value].each do |val|
                       val = val ? attribute.type.of_#{format}(val) : val
-                      instance.public_send(attribute.name) << attribute.type.cast(val)
+                      instance.send(attribute.name) << attribute.type.cast(val)
                     end
                   else
                     val = attribute.type.of_#{format}(value)
-                    instance.public_send("\#{attribute.name}=", val)
+                    instance.send(attribute.setter, val)
                   end
                 end
               end
@@ -71,14 +68,11 @@ module Shale
                   attribute = instance.class.attributes[mapping.attribute]
                   next unless attribute
 
-                  value = instance.public_send(attribute.name)
+                  value = instance.send(attribute.name)
 
                   if value.nil?
                     hash[mapping.name] = nil
-                    next
-                  end
-
-                  if attribute.collection?
+                  elsif attribute.collection?
                     hash[mapping.name] = [*value].map do |v|
                       v ? attribute.type.as_#{format}(v) : v
                     end
@@ -163,9 +157,9 @@ module Shale
               next unless attribute
 
               if attribute.collection?
-                instance.public_send(attribute.name) << attribute.type.cast(value)
+                instance.send(attribute.name) << attribute.type.cast(value)
               else
-                instance.public_send("#{attribute.name}=", value)
+                instance.send(attribute.setter, value)
               end
             end
           end
@@ -174,7 +168,7 @@ module Shale
             attribute = attributes[xml_mapping.content]
 
             if attribute
-              instance.public_send("#{attribute.name}=", attribute.type.of_xml(element))
+              instance.send(attribute.setter, attribute.type.of_xml(element))
             end
           end
 
@@ -190,9 +184,9 @@ module Shale
 
               if attribute.collection?
                 value = attribute.type.of_xml(node)
-                instance.public_send(attribute.name) << attribute.type.cast(value)
+                instance.send(attribute.name) << attribute.type.cast(value)
               else
-                instance.public_send("#{attribute.name}=", attribute.type.of_xml(node))
+                instance.send(attribute.setter, attribute.type.of_xml(node))
               end
             end
           end
@@ -237,7 +231,7 @@ module Shale
               attribute = instance.class.attributes[mapping.attribute]
               next unless attribute
 
-              value = instance.public_send(attribute.name)
+              value = instance.send(attribute.name)
               next if value.nil?
 
               doc.add_namespace(mapping.namespace.prefix, mapping.namespace.name)
@@ -249,7 +243,7 @@ module Shale
             attribute = instance.class.attributes[xml_mapping.content]
 
             if attribute
-              value = instance.public_send(attribute.name)
+              value = instance.send(attribute.name)
               doc.add_text(element, value.to_s) if value
             end
           end
@@ -261,7 +255,7 @@ module Shale
               attribute = instance.class.attributes[mapping.attribute]
               next unless attribute
 
-              value = instance.public_send(attribute.name)
+              value = instance.send(attribute.name)
               next if value.nil?
 
               doc.add_namespace(mapping.namespace.prefix, mapping.namespace.name)

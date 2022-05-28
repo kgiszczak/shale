@@ -9,6 +9,12 @@ RSpec.describe Shale::Attribute do
     end
   end
 
+  describe '#setter' do
+    it "returns attribute's setter name" do
+      expect(described_class.new('foo', 'bar', false, nil).setter).to eq('foo=')
+    end
+  end
+
   describe '#type' do
     it 'returns attribute value' do
       expect(described_class.new('foo', 'bar', false, nil).type).to eq('bar')

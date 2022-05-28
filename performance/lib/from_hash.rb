@@ -1,6 +1,6 @@
 require_relative 'data_model'
 
-module BuildJson
+module FromHash
   class << self
     def build_address(json)
       Address.new(

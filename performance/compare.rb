@@ -1,39 +1,48 @@
 require 'benchmark/ips'
 require 'ox'
 
-require_relative 'lib/build_json'
+require_relative 'lib/from_hash'
+require_relative 'lib/to_hash'
 require_relative 'lib/build_nokogiri_css'
 require_relative 'lib/build_nokogiri_xpath'
 require_relative 'lib/build_ox'
 require_relative 'lib/build_rexml'
+require_relative 'lib/validator'
 
 json = File.read('./data/report.json')
 yaml = File.read('./data/report.yml')
 xml = File.read('./data/report.xml')
 
-puts "JSON: building object model by hand vs using Shale.from_json\n\n"
+json_hash = JSON.parse(json)
+yaml_hash = YAML.load(yaml)
+
+puts "JSON: building object model by hand vs using Shale.of_json\n\n"
+
+Validator.validate!(FromHash.build_report(json_hash), Report.of_json(json_hash))
 
 Benchmark.ips do |x|
   x.report('build JSON') do
-    BuildJson.build_report(JSON.parse(json))
+    FromHash.build_report(json_hash)
   end
 
-  x.report('Shale from_json') do
-    Report.from_json(json)
+  x.report('Shale of_json') do
+    Report.of_json(json_hash)
   end
 
   x.compare!
 end
 
-puts "\n\nYAML: building object model by hand vs using Shale.from_yaml\n\n"
+puts "JSON: building Hash by hand vs using Shale.as_json\n\n"
+
+report = Report.of_json(json_hash)
 
 Benchmark.ips do |x|
-  x.report('build YAML') do
-    BuildJson.build_report(YAML.load(yaml))
+  x.report('build JSON') do
+    ToHash.build_report(report)
   end
 
-  x.report('Shale from_yaml') do
-    Report.from_yaml(yaml)
+  x.report('Shale as_json') do
+    Report.as_json(report)
   end
 
   x.compare!

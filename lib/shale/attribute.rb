@@ -20,6 +20,11 @@ module Shale
     # @api private
     attr_reader :default
 
+    # Return setter name
+    #
+    # @api private
+    attr_reader :setter
+
     # Initialize Attribute object
     #
     # @param [Symbol] name Name of the attribute
@@ -30,6 +35,7 @@ module Shale
     # @api private
     def initialize(name, type, collection, default)
       @name = name
+      @setter = "#{name}="
       @type = type
       @collection = collection
       @default = collection ? -> { [] } : default

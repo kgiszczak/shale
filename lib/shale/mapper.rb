@@ -285,7 +285,7 @@ module Shale
           value = attribute.default.call
         end
 
-        public_send("#{name}=", value)
+        send(attribute.setter, value)
       end
     end
   end
