@@ -1,3 +1,18 @@
+## [0.4.0] - 2022-05-30
+
+### Added
+- Allow to add title to JSON Schema
+- Map Shale::Type::Value to "anyType" XML Schema type
+- Map Shale::Type::Value to "any" JSON Schema type
+- Allow to generate Shale model from JSON Schema
+
+### Changed
+- Performance improvements
+- Reformat README a little bit and fix typos
+
+### Fixed
+- Fix stack overflow caused by circular dependency when generating JSON and XML schemas
+
 ## [0.3.1] - 2022-04-29
 
 ### Changed
