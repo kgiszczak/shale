@@ -272,9 +272,11 @@ module Shale
     def initialize(**props)
       super()
 
-      props.each_key do |name|
-        unless self.class.attributes.keys.include?(name)
-          raise UnknownAttributeError.new(self.class.to_s, name.to_s)
+      unless props.empty?
+        unknown_attributes = props.keys - self.class.attributes.keys
+
+        unless unknown_attributes.empty?
+          raise UnknownAttributeError.new(self.class.to_s, unknown_attributes[0].to_s)
         end
       end
 
