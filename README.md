@@ -15,7 +15,7 @@ as well as serialize data structures into JSON, YAML or XML.
 
 ## Installation
 
-Shale supports Ruby (MRI) 2.6+
+Shale supports Ruby (MRI) 2.7+
 
 Add this line to your application's Gemfile:
 
