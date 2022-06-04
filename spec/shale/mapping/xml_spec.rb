@@ -138,7 +138,7 @@ RSpec.describe Shale::Mapping::Xml do
     end
 
     context 'when namespace is not set' do
-      it 'it will use default namespace' do
+      it 'will use default namespace' do
         obj = described_class.new
         obj.namespace 'http://default.com', 'default'
 
@@ -151,7 +151,7 @@ RSpec.describe Shale::Mapping::Xml do
     end
 
     context 'when namespace and prefix is nil' do
-      it 'it will set namespace and prefix to nil' do
+      it 'will set namespace and prefix to nil' do
         obj = described_class.new
         obj.namespace 'http://default.com', 'default'
 
@@ -164,7 +164,7 @@ RSpec.describe Shale::Mapping::Xml do
     end
 
     context 'when namespace and prefix is set' do
-      it 'it will set namespace and prefix to provided values' do
+      it 'will set namespace and prefix to provided values' do
         obj = described_class.new
         obj.namespace 'http://default.com', 'default'
 
@@ -250,7 +250,7 @@ RSpec.describe Shale::Mapping::Xml do
     end
 
     context 'when namespace and prefix is set' do
-      it 'it will set namespace and prefix to provided values' do
+      it 'will set namespace and prefix to provided values' do
         obj = described_class.new
 
         obj.map_attribute('foo', to: :foo, namespace: 'http://custom.com', prefix: 'custom')
@@ -262,7 +262,7 @@ RSpec.describe Shale::Mapping::Xml do
     end
 
     context 'when default namespace is set' do
-      it 'it will not use default namespace' do
+      it 'will not use default namespace' do
         obj = described_class.new
         obj.namespace 'http://default.com', 'default'
 
