@@ -9,12 +9,12 @@ module Shale
       #
       # @api private
       class Property
-        # Return property's name
+        # Return mapping's name
         #
         # @return [String]
         #
         # @api private
-        attr_reader :property_name
+        attr_reader :mapping_name
 
         # Return attribute's name
         #
@@ -39,7 +39,7 @@ module Shale
         #
         # @api private
         def initialize(name, type, collection, default)
-          @property_name = name
+          @mapping_name = name
           @attribute_name = Utils.snake_case(name)
           @type = type
           @collection = collection

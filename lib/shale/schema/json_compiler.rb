@@ -44,7 +44,7 @@ module Shale
 
           json do
             <%- type.properties.each do |property| -%>
-            map '<%= property.property_name %>', to: :<%= property.attribute_name %>
+            map '<%= property.mapping_name %>', to: :<%= property.attribute_name %>
             <%- end -%>
           end
         end

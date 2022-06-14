@@ -6,10 +6,10 @@ require 'shale/schema/compiler/value'
 RSpec.describe Shale::Schema::Compiler::Property do
   let(:type) { Shale::Schema::Compiler::Value.new }
 
-  describe '#property_name' do
+  describe '#mapping_name' do
     it 'returns property name' do
       property = described_class.new('fooBar', type, false, nil)
-      expect(property.property_name).to eq('fooBar')
+      expect(property.mapping_name).to eq('fooBar')
     end
   end
 
