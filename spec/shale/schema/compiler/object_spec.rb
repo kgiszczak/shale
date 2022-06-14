@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-require 'shale/schema/json_compiler/object'
-require 'shale/schema/json_compiler/property'
-require 'shale/schema/json_compiler/value'
+require 'shale/schema/compiler/object'
+require 'shale/schema/compiler/property'
+require 'shale/schema/compiler/value'
 
-RSpec.describe Shale::Schema::JSONCompiler::Object do
-  let(:type) { Shale::Schema::JSONCompiler::Value.new }
+RSpec.describe Shale::Schema::Compiler::Object do
+  let(:type) { Shale::Schema::Compiler::Value.new }
 
   describe '#id' do
     it 'returns value' do
@@ -16,7 +16,7 @@ RSpec.describe Shale::Schema::JSONCompiler::Object do
 
   describe '#properties' do
     it 'returns value' do
-      property = Shale::Schema::JSONCompiler::Property.new('fooBar', type, false, nil)
+      property = Shale::Schema::Compiler::Property.new('fooBar', type, false, nil)
 
       object = described_class.new('foobar-id', 'foobar')
       object.add_property(property)
@@ -49,13 +49,13 @@ RSpec.describe Shale::Schema::JSONCompiler::Object do
 
   describe '#references' do
     it 'returns properties with Object type' do
-      property1 = Shale::Schema::JSONCompiler::Property.new('fooBar1', type, false, nil)
+      property1 = Shale::Schema::Compiler::Property.new('fooBar1', type, false, nil)
 
       object1 = described_class.new('id1', 'foo1')
-      property2 = Shale::Schema::JSONCompiler::Property.new('fooBar2', object1, false, nil)
+      property2 = Shale::Schema::Compiler::Property.new('fooBar2', object1, false, nil)
 
       object = described_class.new('id', 'foo')
-      property3 = Shale::Schema::JSONCompiler::Property.new('fooBar2', object, false, nil)
+      property3 = Shale::Schema::Compiler::Property.new('fooBar2', object, false, nil)
 
       object.add_property(property1)
       object.add_property(property2)
@@ -68,8 +68,8 @@ RSpec.describe Shale::Schema::JSONCompiler::Object do
 
   describe '#add_property' do
     it 'returns value' do
-      property1 = Shale::Schema::JSONCompiler::Property.new('fooBar1', type, false, nil)
-      property2 = Shale::Schema::JSONCompiler::Property.new('fooBar2', type, false, nil)
+      property1 = Shale::Schema::Compiler::Property.new('fooBar1', type, false, nil)
+      property2 = Shale::Schema::Compiler::Property.new('fooBar2', type, false, nil)
 
       object = described_class.new('foobar-id', 'foobar')
       expect(object.properties.length).to eq(0)

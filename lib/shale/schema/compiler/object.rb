@@ -4,7 +4,7 @@ require_relative 'utils'
 
 module Shale
   module Schema
-    class JSONCompiler
+    module Compiler
       # Class representing Shale's comosite type
       #
       # @api private
@@ -18,7 +18,7 @@ module Shale
 
         # Return properties
         #
-        # @return [Array<Shale::Schema::JSONCompiler::Property>]
+        # @return [Array<Shale::Schema::Compiler::Property>]
         #
         # @api private
         attr_reader :properties
@@ -62,7 +62,7 @@ module Shale
 
         # Return references
         #
-        # @return [Array<Shale::Schema::JSONCompiler::Property>]
+        # @return [Array<Shale::Schema::Compiler::Property>]
         #
         # @api private
         def references
@@ -73,7 +73,7 @@ module Shale
 
         # Add property to Object
         #
-        # @param [Shale::Schema::JSONCompiler::Property] property
+        # @param [Shale::Schema::Compiler::Property] property
         #
         # @api private
         def add_property(property)

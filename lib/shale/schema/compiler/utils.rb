@@ -2,7 +2,7 @@
 
 module Shale
   module Schema
-    class JSONCompiler
+    module Compiler
       # Module with utility functions
       #
       # @api private
@@ -12,7 +12,7 @@ module Shale
         # @param [String] val
         #
         # @example
-        #   Shale::Schema::JSONCompiler.classify('foobar')
+        #   Shale::Schema::Compiler.classify('foobar')
         #   # => 'Foobar'
         #
         # @api private
@@ -33,7 +33,7 @@ module Shale
         # @param [String] val
         #
         # @example
-        #   Shale::Schema::JSONCompiler.snake_case('FooBar')
+        #   Shale::Schema::Compiler.snake_case('FooBar')
         #   # => 'foo_bar'
         #
         # @api private

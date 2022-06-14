@@ -2,7 +2,7 @@
 
 module Shale
   module Schema
-    class JSONCompiler
+    module Compiler
       # Class that maps Schema type to Shale Date type
       #
       # @api private

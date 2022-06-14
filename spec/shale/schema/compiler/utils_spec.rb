@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require 'shale/schema/json_compiler/utils'
+require 'shale/schema/compiler/utils'
 
-RSpec.describe Shale::Schema::JSONCompiler::Utils do
+RSpec.describe Shale::Schema::Compiler::Utils do
   describe '.classify' do
     it 'returns value' do
       expect(described_class.classify(nil)).to eq('')

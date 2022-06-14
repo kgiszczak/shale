@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require 'shale/schema/json_compiler/property'
-require 'shale/schema/json_compiler/value'
+require 'shale/schema/compiler/property'
+require 'shale/schema/compiler/value'
 
-RSpec.describe Shale::Schema::JSONCompiler::Property do
-  let(:type) { Shale::Schema::JSONCompiler::Value.new }
+RSpec.describe Shale::Schema::Compiler::Property do
+  let(:type) { Shale::Schema::Compiler::Value.new }
 
   describe '#property_name' do
     it 'returns property name' do

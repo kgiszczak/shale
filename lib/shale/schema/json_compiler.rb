@@ -4,15 +4,15 @@ require 'erb'
 require 'uri'
 
 require_relative '../../shale'
-require_relative 'json_compiler/boolean'
-require_relative 'json_compiler/date'
-require_relative 'json_compiler/float'
-require_relative 'json_compiler/integer'
-require_relative 'json_compiler/object'
-require_relative 'json_compiler/property'
-require_relative 'json_compiler/string'
-require_relative 'json_compiler/time'
-require_relative 'json_compiler/value'
+require_relative 'compiler/boolean'
+require_relative 'compiler/date'
+require_relative 'compiler/float'
+require_relative 'compiler/integer'
+require_relative 'compiler/object'
+require_relative 'compiler/property'
+require_relative 'compiler/string'
+require_relative 'compiler/time'
+require_relative 'compiler/value'
 
 module Shale
   module Schema
@@ -57,7 +57,7 @@ module Shale
       #
       # @raise [JSONSchemaError] when JSON Schema has errors
       #
-      # @return [Array<Shale::Schema::JSONCompiler::Object>]
+      # @return [Array<Shale::Schema::Compiler::Object>]
       #
       # @example
       #   Shale::Schema::JSONCompiler.new.as_models([schema1, schema2])
@@ -188,12 +188,12 @@ module Shale
       # @param [String] id
       # @param [String] name
       #
-      # @return [Shale::Schema::JSONCompiler::Type]
+      # @return [Shale::Schema::Compiler::Type]
       #
       # @api private
       def infer_type(schema, id, name)
         return unless schema
-        return Value.new if schema == true
+        return Compiler::Value.new if schema == true
 
         type = schema['type']
         format = schema['format']
@@ -202,28 +202,28 @@ module Shale
           type -= ['null']
 
           if type.length > 1
-            return Value.new
+            return Compiler::Value.new
           else
             type = type[0]
           end
         end
 
         if type == 'object'
-          Object.new(id, name)
+          Compiler::Object.new(id, name)
         elsif type == 'string' && format == 'date'
-          Date.new
+          Compiler::Date.new
         elsif type == 'string' && format == 'date-time'
-          Time.new
+          Compiler::Time.new
         elsif type == 'string'
-          String.new
+          Compiler::String.new
         elsif type == 'number'
-          Float.new
+          Compiler::Float.new
         elsif type == 'integer'
-          Integer.new
+          Compiler::Integer.new
         elsif type == 'boolean'
-          Boolean.new
+          Compiler::Boolean.new
         else
-          Value.new
+          Compiler::Value.new
         end
       end
 
@@ -274,7 +274,7 @@ module Shale
       # @param [String] base_id
       # @param [Array<String>] fragment
       #
-      # @return [Shale::Schema::JSONCompiler::Property, nil]
+      # @return [Shale::Schema::Compiler::Property, nil]
       #
       # @api private
       def compile(schema, is_root, base_id = '', fragment = [])
@@ -317,7 +317,7 @@ module Shale
           default = schema['default']
         end
 
-        if type.is_a?(Object) && !@types.include?(type)
+        if type.is_a?(Compiler::Object) && !@types.include?(type)
           @types << type
 
           (schema['properties'] || {}).each do |subschema_key, subschema|
@@ -326,7 +326,7 @@ module Shale
           end
         end
 
-        Property.new(key, type, collection, default) if type
+        Compiler::Property.new(key, type, collection, default) if type
       end
     end
   end

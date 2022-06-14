@@ -2,18 +2,18 @@
 
 module Shale
   module Schema
-    class JSONCompiler
-      # Class that maps Schema type to Shale String type
+    module Compiler
+      # Class that maps Schema type to Shale Boolean type
       #
       # @api private
-      class String
+      class Boolean
         # Return name of the Shale type
         #
         # @return [String]
         #
         # @api private
         def name
-          'Shale::Type::String'
+          'Shale::Type::Boolean'
         end
       end
     end

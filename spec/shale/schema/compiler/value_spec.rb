@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require 'shale/schema/json_compiler/value'
+require 'shale/schema/compiler/value'
 
-RSpec.describe Shale::Schema::JSONCompiler::Value do
+RSpec.describe Shale::Schema::Compiler::Value do
   describe '#name' do
     it 'returns Shale type name' do
       expect(described_class.new.name).to eq('Shale::Type::Value')

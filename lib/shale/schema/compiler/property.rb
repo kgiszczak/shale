@@ -4,7 +4,7 @@ require_relative 'utils'
 
 module Shale
   module Schema
-    class JSONCompiler
+    module Compiler
       # Class representing Shale's property
       #
       # @api private
@@ -33,7 +33,7 @@ module Shale
         # Initialize Property object
         #
         # @param [String] name
-        # @param [Shale::Schema::JsonCompiler::Type] type
+        # @param [Shale::Schema::Compiler::Type] type
         # @param [true, false] collection
         # @param [Object] default
         #

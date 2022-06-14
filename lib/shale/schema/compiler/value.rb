@@ -2,18 +2,18 @@
 
 module Shale
   module Schema
-    class JSONCompiler
-      # Class that maps Schema type to Shale Time type
+    module Compiler
+      # Class that maps Schema type to Shale Value type
       #
       # @api private
-      class Time
+      class Value
         # Return name of the Shale type
         #
         # @return [String]
         #
         # @api private
         def name
-          'Shale::Type::Time'
+          'Shale::Type::Value'
         end
       end
     end

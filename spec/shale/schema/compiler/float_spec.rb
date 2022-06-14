@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require 'shale/schema/json_compiler/float'
+require 'shale/schema/compiler/float'
 
-RSpec.describe Shale::Schema::JSONCompiler::Float do
+RSpec.describe Shale::Schema::Compiler::Float do
   describe '#name' do
     it 'returns Shale type name' do
       expect(described_class.new.name).to eq('Shale::Type::Float')
