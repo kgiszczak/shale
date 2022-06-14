@@ -2,25 +2,25 @@
 
 require 'shale'
 
-module ShaleCompositeTesting
-  class CompositeType < Shale::Mapper
-    attribute :composite_attr1, Shale::Type::String
+module ShaleComplexTesting
+  class ComplexType < Shale::Mapper
+    attribute :complex_attr1, Shale::Type::String
 
     hsh do
-      map 'composite_attr1', to: :composite_attr1
+      map 'complex_attr1', to: :complex_attr1
     end
 
     json do
-      map 'composite_attr1', to: :composite_attr1
+      map 'complex_attr1', to: :complex_attr1
     end
 
     yaml do
-      map 'composite_attr1', to: :composite_attr1
+      map 'complex_attr1', to: :complex_attr1
     end
 
     xml do
-      root 'composite_type'
-      map_content to: :composite_attr1
+      root 'complex_type'
+      map_content to: :complex_attr1
     end
   end
 
@@ -51,7 +51,7 @@ module ShaleCompositeTesting
     attribute :root_attr3, Shale::Type::String
     attribute :root_bool, Shale::Type::Boolean
     attribute :root_collection, Shale::Type::String, collection: true
-    attribute :root_attr_composite, CompositeType
+    attribute :root_attr_complex, ComplexType
     attribute :root_attr_using, Shale::Type::String
     attribute :root_attr_attribute_using, Shale::Type::String
     attribute :element_namespaced, ElementNamespaced
@@ -61,7 +61,7 @@ module ShaleCompositeTesting
       map 'root_attr2', to: :root_attr2
       map 'root_attr3', to: :root_attr3
       map 'root_bool', to: :root_bool
-      map 'root_attr_composite', to: :root_attr_composite
+      map 'root_attr_complex', to: :root_attr_complex
       map 'root_attr_using', using: {
         from: :root_attr_using_from_hash,
         to: :root_attr_using_to_hash,
@@ -73,7 +73,7 @@ module ShaleCompositeTesting
       map 'root_attr2', to: :root_attr2
       map 'root_attr3', to: :root_attr3
       map 'root_bool', to: :root_bool
-      map 'root_attr_composite', to: :root_attr_composite
+      map 'root_attr_complex', to: :root_attr_complex
       map 'root_attr_using', using: {
         from: :root_attr_using_from_json,
         to: :root_attr_using_to_json,
@@ -85,7 +85,7 @@ module ShaleCompositeTesting
       map 'root_attr2', to: :root_attr2
       map 'root_attr3', to: :root_attr3
       map 'root_bool', to: :root_bool
-      map 'root_attr_composite', to: :root_attr_composite
+      map 'root_attr_complex', to: :root_attr_complex
       map 'root_attr_using', using: {
         from: :root_attr_using_from_yaml,
         to: :root_attr_using_to_yaml,
@@ -103,7 +103,7 @@ module ShaleCompositeTesting
       map_element 'element1', to: :root_attr2
       map_element 'element2', to: :root_attr3
       map_element 'element_bool', to: :root_bool
-      map_element 'element_composite', to: :root_attr_composite
+      map_element 'element_complex', to: :root_attr_complex
       map_element 'element_using', using: {
         from: :root_attr_using_from_xml,
         to: :root_attr_using_to_xml,
@@ -158,7 +158,7 @@ module ShaleCompositeTesting
   end
 end
 
-RSpec.describe Shale::Type::Composite do
+RSpec.describe Shale::Type::Complex do
   context 'with hash mapping' do
     let(:hash) do
       {
@@ -166,32 +166,32 @@ RSpec.describe Shale::Type::Composite do
         'root_attr2' => %w[one two three],
         'root_attr3' => nil,
         'root_bool' => false,
-        'root_attr_composite' => { 'composite_attr1' => 'bar' },
+        'root_attr_complex' => { 'complex_attr1' => 'bar' },
         'root_attr_using' => 'using_foo',
       }
     end
 
     describe '.from_hash' do
       it 'maps hash to object' do
-        instance = ShaleCompositeTesting::RootType.from_hash(hash)
+        instance = ShaleComplexTesting::RootType.from_hash(hash)
 
         expect(instance.root_attr1).to eq('foo')
         expect(instance.root_attr2).to eq(%w[one two three])
         expect(instance.root_attr3).to eq(nil)
         expect(instance.root_bool).to eq(false)
-        expect(instance.root_attr_composite.composite_attr1).to eq('bar')
+        expect(instance.root_attr_complex.complex_attr1).to eq('bar')
         expect(instance.root_attr_using).to eq('using_foo')
       end
     end
 
     describe '.to_hash' do
       it 'converts objects to hash' do
-        instance = ShaleCompositeTesting::RootType.new(
+        instance = ShaleComplexTesting::RootType.new(
           root_attr1: 'foo',
           root_attr2: %w[one two three],
           root_attr3: nil,
           root_bool: false,
-          root_attr_composite: ShaleCompositeTesting::CompositeType.new(composite_attr1: 'bar'),
+          root_attr_complex: ShaleComplexTesting::ComplexType.new(complex_attr1: 'bar'),
           root_attr_using: 'using_foo'
         )
 
@@ -212,8 +212,8 @@ RSpec.describe Shale::Type::Composite do
           ],
           "root_attr3": null,
           "root_bool": false,
-          "root_attr_composite": {
-            "composite_attr1": "bar"
+          "root_attr_complex": {
+            "complex_attr1": "bar"
           },
           "root_attr_using": "using_foo"
         }
@@ -222,13 +222,13 @@ RSpec.describe Shale::Type::Composite do
 
     describe '.from_json' do
       it 'maps json to object' do
-        instance = ShaleCompositeTesting::RootType.from_json(json)
+        instance = ShaleComplexTesting::RootType.from_json(json)
 
         expect(instance.root_attr1).to eq('foo')
         expect(instance.root_attr2).to eq(%w[one two three])
         expect(instance.root_attr3).to eq(nil)
         expect(instance.root_bool).to eq(false)
-        expect(instance.root_attr_composite.composite_attr1).to eq('bar')
+        expect(instance.root_attr_complex.complex_attr1).to eq('bar')
         expect(instance.root_attr_using).to eq('using_foo')
       end
     end
@@ -236,12 +236,12 @@ RSpec.describe Shale::Type::Composite do
     describe '.to_json' do
       context 'without params' do
         it 'converts objects to json' do
-          instance = ShaleCompositeTesting::RootType.new(
+          instance = ShaleComplexTesting::RootType.new(
             root_attr1: 'foo',
             root_attr2: %w[one two three],
             root_attr3: nil,
             root_bool: false,
-            root_attr_composite: ShaleCompositeTesting::CompositeType.new(composite_attr1: 'bar'),
+            root_attr_complex: ShaleComplexTesting::ComplexType.new(complex_attr1: 'bar'),
             root_attr_using: 'using_foo'
           )
 
@@ -251,12 +251,12 @@ RSpec.describe Shale::Type::Composite do
 
       context 'with :pretty param' do
         it 'converts objects to json and formats it' do
-          instance = ShaleCompositeTesting::RootType.new(
+          instance = ShaleComplexTesting::RootType.new(
             root_attr1: 'foo',
             root_attr2: %w[one two three],
             root_attr3: nil,
             root_bool: false,
-            root_attr_composite: ShaleCompositeTesting::CompositeType.new(composite_attr1: 'bar'),
+            root_attr_complex: ShaleComplexTesting::ComplexType.new(complex_attr1: 'bar'),
             root_attr_using: 'using_foo'
           )
 
@@ -277,33 +277,33 @@ RSpec.describe Shale::Type::Composite do
         - three
         root_attr3:
         root_bool: false
-        root_attr_composite:
-          composite_attr1: bar
+        root_attr_complex:
+          complex_attr1: bar
         root_attr_using: using_foo
       YAML
     end
 
     describe '.from_yaml' do
       it 'maps yaml to object' do
-        instance = ShaleCompositeTesting::RootType.from_yaml(yaml)
+        instance = ShaleComplexTesting::RootType.from_yaml(yaml)
 
         expect(instance.root_attr1).to eq('foo')
         expect(instance.root_attr2).to eq(%w[one two three])
         expect(instance.root_attr3).to eq(nil)
         expect(instance.root_bool).to eq(false)
-        expect(instance.root_attr_composite.composite_attr1).to eq('bar')
+        expect(instance.root_attr_complex.complex_attr1).to eq('bar')
         expect(instance.root_attr_using).to eq('using_foo')
       end
     end
 
     describe '.to_yaml' do
       it 'converts objects to yaml' do
-        instance = ShaleCompositeTesting::RootType.new(
+        instance = ShaleComplexTesting::RootType.new(
           root_attr1: 'foo',
           root_attr2: %w[one two three],
           root_attr3: nil,
           root_bool: false,
-          root_attr_composite: ShaleCompositeTesting::CompositeType.new(composite_attr1: 'bar'),
+          root_attr_complex: ShaleComplexTesting::ComplexType.new(complex_attr1: 'bar'),
           root_attr_using: 'using_foo'
         )
 
@@ -324,7 +324,7 @@ RSpec.describe Shale::Type::Composite do
           <element1>two</element1>
           <element1>three</element1>
           <element_bool>false</element_bool>
-          <element_composite>bar</element_composite>
+          <element_complex>bar</element_complex>
           <element_using>foo_element_using</element_using>
           <ns1:element_namespaced attr1="attr1" ns1:attr1="ns1 attr1" ns2:attr1="ns2 attr1">
             <not_namespaced>not namespaced</not_namespaced>
@@ -337,13 +337,13 @@ RSpec.describe Shale::Type::Composite do
 
     describe '.from_xml' do
       it 'maps xml to object' do
-        instance = ShaleCompositeTesting::RootType.from_xml(xml)
+        instance = ShaleComplexTesting::RootType.from_xml(xml)
 
         expect(instance.root_attr1).to eq('foo')
         expect(instance.root_attr2).to eq(%w[one two three])
         expect(instance.root_attr3).to eq(nil)
         expect(instance.root_bool).to eq(false)
-        expect(instance.root_attr_composite.composite_attr1).to eq('bar')
+        expect(instance.root_attr_complex.complex_attr1).to eq('bar')
         expect(instance.root_attr_using).to eq('foo_element_using')
         expect(instance.root_attr_attribute_using).to eq('foo')
         expect(instance.element_namespaced.attr1).to eq('attr1')
@@ -358,16 +358,16 @@ RSpec.describe Shale::Type::Composite do
     describe '.to_xml' do
       context 'without params' do
         it 'converts objects to xml' do
-          instance = ShaleCompositeTesting::RootType.new(
+          instance = ShaleComplexTesting::RootType.new(
             root_attr1: 'foo',
             root_attr2: %w[one two three],
             root_attr3: nil,
             root_collection: ['collection'],
             root_bool: false,
-            root_attr_composite: ShaleCompositeTesting::CompositeType.new(composite_attr1: 'bar'),
+            root_attr_complex: ShaleComplexTesting::ComplexType.new(complex_attr1: 'bar'),
             root_attr_using: 'foo_element_using',
             root_attr_attribute_using: 'foo',
-            element_namespaced: ShaleCompositeTesting::ElementNamespaced.new(
+            element_namespaced: ShaleComplexTesting::ElementNamespaced.new(
               attr1: 'attr1',
               ns1_attr1: 'ns1 attr1',
               ns2_attr1: 'ns2 attr1',
@@ -381,7 +381,7 @@ RSpec.describe Shale::Type::Composite do
         end
 
         it 'converts blank attributes to xml' do
-          instance = ShaleCompositeTesting::RootType.new(root_attr1: '')
+          instance = ShaleComplexTesting::RootType.new(root_attr1: '')
           expected = '<root_type attr1="" collection="[]"><element_using/></root_type>'
           expect(instance.to_xml).to eq(expected)
         end
@@ -389,7 +389,7 @@ RSpec.describe Shale::Type::Composite do
 
       context 'with :pretty param' do
         it 'converts objects to xml and formats it' do
-          instance = ShaleCompositeTesting::RootType.new(
+          instance = ShaleComplexTesting::RootType.new(
             root_attr1: 'foo',
             root_bool: false,
             root_attr_using: 'foo_element_using',
@@ -409,7 +409,7 @@ RSpec.describe Shale::Type::Composite do
 
       context 'with :declaration param' do
         it 'converts objects to xml with declaration' do
-          instance = ShaleCompositeTesting::RootType.new(
+          instance = ShaleComplexTesting::RootType.new(
             root_attr1: 'foo',
             root_bool: false,
             root_attr_using: 'foo_element_using',
@@ -430,7 +430,7 @@ RSpec.describe Shale::Type::Composite do
 
       context 'with :pretty and :declaration param' do
         it 'converts objects to xml with declaration and formats it' do
-          instance = ShaleCompositeTesting::RootType.new(
+          instance = ShaleComplexTesting::RootType.new(
             root_attr1: 'foo',
             root_bool: false,
             root_attr_using: 'foo_element_using',

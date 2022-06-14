@@ -94,12 +94,12 @@ module Shale
         )
         schemas[default_namespace.name].add_child(root_element)
 
-        composites = []
-        collect_composite_types(composites, klass, klass.xml_mapping.default_namespace.name)
+        complexes = []
+        collect_complex_types(complexes, klass, klass.xml_mapping.default_namespace.name)
 
-        composites.each do |composite|
-          type = composite[:type]
-          namespace = composite[:namespace]
+        complexes.each do |complex|
+          type = complex[:type]
+          namespace = complex[:namespace]
           children = []
 
           type.xml_mapping.elements.values.each do |mapping|
@@ -252,7 +252,7 @@ module Shale
       # @param [String, nil] namespace
       #
       # @api private
-      def collect_composite_types(types, type, namespace)
+      def collect_complex_types(types, type, namespace)
         types << { type: type, namespace: namespace }
 
         type.xml_mapping.elements.values.each do |mapping|
@@ -263,7 +263,7 @@ module Shale
           is_included = types.include?({ type: attribute.type, namespace: namespace })
 
           if is_mapper && !is_included
-            collect_composite_types(types, attribute.type, mapping.namespace.name)
+            collect_complex_types(types, attribute.type, mapping.namespace.name)
           end
         end
       end

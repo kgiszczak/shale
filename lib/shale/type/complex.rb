@@ -4,11 +4,11 @@ require_relative 'value'
 
 module Shale
   module Type
-    # Build composite object. Don't use it directly.
+    # Build complex object. Don't use it directly.
     # It serves as a base type class for @see Shale::Mapper
     #
     # @api private
-    class Composite < Value
+    class Complex < Value
       class << self
         %i[hash json yaml].each do |format|
           class_eval(<<-RUBY, __FILE__, __LINE__ + 1)

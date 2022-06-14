@@ -5,10 +5,10 @@ require 'uri'
 
 require_relative '../../shale'
 require_relative 'compiler/boolean'
+require_relative 'compiler/complex'
 require_relative 'compiler/date'
 require_relative 'compiler/float'
 require_relative 'compiler/integer'
-require_relative 'compiler/object'
 require_relative 'compiler/property'
 require_relative 'compiler/string'
 require_relative 'compiler/time'
@@ -57,7 +57,7 @@ module Shale
       #
       # @raise [JSONSchemaError] when JSON Schema has errors
       #
-      # @return [Array<Shale::Schema::Compiler::Object>]
+      # @return [Array<Shale::Schema::Compiler::Complex>]
       #
       # @example
       #   Shale::Schema::JSONCompiler.new.as_models([schema1, schema2])
@@ -209,7 +209,7 @@ module Shale
         end
 
         if type == 'object'
-          Compiler::Object.new(id, name)
+          Compiler::Complex.new(id, name)
         elsif type == 'string' && format == 'date'
           Compiler::Date.new
         elsif type == 'string' && format == 'date-time'
@@ -317,7 +317,7 @@ module Shale
           default = schema['default']
         end
 
-        if type.is_a?(Compiler::Object) && !@types.include?(type)
+        if type.is_a?(Compiler::Complex) && !@types.include?(type)
           @types << type
 
           (schema['properties'] || {}).each do |subschema_key, subschema|

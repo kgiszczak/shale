@@ -194,19 +194,19 @@ RSpec.describe Shale::Schema::JSONCompiler do
         expect(props[12].default).to eq(nil)
 
         expect(props[13].mapping_name).to eq('address')
-        expect(props[13].type).to be_a(Shale::Schema::Compiler::Object)
+        expect(props[13].type).to be_a(Shale::Schema::Compiler::Complex)
         expect(props[13].type.name).to eq('Address1')
         expect(props[13].collection?).to eq(false)
         expect(props[13].default).to eq(nil)
 
         expect(props[14].mapping_name).to eq('shipping')
-        expect(props[14].type).to be_a(Shale::Schema::Compiler::Object)
+        expect(props[14].type).to be_a(Shale::Schema::Compiler::Complex)
         expect(props[14].type.name).to eq('Address2')
         expect(props[14].collection?).to eq(false)
         expect(props[14].default).to eq(nil)
 
         expect(props[15].mapping_name).to eq('billing')
-        expect(props[15].type).to be_a(Shale::Schema::Compiler::Object)
+        expect(props[15].type).to be_a(Shale::Schema::Compiler::Complex)
         expect(props[15].type.name).to eq('Address2')
         expect(props[15].collection?).to eq(false)
         expect(props[15].default).to eq(nil)

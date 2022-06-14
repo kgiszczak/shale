@@ -76,7 +76,7 @@ module Shale
         end
 
         types = []
-        collect_composite_types(types, klass)
+        collect_complex_types(types, klass)
         objects = []
 
         types.each do |type|
@@ -148,7 +148,7 @@ module Shale
       # @param [Shale::Mapper] type
       #
       # @api private
-      def collect_composite_types(types, type)
+      def collect_complex_types(types, type)
         types << type
 
         type.json_mapping.keys.values.each do |mapping|
@@ -156,7 +156,7 @@ module Shale
           next unless attribute
 
           if mapper_type?(attribute.type) && !types.include?(attribute.type)
-            collect_composite_types(types, attribute.type)
+            collect_complex_types(types, attribute.type)
           end
         end
       end

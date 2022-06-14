@@ -8,7 +8,7 @@ module Shale
       # Class representing Shale's comosite type
       #
       # @api private
-      class Object
+      class Complex
         # Return id
         #
         # @return [String]
