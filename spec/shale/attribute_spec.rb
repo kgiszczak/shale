@@ -23,14 +23,14 @@ RSpec.describe Shale::Attribute do
 
   describe '#default' do
     context 'when collection is false' do
-      it 'it returns passed default' do
+      it 'returns passed default' do
         attribute = described_class.new('foo', 'bar', false, :default)
         expect(attribute.default).to eq(:default)
       end
     end
 
     context 'when collection is true' do
-      it 'it returns array default' do
+      it 'returns array default' do
         attribute = described_class.new('foo', 'bar', true, :default)
         expect(attribute.default.call).to eq([])
       end
@@ -39,14 +39,14 @@ RSpec.describe Shale::Attribute do
 
   describe '#collection?' do
     context 'when collection is false' do
-      it 'it returns false' do
+      it 'returns false' do
         attribute = described_class.new('foo', 'bar', false, nil)
         expect(attribute.collection?).to eq(false)
       end
     end
 
     context 'when collection is true' do
-      it 'it returns true' do
+      it 'returns true' do
         attribute = described_class.new('foo', 'bar', true, nil)
         expect(attribute.collection?).to eq(true)
       end
