@@ -75,7 +75,7 @@ RSpec.describe Shale::Schema::JSONCompiler do
       it 'raises error' do
         expect do
           described_class.new.as_models([schema])
-        end.to raise_error(Shale::JSONSchemaError, "schema with id 'foo' already exists")
+        end.to raise_error(Shale::SchemaError, "schema with id 'foo' already exists")
       end
     end
 
@@ -97,7 +97,7 @@ RSpec.describe Shale::Schema::JSONCompiler do
       it 'raises error' do
         expect do
           described_class.new.as_models([schema])
-        end.to raise_error(Shale::JSONSchemaError, "can't resolve reference '#/$defs/bar'")
+        end.to raise_error(Shale::SchemaError, "can't resolve reference '#/$defs/bar'")
       end
     end
 

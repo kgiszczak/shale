@@ -55,7 +55,7 @@ module Shale
       # @param [Array<String>] schemas
       # @param [String, nil] root_name
       #
-      # @raise [JSONSchemaError] when JSON Schema has errors
+      # @raise [SchemaError] when JSON Schema has errors
       #
       # @return [Array<Shale::Schema::Compiler::Complex>]
       #
@@ -103,7 +103,7 @@ module Shale
       # @param [Array<String>] schemas
       # @param [String, nil] root_name
       #
-      # @raise [JSONSchemaError] when JSON Schema has errors
+      # @raise [SchemaError] when JSON Schema has errors
       #
       # @return [Hash<String, String>]
       #
@@ -159,7 +159,7 @@ module Shale
       # @param [String, nil] base_id
       # @param [String, nil] ref
       #
-      # @raise [JSONSchemaError] when ref can't be resolved
+      # @raise [SchemaError] when ref can't be resolved
       #
       # @return [Hash, true, false]
       #
@@ -172,7 +172,7 @@ module Shale
         entry = @schema_repository[key]
 
         unless entry
-          raise JSONSchemaError, "can't resolve reference '#{key}'"
+          raise SchemaError, "can't resolve reference '#{key}'"
         end
 
         if entry[:schema].key?('$ref')
@@ -233,7 +233,7 @@ module Shale
       # @param [Array<String>] fragment
       # @param [String] base_id
       #
-      # @raise [JSONSchemaError] when there are problems with JSON schema
+      # @raise [SchemaError] when there are problems with JSON schema
       #
       # @api private
       def disassemble_schema(schema, fragment = [], base_id = '')
@@ -249,7 +249,7 @@ module Shale
         pointer = build_pointer(id, fragment)
 
         if @schema_repository.key?(pointer)
-          raise JSONSchemaError, "schema with id '#{pointer}' already exists"
+          raise SchemaError, "schema with id '#{pointer}' already exists"
         else
           @schema_repository[pointer] = {
             id: pointer,

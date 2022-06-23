@@ -43,9 +43,9 @@ module Shale
   class NotAShaleMapperError < StandardError
   end
 
-  # JSON Schema compilation error
+  # Schema compilation error
   #
   # @api private
-  class JSONSchemaError < StandardError
+  class SchemaError < StandardError
   end
 end
