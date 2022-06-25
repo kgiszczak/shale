@@ -54,7 +54,11 @@ if params[:compile]
     end
   end
 
-  models = Shale::Schema.from_json(schemas, root_name: params[:root])
+  if params[:format] == 'xml'
+    models = Shale::Schema.from_xml(schemas)
+  else
+    models = Shale::Schema.from_json(schemas, root_name: params[:root])
+  end
 
   if params[:output]
     dir = File.expand_path(params[:output], Dir.pwd)

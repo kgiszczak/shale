@@ -334,7 +334,7 @@ RSpec.describe Shale::Schema::JSONCompiler do
     end
   end
 
-  describe '#to_schema' do
+  describe '#to_models' do
     let(:schema) do
       <<~DATA
         {

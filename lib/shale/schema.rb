@@ -3,6 +3,7 @@
 require_relative 'schema/json_generator'
 require_relative 'schema/json_compiler'
 require_relative 'schema/xml_generator'
+require_relative 'schema/xml_compiler'
 
 module Shale
   # Module for handling JSON and XML schema
@@ -65,6 +66,21 @@ module Shale
     # @api public
     def self.to_xml(klass, base_name = nil, pretty: false, declaration: false)
       XMLGenerator.new.to_schemas(klass, base_name, pretty: pretty, declaration: declaration)
+    end
+
+    # Generate Shale model from XML Schema
+    #
+    # @param [Array<String>] schemas
+    #
+    # @return [Array<String>]
+    #
+    # @example
+    #   Shale::Schema.from_xml([xml_schema1, xml_schema2])
+    #   # => [model1, model2, model3]
+    #
+    # @api public
+    def self.from_xml(schemas)
+      XMLCompiler.new.to_models(schemas)
     end
   end
 end

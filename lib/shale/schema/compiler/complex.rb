@@ -5,7 +5,7 @@ require_relative '../../utils'
 module Shale
   module Schema
     module Compiler
-      # Class representing Shale's comosite type
+      # Class representing Shale's complex type
       #
       # @api private
       class Complex
@@ -69,6 +69,7 @@ module Shale
           @properties
             .filter { |e| e.type.is_a?(self.class) && e.type != self }
             .uniq { |e| e.type.id }
+            .sort { |a, b| a.type.file_name <=> b.type.file_name }
         end
 
         # Add property to Object
@@ -77,7 +78,9 @@ module Shale
         #
         # @api private
         def add_property(property)
-          @properties << property
+          unless @properties.find { |e| e.mapping_name == property.mapping_name }
+            @properties << property
+          end
         end
       end
     end

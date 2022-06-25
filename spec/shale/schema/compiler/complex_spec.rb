@@ -64,21 +64,82 @@ RSpec.describe Shale::Schema::Compiler::Complex do
 
       expect(complex.references).to eq([property2])
     end
+
+    it 'sorts references by file_name' do
+      complex = described_class.new('id', 'foo')
+
+      complex1 = described_class.new('id1', 'a')
+      property1 = Shale::Schema::Compiler::Property.new('prop1', complex1, false, nil)
+
+      complex2 = described_class.new('id2', 'b')
+      property2 = Shale::Schema::Compiler::Property.new('prop2', complex2, false, nil)
+
+      complex3 = described_class.new('id3', 'c')
+      property3 = Shale::Schema::Compiler::Property.new('prop3', complex3, false, nil)
+
+      complex4 = described_class.new('id4', 'd')
+      property4 = Shale::Schema::Compiler::Property.new('prop4', complex4, false, nil)
+
+      complex.add_property(property2)
+      complex.add_property(property1)
+      complex.add_property(property4)
+      complex.add_property(property3)
+
+      expect(complex.references).to eq([property1, property2, property3, property4])
+    end
+
+    it 'returns uniq references' do
+      complex = described_class.new('id', 'foo')
+
+      complex1 = described_class.new('id1', 'a')
+      property1 = Shale::Schema::Compiler::Property.new('prop1', complex1, false, nil)
+      property2 = Shale::Schema::Compiler::Property.new('prop2', complex1, false, nil)
+
+      complex2 = described_class.new('id2', 'b')
+      property3 = Shale::Schema::Compiler::Property.new('prop3', complex2, false, nil)
+      property4 = Shale::Schema::Compiler::Property.new('prop4', complex2, false, nil)
+
+      complex.add_property(property2)
+      complex.add_property(property1)
+      complex.add_property(property4)
+      complex.add_property(property3)
+
+      expect(complex.references).to eq([property2, property4])
+    end
   end
 
   describe '#add_property' do
-    it 'returns value' do
-      property1 = Shale::Schema::Compiler::Property.new('fooBar1', type, false, nil)
-      property2 = Shale::Schema::Compiler::Property.new('fooBar2', type, false, nil)
+    context 'when property with given name is not present' do
+      it 'adds property' do
+        property1 = Shale::Schema::Compiler::Property.new('fooBar1', type, false, nil)
+        property2 = Shale::Schema::Compiler::Property.new('fooBar2', type, false, nil)
 
-      complex = described_class.new('foobar-id', 'foobar')
-      expect(complex.properties.length).to eq(0)
+        complex = described_class.new('foobar-id', 'foobar')
+        expect(complex.properties.length).to eq(0)
 
-      complex.add_property(property1)
-      expect(complex.properties.length).to eq(1)
+        complex.add_property(property1)
+        expect(complex.properties.length).to eq(1)
 
-      complex.add_property(property2)
-      expect(complex.properties.length).to eq(2)
+        complex.add_property(property2)
+        expect(complex.properties.length).to eq(2)
+      end
+    end
+
+    context 'when proeprty with given name is already present' do
+      it 'adds property' do
+        property1 = Shale::Schema::Compiler::Property.new('fooBar1', type, false, nil)
+        property2 = Shale::Schema::Compiler::Property.new('fooBar1', type, false, nil)
+
+        complex = described_class.new('foobar-id', 'foobar')
+        expect(complex.properties.length).to eq(0)
+
+        complex.add_property(property1)
+        expect(complex.properties.length).to eq(1)
+
+        complex.add_property(property2)
+        expect(complex.properties.length).to eq(1)
+        expect(complex.properties[0].mapping_name).to eq('fooBar1')
+      end
     end
   end
 end

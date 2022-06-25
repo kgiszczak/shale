@@ -23,9 +23,13 @@ Metrics/CyclomaticComplexity:
   Enabled: false
 Metrics/MethodLength:
   Enabled: false
+Metrics/ParameterLists:
+  Enabled: false
 Metrics/PerceivedComplexity:
   Enabled: false
 Style/BlockComments:
+  Enabled: false
+Style/CombinableLoops:
   Enabled: false
 Style/ConditionalAssignment:
   Enabled: false

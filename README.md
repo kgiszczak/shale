@@ -11,7 +11,7 @@ Documentation with interactive examples is available at [Shale website](https://
 * Convert JSON, YAML and XML to Ruby data model
 * Convert Ruby data model to JSON, YAML and XML
 * Generate JSON and XML Schema from Ruby models
-* Compile JSON Schema into Ruby models
+* Compile JSON and XML Schema into Ruby models
 * Out of the box support for JSON, YAML, Nokogiri, REXML and Ox parsers
 * Support for custom adapters
 
@@ -62,6 +62,7 @@ $ gem install shale
 * [Generating JSON Schema](#generating-json-schema)
 * [Compiling JSON Schema into Shale model](#compiling-json-schema-into-shale-model)
 * [Generating XML Schema](#generating-xml-schema)
+* [Compiling XML Schema into Shale model](#compiling-xml-schema-into-shale-model)
 
 ## Usage
 
@@ -840,6 +841,82 @@ class MyEmailType < Shale::Type::Value
 end
 
 Shale::Schema::XMLGenerator.register_xml_type(MyEmailType, 'myEmailXMLType')
+```
+
+### Compiling XML Schema into Shale model
+
+To generate Shale data model from XML Schema use:
+
+```ruby
+require 'shale/schema'
+
+schema = <<~SCHEMA
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="Person" type="Person" />
+
+  <xs:complexType name="Person">
+    <xs:sequence>
+      <xs:element name="FirstName" type="xs:string" />
+      <xs:element name="LastName" type="xs:string" />
+      <xs:element name="Address" type="Address" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="Address">
+    <xs:sequence>
+      <xs:element name="Street" type="xs:string" />
+      <xs:element name="City" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>
+SCHEMA
+
+Shale::Schema.from_xml([schema])
+
+# =>
+#
+# {
+#   "address" => "
+#     require 'shale'
+#
+#     class Address < Shale::Mapper
+#       attribute :street, Shale::Type::String
+#       attribute :city, Shale::Type::String
+#
+#       xml do
+#         root 'Address'
+#
+#         map_element 'Street', to: :street
+#         map_element 'City', to: :city
+#       end
+#     end
+#   ",
+#   "person" => "
+#     require 'shale'
+#
+#     require_relative 'address'
+#
+#     class Person < Shale::Mapper
+#       attribute :first_name, Shale::Type::String
+#       attribute :last_name, Shale::Type::String
+#       attribute :address, Address
+#
+#       xml do
+#         root 'Person'
+#
+#         map_element 'FirstName', to: :first_name
+#         map_element 'LastName', to: :last_name
+#         map_element 'Address', to: :address
+#       end
+#     end
+#   "
+# }
+```
+
+You can also use a command line tool to do it:
+
+```
+$ shaleb -c -f xml -i schema.xml
 ```
 
 ## Contributing

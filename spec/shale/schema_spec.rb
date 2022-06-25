@@ -92,4 +92,42 @@ RSpec.describe Shale::Schema do
       expect(schemas).to eq(expected_xml_schema)
     end
   end
+
+  describe '.from_xml' do
+    let(:schema) do
+      <<~DATA
+        <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+          <xs:element name="foo" type="foo" />
+
+          <xs:complexType name="foo">
+            <xs:sequence>
+              <xs:element name="name" type="xs:string" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:schema>
+      DATA
+    end
+
+    let(:expected_shale_model) do
+      <<~DATA
+        require 'shale'
+
+        class Foo < Shale::Mapper
+          attribute :name, Shale::Type::String
+
+          xml do
+            root 'foo'
+
+            map_element 'name', to: :name
+          end
+        end
+      DATA
+    end
+
+    it 'generates Shale models' do
+      models = described_class.from_xml([schema])
+      expect(models.length).to eq(1)
+      expect(models).to eq({ 'foo' => expected_shale_model })
+    end
+  end
 end

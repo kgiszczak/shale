@@ -50,7 +50,7 @@ module Shale
         end
       TEMPLATE
 
-      # Generate Shale models from JSON Schema and return them as a Ruby Array od objects
+      # Generate Shale models from JSON Schema and return them as a Ruby Array of objects
       #
       # @param [Array<String>] schemas
       # @param [String, nil] root_name
@@ -81,7 +81,6 @@ module Shale
         total_duplicates = Hash.new(0)
         duplicates = Hash.new(0)
 
-        # rubocop:disable Style/CombinableLoops
         @types.each do |type|
           total_duplicates[type.name] += 1
         end
@@ -93,7 +92,6 @@ module Shale
             type.name = format("#{type.name}%d", duplicates[type.name])
           end
         end
-        # rubocop:enable Style/CombinableLoops
 
         @types.reverse
       end
