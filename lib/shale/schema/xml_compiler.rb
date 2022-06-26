@@ -412,7 +412,7 @@ module Shale
       # @api private
       def replace_ns_prefixes(type, namespaces)
         namespaces.each do |prefix, name|
-          type = type.sub(/\A#{prefix}/, name)
+          type = type.sub(/^#{prefix}/, name)
         end
 
         type
