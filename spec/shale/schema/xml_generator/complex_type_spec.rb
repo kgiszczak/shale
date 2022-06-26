@@ -1,11 +1,16 @@
 # frozen_string_literal: true
 
 require 'shale'
+require 'shale/adapter/rexml'
 require 'shale/schema/xml_generator/complex_type'
 require 'shale/schema/xml_generator/typed_attribute'
 require 'shale/schema/xml_generator/typed_element'
 
 RSpec.describe Shale::Schema::XMLGenerator::ComplexType do
+  before(:each) do
+    Shale.xml_adapter = Shale::Adapter::REXML
+  end
+
   describe '#name' do
     it 'returns namespace' do
       expect(described_class.new('foo').name).to eq('foo')

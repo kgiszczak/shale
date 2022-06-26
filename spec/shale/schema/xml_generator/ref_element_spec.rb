@@ -1,9 +1,14 @@
 # frozen_string_literal: true
 
 require 'shale'
+require 'shale/adapter/rexml'
 require 'shale/schema/xml_generator/ref_element'
 
 RSpec.describe Shale::Schema::XMLGenerator::RefElement do
+  before(:each) do
+    Shale.xml_adapter = Shale::Adapter::REXML
+  end
+
   describe '#as_xml' do
     context 'with default' do
       it 'returns XML node' do

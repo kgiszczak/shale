@@ -68,7 +68,9 @@ module Shale
         #
         # @api private
         def parent
-          self.class.new(@node.parent) if @node.parent
+          if @node.parent && @node.parent.name != ''
+            self.class.new(@node.parent)
+          end
         end
 
         # Return node's element children

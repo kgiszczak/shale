@@ -2,6 +2,7 @@
 
 require 'rexml/document'
 
+require_relative '../error'
 require_relative 'rexml/document'
 require_relative 'rexml/node'
 
@@ -15,12 +16,16 @@ module Shale
       #
       # @param [String] xml XML document
       #
-      # @return [::REXML::Document]
+      # @raise [ParseError] when XML document has errors
+      #
+      # @return [Shale::Adapter::REXML::Node]
       #
       # @api private
       def self.load(xml)
         doc = ::REXML::Document.new(xml, ignore_whitespace_nodes: :all)
         Node.new(doc.root)
+      rescue ::REXML::ParseException => e
+        raise ParseError, "Document is invalid: #{e.message}"
       end
 
       # Serialize REXML document into XML

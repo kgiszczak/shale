@@ -4,7 +4,6 @@ require 'yaml'
 
 require_relative 'shale/mapper'
 require_relative 'shale/adapter/json'
-require_relative 'shale/adapter/rexml'
 require_relative 'shale/type/boolean'
 require_relative 'shale/type/date'
 require_relative 'shale/type/float'
@@ -73,15 +72,20 @@ module Shale
     # @api public
     attr_writer :yaml_adapter
 
-    # Set XML adapter
+    # XML adapter accessor. Available adapters are Shale::Adapter::REXML,
+    # Shale::Adapter::Nokogiri and Shale::Adapter::Ox
     #
     # @param [@see Shale::Adapter::REXML] adapter
     #
-    # @example
+    # @example setting adapter
     #   Shale.xml_adapter = Shale::Adapter::REXML
     #
+    # @example getting adapter
+    #   Shale.xml_adapter
+    #   # => Shale::Adapter::REXML
+    #
     # @api public
-    attr_writer :xml_adapter
+    attr_accessor :xml_adapter
 
     # Return JSON adapter. By default Shale::Adapter::JSON is used
     #
@@ -107,21 +111,6 @@ module Shale
     # @api public
     def yaml_adapter
       @yaml_adapter || YAML
-    end
-
-    # Return XML adapter. By default Shale::Adapter::REXML is used.
-    # Available adapters are Shale::Adapter::REXML,
-    # Shale::Adapter::Nokogiri and Shale::Adapter::Ox
-    #
-    # @return [@see Shale::Adapter::REXML]
-    #
-    # @example
-    #   Shale.xml_adapter
-    #   # => Shale::Adapter::REXML
-    #
-    # @api public
-    def xml_adapter
-      @xml_adapter || Adapter::REXML
     end
   end
 end

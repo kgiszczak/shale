@@ -5,9 +5,19 @@ require 'shale/adapter/rexml'
 
 RSpec.describe Shale::Adapter::REXML do
   describe '.load' do
-    it 'parses XML document' do
-      doc = described_class.load('<foo></foo>')
-      expect(doc.name).to eq('foo')
+    context 'with valid XML document' do
+      it 'parses XML document' do
+        doc = described_class.load('<foo></foo>')
+        expect(doc.name).to eq('foo')
+      end
+    end
+
+    context 'with invalid XML document' do
+      it 'raises an error' do
+        expect do
+          described_class.load('<foo')
+        end.to raise_error(Shale::ParseError)
+      end
     end
   end
 

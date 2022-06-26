@@ -1,9 +1,14 @@
 # frozen_string_literal: true
 
 require 'shale'
+require 'shale/adapter/rexml'
 require 'shale/schema/xml_generator/import'
 
 RSpec.describe Shale::Schema::XMLGenerator::Import do
+  before(:each) do
+    Shale.xml_adapter = Shale::Adapter::REXML
+  end
+
   describe '#namespace' do
     it 'returns namespace' do
       expect(described_class.new('foo', 'bar').namespace).to eq('foo')

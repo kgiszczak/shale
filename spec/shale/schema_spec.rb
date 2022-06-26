@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'shale/adapter/rexml'
 require 'shale/schema'
 
 module ShaleSchemaTesting
@@ -88,6 +89,7 @@ RSpec.describe Shale::Schema do
     end
 
     it 'generates XML schema' do
+      Shale.xml_adapter = Shale::Adapter::REXML
       schemas = described_class.to_xml(ShaleSchemaTesting::Root, pretty: true)
       expect(schemas).to eq(expected_xml_schema)
     end
@@ -125,6 +127,7 @@ RSpec.describe Shale::Schema do
     end
 
     it 'generates Shale models' do
+      Shale.xml_adapter = Shale::Adapter::REXML
       models = described_class.from_xml([schema])
       expect(models.length).to eq(1)
       expect(models).to eq({ 'foo' => expected_shale_model })

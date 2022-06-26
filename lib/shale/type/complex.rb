@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require_relative '../error'
 require_relative 'value'
 
 module Shale
@@ -198,10 +199,13 @@ module Shale
         #
         # @param [String] xml XML to convert
         #
+        # @raise [AdapterError]
+        #
         # @return [Shale::Mapper]
         #
         # @api public
         def from_xml(xml)
+          validate_xml_adapter
           of_xml(Shale.xml_adapter.load(xml))
         end
 
@@ -279,11 +283,25 @@ module Shale
         # @param [Shale::Mapper] instance Object to convert
         # @param [Array<Symbol>] options
         #
+        # @raise [AdapterError]
+        #
         # @return [String]
         #
         # @api public
         def to_xml(instance, *options)
+          validate_xml_adapter
           Shale.xml_adapter.dump(as_xml(instance), *options)
+        end
+
+        private
+
+        # Validate XML adapter
+        #
+        # @raise [AdapterError]
+        #
+        # @api private
+        def validate_xml_adapter
+          raise AdapterError, ADAPTER_NOT_SET_MESSAGE unless Shale.xml_adapter
         end
       end
 

@@ -35,8 +35,9 @@ RSpec.describe Shale do
 
   describe '.xml_adapter' do
     context 'when adapter is not set' do
-      it 'returns default adapter' do
-        expect(described_class.xml_adapter).to eq(Shale::Adapter::REXML)
+      it 'returns nil' do
+        described_class.xml_adapter = nil
+        expect(described_class.xml_adapter).to eq(nil)
       end
     end
 

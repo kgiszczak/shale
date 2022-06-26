@@ -62,7 +62,9 @@ module Shale
         #
         # @api private
         def parent
-          self.class.new(@node.parent) if @node.respond_to?(:parent) && @node.parent
+          if @node.respond_to?(:parent) && @node.parent && @node.parent.name != 'document'
+            self.class.new(@node.parent)
+          end
         end
 
         # Return node's element children

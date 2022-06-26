@@ -3,7 +3,7 @@
 require 'erb'
 
 require_relative '../../shale'
-require_relative '../adapter/rexml'
+require_relative '../error'
 require_relative 'compiler/boolean'
 require_relative 'compiler/date'
 require_relative 'compiler/float'
@@ -189,6 +189,7 @@ module Shale
       #
       # @param [Array<String>] schemas
       #
+      # @raise [AdapterError] when XML adapter is not set or Ox adapter is used
       # @raise [SchemaError] when XML Schema has errors
       #
       # @return [Array<Shale::Schema::Compiler::XMLComplex>]
@@ -198,8 +199,17 @@ module Shale
       #
       # @api public
       def as_models(schemas)
+        unless Shale.xml_adapter
+          raise AdapterError, ADAPTER_NOT_SET_MESSAGE
+        end
+
+        if Shale.xml_adapter.name == 'Shale::Adapter::Ox'
+          msg = "Ox doesn't support XML namespaces and can't be used to compile XML Schema"
+          raise AdapterError, msg
+        end
+
         schemas = schemas.map do |schema|
-          Shale::Adapter::REXML.load(schema)
+          Shale.xml_adapter.load(schema)
         end
 
         @elements_repository = {}
@@ -239,7 +249,7 @@ module Shale
         end
 
         @types.reverse
-      rescue REXML::ParseException => e
+      rescue ParseError => e
         raise SchemaError, "XML Schema document is invalid: #{e.message}"
       end
 
@@ -267,7 +277,7 @@ module Shale
 
       # Check if node is a given type
       #
-      # @param [Shale::Adapter::REXML::Node] node
+      # @param [Shale::Adapter::<Adapter>::Node] node
       # @param [String] name
       #
       # @return [true false]
@@ -279,7 +289,7 @@ module Shale
 
       # Check if node has attribute
       #
-      # @param [Shale::Adapter::REXML::Node] node
+      # @param [Shale::Adapter::<Adapter>::Node] node
       # @param [String] name
       #
       # @return [true false]
@@ -293,9 +303,9 @@ module Shale
 
       # Traverse over all child nodes and call a block for each one
       #
-      # @param [Shale::Adapter::REXML::Node] node
+      # @param [Shale::Adapter::<Adapter>::Node] node
       #
-      # @yieldparam [Shale::Adapter::REXML::Node]
+      # @yieldparam [Shale::Adapter::<Adapter>::Node]
       #
       # @api private
       def traverse(node, &block)
@@ -318,9 +328,9 @@ module Shale
 
       # Get schema node
       #
-      # @param [Shale::Adapter::REXML::Node] node
+      # @param [Shale::Adapter::<Adapter>::Node] node
       #
-      # @return [Shale::Adapter::REXML::Node, nil]
+      # @return [Shale::Adapter::<Adapter>::Node, nil]
       #
       # @api private
       def get_schema(node)
@@ -358,7 +368,7 @@ module Shale
 
       # Build id from child nodes
       #
-      # @param [Shale::Adapter::REXML::Node] node
+      # @param [Shale::Adapter::<Adapter>::Node] node
       # @param [String] namespace
       #
       # @return [String]
@@ -376,7 +386,7 @@ module Shale
 
       # Build unique id for a node
       #
-      # @param [Shale::Adapter::REXML::Node] node
+      # @param [Shale::Adapter::<Adapter>::Node] node
       #
       # @return [String]
       #
@@ -410,7 +420,7 @@ module Shale
 
       # Normalize reference to type
       #
-      # @param [Shale::Adapter::REXML::Node] node
+      # @param [Shale::Adapter::<Adapter>::Node] node
       #
       # @return [String]
       #
@@ -428,7 +438,7 @@ module Shale
 
       # Infer simple type from node
       #
-      # @param [Shale::Adapter::REXML::Node] node
+      # @param [Shale::Adapter::<Adapter>::Node] node
       #
       # @return [String]
       #
@@ -456,7 +466,7 @@ module Shale
 
       # Resolve namespace for complex type
       #
-      # @param [Shale::Adapter::REXML::Node] node
+      # @param [Shale::Adapter::<Adapter>::Node] node
       #
       # @return [Array<String>]
       #
@@ -469,7 +479,7 @@ module Shale
         form_element = node.parent.attributes['form'] || form_default
 
         is_top = node_is_a?(node.parent, XS_SCHEMA)
-        parent_is_top = node_is_a?(node.parent.parent, XS_SCHEMA)
+        parent_is_top = node.parent.parent && node_is_a?(node.parent.parent, XS_SCHEMA)
         parent_is_qualified = form_element == 'qualified'
 
         if is_top || parent_is_top || parent_is_qualified
@@ -479,7 +489,7 @@ module Shale
 
       # Resolve namespace for properties
       #
-      # @param [Shale::Adapter::REXML::Node] node
+      # @param [Shale::Adapter::<Adapter>::Node] node
       # @param [String] form_default
       #
       # @return [Array<String>]
@@ -502,7 +512,7 @@ module Shale
 
       # Build repository of XML Schema entities
       #
-      # @param [Shale::Adapter::REXML::Node] schema
+      # @param [Shale::Adapter::<Adapter>::Node] schema
       #
       # @api private
       def build_repositories(schema)
@@ -550,7 +560,7 @@ module Shale
 
       # Infer type from node
       #
-      # @param [Shale::Adapter::REXML::Node] node
+      # @param [Shale::Adapter::<Adapter>::Node] node
       #
       # @return [Shale::Schema::Compiler::<any>]
       #
@@ -587,7 +597,7 @@ module Shale
 
       # Test if element is a collection
       #
-      # @param [Shale::Adapter::REXML::Node] node
+      # @param [Shale::Adapter::<Adapter>::Node] node
       # @param [String] max_occurs
       #
       # @return [true, false]
@@ -605,7 +615,7 @@ module Shale
 
       # Return base type ref
       #
-      # @param [Shale::Adapter::REXML::Node] node
+      # @param [Shale::Adapter::<Adapter>::Node] node
       #
       # @return [String]
       #
@@ -626,7 +636,7 @@ module Shale
 
       # Return base type ref
       #
-      # @param [Shale::Adapter::REXML::Node] node
+      # @param [Shale::Adapter::<Adapter>::Node] node
       #
       # @return [String]
       #
@@ -647,7 +657,7 @@ module Shale
 
       # Return content type
       #
-      # @param [Shale::Adapter::REXML::Node] node
+      # @param [Shale::Adapter::<Adapter>::Node] node
       #
       # @return [String]
       #
@@ -676,9 +686,9 @@ module Shale
 
       # Return attributes
       #
-      # @param [Shale::Adapter::REXML::Node] node
+      # @param [Shale::Adapter::<Adapter>::Node] node
       #
-      # @return [Array<Shale::Adapter::REXML::Node>]
+      # @return [Array<Shale::Adapter::<Adapter>::Node>]
       #
       # @api private
       def find_attributes(node)
@@ -706,7 +716,7 @@ module Shale
 
       # Return elements
       #
-      # @param [Shale::Adapter::REXML::Node] node
+      # @param [Shale::Adapter::<Adapter>::Node] node
       #
       # @return [Hash]
       #
@@ -769,7 +779,7 @@ module Shale
       # Compile complex type
       #
       # @param [Shale::Schema::Compiler::XMLComplex] complex_type
-      # @param [Shale::Adapter::REXML::Node] node
+      # @param [Shale::Adapter::<Adapter>::Node] node
       # @param [Symbol] mode
       #
       # @api private
@@ -857,9 +867,9 @@ module Shale
 
       # Return top level elements
       #
-      # @param [Shale::Adapter::REXML::Node] schema
+      # @param [Shale::Adapter::<Adapter>::Node] schema
       #
-      # @return [Shale::Adapter::REXML::Node]
+      # @return [Shale::Adapter::<Adapter>::Node]
       #
       # @api private
       def find_top_level_elements(schema)
@@ -884,7 +894,7 @@ module Shale
 
       # Compile schema
       #
-      # @param [Shale::Adapter::REXML::Node] schema
+      # @param [Shale::Adapter::<Adapter>::Node] schema
       #
       # @api private
       def compile(schema)

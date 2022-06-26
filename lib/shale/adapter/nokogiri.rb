@@ -2,6 +2,7 @@
 
 require 'nokogiri'
 
+require_relative '../error'
 require_relative 'nokogiri/document'
 require_relative 'nokogiri/node'
 
@@ -15,12 +16,18 @@ module Shale
       #
       # @param [String] xml XML document
       #
-      # @return [::Nokogiri::XML::Document]
+      # @raise [ParseError] when XML document has errors
+      #
+      # @return [Shale::Adapter::Nokogiri::Node]
       #
       # @api private
       def self.load(xml)
         doc = ::Nokogiri::XML::Document.parse(xml) do |config|
           config.noblanks
+        end
+
+        unless doc.errors.empty?
+          raise ParseError, "Document is invalid: #{doc.errors}"
         end
 
         Node.new(doc.root)

@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'shale/adapter/ox'
+require 'shale/adapter/rexml'
 require 'shale/schema/compiler/boolean'
 require 'shale/schema/compiler/date'
 require 'shale/schema/compiler/float'
@@ -539,19 +541,36 @@ schema_namespaces2 = <<~SCHEMA
 SCHEMA
 
 RSpec.describe Shale::Schema::XMLCompiler do
+  before(:each) do
+    Shale.xml_adapter = Shale::Adapter::REXML
+  end
+
   describe '#as_models' do
-    context 'with incorrect schema' do
+    context 'when no adapter is set' do
       it 'raises error' do
-        msg = <<~MSG
-          XML Schema document is invalid: No close tag for /asd
-          Line: 1
-          Position: 5
-          Last 80 unconsumed characters:
-        MSG
+        Shale.xml_adapter = nil
 
         expect do
           described_class.new.as_models(['<asd>'])
-        end.to raise_error(Shale::SchemaError, msg)
+        end.to raise_error(Shale::AdapterError, /XML Adapter is not set/)
+      end
+    end
+
+    context 'when Ox adapter is set' do
+      it 'raises error' do
+        Shale.xml_adapter = Shale::Adapter::Ox
+
+        expect do
+          described_class.new.as_models(['<asd>'])
+        end.to raise_error(Shale::AdapterError, /Ox doesn't support XML namespaces/)
+      end
+    end
+
+    context 'with incorrect schema' do
+      it 'raises error' do
+        expect do
+          described_class.new.as_models(['<asd>'])
+        end.to raise_error(Shale::SchemaError, /XML Schema document is invalid/)
       end
     end
 

@@ -4,12 +4,29 @@
 require 'fileutils'
 require 'optparse'
 
-base_path = File.expand_path('../lib', __dir__)
+def require_local_or_global(path)
+  base_path = File.expand_path('../lib', __dir__)
 
-if File.exist?(base_path)
-  require_relative '../lib/shale/schema'
-else
-  require 'shale/schema'
+  if File.exist?(base_path)
+    require_relative "../lib/#{path}"
+  else
+    require path
+  end
+end
+
+require_local_or_global('shale/schema')
+
+def load_xml_parser
+  require_local_or_global('shale/adapter/nokogiri')
+  Shale.xml_adapter = Shale::Adapter::Nokogiri
+rescue LoadError
+  begin
+    require_local_or_global('shale/adapter/rexml')
+    Shale.xml_adapter = Shale::Adapter::REXML
+  rescue LoadError
+    puts "Can't load XML parser. Make sure Nokogiri or REXML is installed on your system!"
+    exit
+  end
 end
 
 params = {}
@@ -55,6 +72,7 @@ if params[:compile]
   end
 
   if params[:format] == 'xml'
+    load_xml_parser
     models = Shale::Schema.from_xml(schemas)
   else
     models = Shale::Schema.from_json(schemas, root_name: params[:root])
@@ -98,6 +116,8 @@ else
   klass = Object.const_get(params[:root])
 
   if params[:format] == 'xml'
+    load_xml_parser
+
     if params[:output]
       base_name = File.basename(params[:output], File.extname(params[:output]))
       schemas = Shale::Schema.to_xml(klass, base_name, pretty: params[:pretty])

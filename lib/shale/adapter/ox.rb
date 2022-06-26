@@ -2,6 +2,7 @@
 
 require 'ox'
 
+require_relative '../error'
 require_relative 'ox/document'
 require_relative 'ox/node'
 
@@ -15,11 +16,15 @@ module Shale
       #
       # @param [String] xml XML document
       #
-      # @return [::Ox::Document, ::Ox::Element]
+      # @raise [ParseError] when XML document has errors
+      #
+      # @return [Shale::Adapter::Ox::Node]
       #
       # @api private
       def self.load(xml)
         Node.new(::Ox.parse(xml))
+      rescue ::Ox::ParseError => e
+        raise ParseError, "Document is invalid: #{e.message}"
       end
 
       # Serialize Ox document into XML

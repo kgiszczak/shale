@@ -231,6 +231,15 @@ person.to_hash
 
 ### Converting XML to object
 
+To use XML with Shale you have to set adapter you want to use.
+Shale comes with adapters for REXML, Nokogiri and OX parsers.
+For details see [Adapters](#adapters) section.
+
+```ruby
+require 'shale/adapter/rexml'
+Shale.xml_adapter = Shale::Adapter::REXML
+```
+
 ```ruby
 person = Person.from_xml(<<~DATA)
 <person>
@@ -589,8 +598,7 @@ end
 ### Adapters
 
 Shale uses adapters for parsing and generating documents.
-By default Ruby's standard JSON parser is used for handling JSON documents, YAML for YAML and
-REXML for XML.
+By default Ruby's standard JSON and YAML parsers are used for handling JSON and YAML documents.
 
 You can change it by providing your own adapter. For JSON and YAML, adapter must implement
 `.load` and `.dump` class methods.
@@ -603,6 +611,7 @@ Shale.json_adapter = MultiJson
 Shale.yaml_adapter = MyYamlAdapter
 ```
 
+To handle XML documents you have to explicitly set XML adapter.
 Shale provides adapters for most popular Ruby XML parsers:
 
 :warning: **Ox doesn't support XML namespaces**
@@ -610,7 +619,7 @@ Shale provides adapters for most popular Ruby XML parsers:
 ```ruby
 require 'shale'
 
-# REXML is used by default:
+# if you want to use REXML:
 
 require 'shale/adapter/rexml'
 Shale.xml_adapter = Shale::Adapter::REXML

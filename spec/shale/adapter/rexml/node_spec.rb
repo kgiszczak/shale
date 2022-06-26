@@ -93,6 +93,14 @@ RSpec.describe Shale::Adapter::REXML::Node do
         expect(node.parent).to eq(nil)
       end
     end
+
+    context 'when parent is document' do
+      it 'returns nil' do
+        doc = ::REXML::Document.new('<parent><child>foo</child></parent>')
+        node = described_class.new(doc.root)
+        expect(node.parent).to eq(nil)
+      end
+    end
   end
 
   describe '#children' do

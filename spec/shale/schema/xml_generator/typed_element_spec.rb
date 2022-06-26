@@ -1,9 +1,14 @@
 # frozen_string_literal: true
 
 require 'shale'
+require 'shale/adapter/rexml'
 require 'shale/schema/xml_generator/typed_element'
 
 RSpec.describe Shale::Schema::XMLGenerator::TypedElement do
+  before(:each) do
+    Shale.xml_adapter = Shale::Adapter::REXML
+  end
+
   describe '#name' do
     it 'returns name' do
       expect(described_class.new(name: 'foo', type: 'string').name).to eq('foo')

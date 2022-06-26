@@ -1,6 +1,27 @@
 # frozen_string_literal: true
 
 module Shale
+  # Error message displayed when adapter is not set
+  # @api private
+  ADAPTER_NOT_SET_MESSAGE = <<~MSG
+    XML Adapter is not set.
+    To use Shale with XML documents you have to install parser and set adapter.
+
+    To use REXML:
+    require 'shale/adapter/rexml'
+    Shale.xml_adapter = Shale::Adapter::REXML
+
+    To use Nokogiri:
+    # Make sure Nokogiri is installed eg. execute: gem install nokogiri
+    require 'shale/adapter/nokogiri'
+    Shale.xml_adapter = Shale::Adapter::Nokogiri
+
+    To use OX:
+    # Make sure Ox is installed eg. execute: gem install ox
+    require 'shale/adapter/ox'
+    Shale.xml_adapter = Shale::Adapter::Ox
+  MSG
+
   # Error for assigning value to not existing attribute
   #
   # @api private
@@ -47,5 +68,17 @@ module Shale
   #
   # @api private
   class SchemaError < StandardError
+  end
+
+  # Parsing error
+  #
+  # @api private
+  class ParseError < StandardError
+  end
+
+  # Adapter error
+  #
+  # @api private
+  class AdapterError < StandardError
   end
 end

@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'shale/adapter/rexml'
 require 'shale/schema/xml_generator'
 require 'shale/error'
 
@@ -117,6 +118,10 @@ module ShaleSchemaXMLGeneratorTesting
 end
 
 RSpec.describe Shale::Schema::XMLGenerator do
+  before(:each) do
+    Shale.xml_adapter = Shale::Adapter::REXML
+  end
+
   let(:expected_schema0) do
     <<~DATA.gsub(/\n\z/, '')
       <xs:schema elementFormDefault="qualified" attributeFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:foo="http://foo.com">

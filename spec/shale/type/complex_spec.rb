@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'shale'
+require 'shale/adapter/rexml'
 
 module ShaleComplexTesting
   class ComplexType < Shale::Mapper
@@ -336,26 +337,56 @@ RSpec.describe Shale::Type::Complex do
     end
 
     describe '.from_xml' do
-      it 'maps xml to object' do
-        instance = ShaleComplexTesting::RootType.from_xml(xml)
+      before(:each) do
+        Shale.xml_adapter = Shale::Adapter::REXML
+      end
 
-        expect(instance.root_attr1).to eq('foo')
-        expect(instance.root_attr2).to eq(%w[one two three])
-        expect(instance.root_attr3).to eq(nil)
-        expect(instance.root_bool).to eq(false)
-        expect(instance.root_attr_complex.complex_attr1).to eq('bar')
-        expect(instance.root_attr_using).to eq('foo_element_using')
-        expect(instance.root_attr_attribute_using).to eq('foo')
-        expect(instance.element_namespaced.attr1).to eq('attr1')
-        expect(instance.element_namespaced.ns1_attr1).to eq('ns1 attr1')
-        expect(instance.element_namespaced.ns2_attr1).to eq('ns2 attr1')
-        expect(instance.element_namespaced.not_namespaced).to eq('not namespaced')
-        expect(instance.element_namespaced.ns1_one).to eq('ns1 element one')
-        expect(instance.element_namespaced.ns2_one).to eq('ns2 element one')
+      context 'when XML adapter is not set' do
+        it 'raises an error' do
+          Shale.xml_adapter = nil
+
+          expect do
+            ShaleComplexTesting::RootType.from_xml(xml)
+          end.to raise_error(Shale::AdapterError, /XML Adapter is not set/)
+        end
+      end
+
+      context 'when XML adapter is set' do
+        it 'maps xml to object' do
+          instance = ShaleComplexTesting::RootType.from_xml(xml)
+
+          expect(instance.root_attr1).to eq('foo')
+          expect(instance.root_attr2).to eq(%w[one two three])
+          expect(instance.root_attr3).to eq(nil)
+          expect(instance.root_bool).to eq(false)
+          expect(instance.root_attr_complex.complex_attr1).to eq('bar')
+          expect(instance.root_attr_using).to eq('foo_element_using')
+          expect(instance.root_attr_attribute_using).to eq('foo')
+          expect(instance.element_namespaced.attr1).to eq('attr1')
+          expect(instance.element_namespaced.ns1_attr1).to eq('ns1 attr1')
+          expect(instance.element_namespaced.ns2_attr1).to eq('ns2 attr1')
+          expect(instance.element_namespaced.not_namespaced).to eq('not namespaced')
+          expect(instance.element_namespaced.ns1_one).to eq('ns1 element one')
+          expect(instance.element_namespaced.ns2_one).to eq('ns2 element one')
+        end
       end
     end
 
     describe '.to_xml' do
+      before(:each) do
+        Shale.xml_adapter = Shale::Adapter::REXML
+      end
+
+      context 'when XML adapter is not set' do
+        it 'raises an error' do
+          Shale.xml_adapter = nil
+
+          expect do
+            ShaleComplexTesting::RootType.new.to_xml
+          end.to raise_error(Shale::AdapterError, /XML Adapter is not set/)
+        end
+      end
+
       context 'without params' do
         it 'converts objects to xml' do
           instance = ShaleComplexTesting::RootType.new(
