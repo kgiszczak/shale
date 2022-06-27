@@ -47,6 +47,7 @@ module Shale
     @hash_mapping = Mapping::Dict.new
     @json_mapping = Mapping::Dict.new
     @yaml_mapping = Mapping::Dict.new
+    @toml_mapping = Mapping::Dict.new
     @xml_mapping = Mapping::Xml.new
 
     class << self
@@ -78,6 +79,13 @@ module Shale
       # @api public
       attr_reader :yaml_mapping
 
+      # Return TOML mapping object
+      #
+      # @return [Shale::Mapping::Dict]
+      #
+      # @api public
+      attr_reader :toml_mapping
+
       # Return XML mapping object
       #
       # @return [Shale::Mapping::XML]
@@ -93,11 +101,13 @@ module Shale
         subclass.instance_variable_set('@__hash_mapping_init', @hash_mapping.dup)
         subclass.instance_variable_set('@__json_mapping_init', @json_mapping.dup)
         subclass.instance_variable_set('@__yaml_mapping_init', @yaml_mapping.dup)
+        subclass.instance_variable_set('@__toml_mapping_init', @toml_mapping.dup)
         subclass.instance_variable_set('@__xml_mapping_init', @xml_mapping.dup)
 
         subclass.instance_variable_set('@hash_mapping', @hash_mapping.dup)
         subclass.instance_variable_set('@json_mapping', @json_mapping.dup)
         subclass.instance_variable_set('@yaml_mapping', @yaml_mapping.dup)
+        subclass.instance_variable_set('@toml_mapping', @toml_mapping.dup)
 
         xml_mapping = @xml_mapping.dup
         xml_mapping.root(Utils.underscore(subclass.name || ''))
@@ -146,6 +156,7 @@ module Shale
         @hash_mapping.map(name.to_s, to: name)
         @json_mapping.map(name.to_s, to: name)
         @yaml_mapping.map(name.to_s, to: name)
+        @toml_mapping.map(name.to_s, to: name)
         @xml_mapping.map_element(name.to_s, to: name)
 
         class_eval(<<-RUBY, __FILE__, __LINE__ + 1)
@@ -168,7 +179,7 @@ module Shale
       #     attribute :age, Shale::Type::Integer
       #
       #     hsh do
-      #       map 'firatName', to: :first_name
+      #       map 'firstName', to: :first_name
       #       map 'lastName', to: :last_name
       #       map 'age', to: :age
       #     end
@@ -191,7 +202,7 @@ module Shale
       #     attribute :age, Shale::Type::Integer
       #
       #     json do
-      #       map 'firatName', to: :first_name
+      #       map 'firstName', to: :first_name
       #       map 'lastName', to: :last_name
       #       map 'age', to: :age
       #     end
@@ -214,7 +225,7 @@ module Shale
       #     attribute :age, Shale::Type::Integer
       #
       #     yaml do
-      #       map 'firat_name', to: :first_name
+      #       map 'first_name', to: :first_name
       #       map 'last_name', to: :last_name
       #       map 'age', to: :age
       #     end
@@ -224,6 +235,29 @@ module Shale
       def yaml(&block)
         @yaml_mapping = @__yaml_mapping_init.dup
         @yaml_mapping.instance_eval(&block)
+      end
+
+      # Define TOML mapping
+      #
+      # @param [Proc] block
+      #
+      # @example
+      #   calss Person < Shale::Mapper
+      #     attribute :first_name, Shale::Type::String
+      #     attribute :last_name, Shale::Type::String
+      #     attribute :age, Shale::Type::Integer
+      #
+      #     toml do
+      #       map 'first_name', to: :first_name
+      #       map 'last_name', to: :last_name
+      #       map 'age', to: :age
+      #     end
+      #   end
+      #
+      # @api public
+      def toml(&block)
+        @toml_mapping = @__toml_mapping_init.dup
+        @toml_mapping.instance_eval(&block)
       end
 
       # Define XML mapping

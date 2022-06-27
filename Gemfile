@@ -10,6 +10,7 @@ gem 'rubocop', '~> 1.30'
 gem 'rexml'
 gem 'nokogiri'
 gem 'ox'
+gem 'toml-rb'
 
 group :test do
   gem 'rspec', '~> 3.11.0'

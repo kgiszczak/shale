@@ -11,9 +11,9 @@ module Shale
     # @api private
     class Complex < Value
       class << self
-        %i[hash json yaml].each do |format|
+        %i[hash json yaml toml].each do |format|
           class_eval(<<-RUBY, __FILE__, __LINE__ + 1)
-            # Convert Hash to Object using Hash/JSON/YAML mapping
+            # Convert Hash to Object using Hash/JSON/YAML/TOML mapping
             #
             # @param [Hash] hash Hash to convert
             #
@@ -52,7 +52,7 @@ module Shale
               instance
             end
 
-            # Convert Object to Hash using Hash/JSON/YAML mapping
+            # Convert Object to Hash using Hash/JSON/YAML/TOML mapping
             #
             # @param [Shale::Mapper] instance Object to convert
             #
@@ -135,6 +135,30 @@ module Shale
         # @api public
         def to_yaml(instance)
           Shale.yaml_adapter.dump(as_yaml(instance))
+        end
+
+        # Convert TOML to Object
+        #
+        # @param [String] toml TOML to convert
+        #
+        # @return [Shale::Mapper]
+        #
+        # @api public
+        def from_toml(toml)
+          validate_toml_adapter
+          of_toml(Shale.toml_adapter.load(toml))
+        end
+
+        # Convert Object to TOML
+        #
+        # @param [Shale::Mapper] instance Object to convert
+        #
+        # @return [String]
+        #
+        # @api public
+        def to_toml(instance)
+          validate_toml_adapter
+          Shale.toml_adapter.dump(as_toml(instance))
         end
 
         # Convert XML document to Object
@@ -295,13 +319,22 @@ module Shale
 
         private
 
+        # Validate TOML adapter
+        #
+        # @raise [AdapterError]
+        #
+        # @api private
+        def validate_toml_adapter
+          raise AdapterError, TOML_ADAPTER_NOT_SET_MESSAGE unless Shale.toml_adapter
+        end
+
         # Validate XML adapter
         #
         # @raise [AdapterError]
         #
         # @api private
         def validate_xml_adapter
-          raise AdapterError, ADAPTER_NOT_SET_MESSAGE unless Shale.xml_adapter
+          raise AdapterError, XML_ADAPTER_NOT_SET_MESSAGE unless Shale.xml_adapter
         end
       end
 
@@ -332,6 +365,15 @@ module Shale
       # @api public
       def to_yaml
         self.class.to_yaml(self)
+      end
+
+      # Convert Object to TOML
+      #
+      # @return [String]
+      #
+      # @api public
+      def to_toml
+        self.class.to_toml(self)
       end
 
       # Convert Object to XML

@@ -1,18 +1,18 @@
 # Shale
 
-Shale is a Ruby object mapper and serializer for JSON, YAML and XML.
-It allows you to parse JSON, YAML and XML data and convert it into Ruby data structures,
-as well as serialize data structures into JSON, YAML or XML.
+Shale is a Ruby object mapper and serializer for JSON, YAML, TOML and XML.
+It allows you to parse JSON, YAML, TOML and XML data and convert it into Ruby data structures,
+as well as serialize data structures into JSON, YAML, TOML or XML.
 
 Documentation with interactive examples is available at [Shale website](https://www.shalerb.org)
 
 ## Features
 
-* Convert JSON, YAML and XML to Ruby data model
-* Convert Ruby data model to JSON, YAML and XML
+* Convert JSON, YAML, TOML and XML to Ruby data model
+* Convert Ruby data model to JSON, YAML, TOML and XML
 * Generate JSON and XML Schema from Ruby models
 * Compile JSON and XML Schema into Ruby models
-* Out of the box support for JSON, YAML, Nokogiri, REXML and Ox parsers
+* Out of the box support for JSON, YAML, toml-rb, Nokogiri, REXML and Ox parsers
 * Support for custom adapters
 
 ## Installation
@@ -45,12 +45,15 @@ $ gem install shale
 * [Converting object to JSON](#converting-object-to-json)
 * [Converting YAML to object](#converting-yaml-to-object)
 * [Converting object to YAML](#converting-object-to-yaml)
+* [Converting TOML to object](#converting-toml-to-object)
+* [Converting object to TOML](#converting-object-to-toml)
 * [Converting Hash to object](#converting-hash-to-object)
 * [Converting object to Hash](#converting-object-to-hash)
 * [Converting XML to object](#converting-xml-to-object)
 * [Converting object to XML](#converting-object-to-xml)
 * [Mapping JSON keys to object attributes](#mapping-json-keys-to-object-attributes)
 * [Mapping YAML keys to object attributes](#mapping-yaml-keys-to-object-attributes)
+* [Mapping TOML keys to object attributes](#mapping-toml-keys-to-object-attributes)
 * [Mapping Hash keys to object attributes](#mapping-hash-keys-to-object-attributes)
 * [Mapping XML elements and attributes to object attributes](#mapping-xml-elements-and-attributes-to-object-attributes)
 * [Using XML namespaces](#using-xml-namespaces)
@@ -195,6 +198,62 @@ person.to_yaml
 #   zip: E1 6AN
 ```
 
+### Converting TOML to object
+
+To use TOML with Shale you have to set adapter you want to use.
+Shale comes with adapter for [toml-rb](https://github.com/emancu/toml-rb).
+For details see [Adapters](#adapters) section.
+
+To set it, first make sure toml-rb gem is installed:
+
+```
+$ gem install shale
+```
+
+then setup adapter:
+
+```ruby
+require 'shale/adapter/toml_rb'
+Shale.toml_adapter = Shale::Adapter::TomlRB
+```
+
+Now you can use TOML with Shale:
+
+```ruby
+person = Person.from_toml(<<~DATA)
+first_name = "John"
+last_name = "Doe"
+age = 50
+married = false
+hobbies = ["Singing", "Dancing"]
+[address]
+city = "London"
+street = "Oxford Street"
+zip = "E1 6AN"
+DATA
+```
+
+### Converting object to TOML
+
+```ruby
+person.to_toml
+
+# =>
+#
+# ---
+# first_name: John
+# last_name: Doe
+# age: 50
+# married: false
+# hobbies:
+# - Singing
+# - Dancing
+# address:
+#   city: London
+#   street: Oxford Street
+#   zip: E1 6AN
+```
+
 ### Converting Hash to object
 
 ```ruby
@@ -239,6 +298,8 @@ For details see [Adapters](#adapters) section.
 require 'shale/adapter/rexml'
 Shale.xml_adapter = Shale::Adapter::REXML
 ```
+
+Now you can use XML with Shale:
 
 ```ruby
 person = Person.from_xml(<<~DATA)
@@ -304,6 +365,20 @@ class Person < Shale::Mapper
   attribute :last_name, Shale::Type::String
 
   yaml do
+    map 'firstName', to: :first_name
+    map 'lastName', to: :last_name
+  end
+end
+```
+
+### Mapping TOML keys to object attributes
+
+```ruby
+class Person < Shale::Mapper
+  attribute :first_name, Shale::Type::String
+  attribute :last_name, Shale::Type::String
+
+  toml do
     map 'firstName', to: :first_name
     map 'lastName', to: :last_name
   end
@@ -598,9 +673,9 @@ end
 ### Adapters
 
 Shale uses adapters for parsing and generating documents.
-By default Ruby's standard JSON and YAML parsers are used for handling JSON and YAML documents.
+By default Ruby's standard JSON, YAML parsers are used for handling JSON and YAML documents.
 
-You can change it by providing your own adapter. For JSON and YAML, adapter must implement
+You can change it by providing your own adapter. For JSON, YAML and TOML, adapter must implement
 `.load` and `.dump` class methods.
 
 ```ruby
@@ -609,6 +684,16 @@ require 'multi_json'
 
 Shale.json_adapter = MultiJson
 Shale.yaml_adapter = MyYamlAdapter
+```
+
+To handle TOML documents you have to set TOML adapter.
+Shale provides adapter for `toml-rb` TOML parser:
+
+```ruby
+require 'shale'
+
+require 'shale/adapter/toml_rb'
+Shale.toml_adapter = Shale::Adapter::TomlRB
 ```
 
 To handle XML documents you have to explicitly set XML adapter.

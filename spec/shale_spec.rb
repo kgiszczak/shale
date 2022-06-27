@@ -33,6 +33,22 @@ RSpec.describe Shale do
     end
   end
 
+  describe '.toml_adapter' do
+    context 'when adapter is not set' do
+      it 'returns nil' do
+        described_class.toml_adapter = nil
+        expect(described_class.toml_adapter).to eq(nil)
+      end
+    end
+
+    context 'when adapter is set' do
+      it 'returns adapter' do
+        described_class.toml_adapter = :foobar
+        expect(described_class.toml_adapter).to eq(:foobar)
+      end
+    end
+  end
+
   describe '.xml_adapter' do
     context 'when adapter is not set' do
       it 'returns nil' do

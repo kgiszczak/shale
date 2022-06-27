@@ -2,6 +2,7 @@
 
 require 'shale'
 require 'shale/adapter/rexml'
+require 'shale/adapter/toml_rb'
 
 module ShaleComplexTesting
   class ComplexType < Shale::Mapper
@@ -16,6 +17,10 @@ module ShaleComplexTesting
     end
 
     yaml do
+      map 'complex_attr1', to: :complex_attr1
+    end
+
+    toml do
       map 'complex_attr1', to: :complex_attr1
     end
 
@@ -93,6 +98,18 @@ module ShaleComplexTesting
       }
     end
 
+    toml do
+      map 'root_attr1', to: :root_attr1
+      map 'root_attr2', to: :root_attr2
+      map 'root_attr3', to: :root_attr3
+      map 'root_bool', to: :root_bool
+      map 'root_attr_complex', to: :root_attr_complex
+      map 'root_attr_using', using: {
+        from: :root_attr_using_from_toml,
+        to: :root_attr_using_to_toml,
+      }
+    end
+
     xml do
       root 'root_type'
       map_attribute 'attr1', to: :root_attr1
@@ -136,6 +153,14 @@ module ShaleComplexTesting
     end
 
     def root_attr_using_to_yaml
+      root_attr_using
+    end
+
+    def root_attr_using_from_toml(value)
+      self.root_attr_using = value
+    end
+
+    def root_attr_using_to_toml
       root_attr_using
     end
 
@@ -309,6 +334,67 @@ RSpec.describe Shale::Type::Complex do
         )
 
         expect(instance.to_yaml.gsub(/ +$/, '')).to eq(yaml)
+      end
+    end
+  end
+
+  context 'with toml mapping' do
+    let(:from_toml) do
+      <<~TOML
+        root_attr1 = "foo"
+        root_attr2 = ["one", "two", "three"]
+        root_bool = false
+        root_attr_using = "using_foo"
+        [root_attr_complex]
+        complex_attr1 = "bar"
+      TOML
+    end
+
+    let(:to_toml) do
+      <<~TOML
+        root_attr1 = "foo"
+        root_attr2 = ["one", "two", "three"]
+        root_attr3 = nil
+        root_attr_using = "using_foo"
+        root_bool = false
+        [root_attr_complex]
+        complex_attr1 = "bar"
+      TOML
+    end
+
+    describe '.from_toml' do
+      before(:each) do
+        Shale.toml_adapter = Shale::Adapter::TomlRB
+      end
+
+      it 'maps toml to object' do
+        instance = ShaleComplexTesting::RootType.from_toml(from_toml)
+
+        expect(instance.root_attr1).to eq('foo')
+        expect(instance.root_attr2).to eq(%w[one two three])
+        expect(instance.root_attr3).to eq(nil)
+        expect(instance.root_bool).to eq(false)
+        expect(instance.root_attr_complex.complex_attr1).to eq('bar')
+        expect(instance.root_attr_using).to eq('using_foo')
+      end
+    end
+
+    describe '.to_toml' do
+      before(:each) do
+        Shale.toml_adapter = Shale::Adapter::TomlRB
+      end
+
+      it 'converts objects to toml' do
+        instance = ShaleComplexTesting::RootType.new(
+          root_attr1: 'foo',
+          root_attr2: %w[one two three],
+          root_attr3: nil,
+          root_bool: false,
+          root_attr_complex: ShaleComplexTesting::ComplexType.new(complex_attr1: 'bar'),
+          root_attr_using: 'using_foo'
+        )
+
+        expect(instance.to_toml).to eq(to_toml)
       end
     end
   end

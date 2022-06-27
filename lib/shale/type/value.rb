@@ -89,6 +89,28 @@ module Shale
           value
         end
 
+        # Extract value from TOML document
+        #
+        # @param [any] value
+        #
+        # @return [any]
+        #
+        # @api private
+        def of_toml(value)
+          value
+        end
+
+        # Convert value to form accepted by TOML document
+        #
+        # @param [any] value
+        #
+        # @return [any]
+        #
+        # @api private
+        def as_toml(value)
+          value
+        end
+
         # Extract value from XML document
         #
         # @param [Shale::Adapter::<XML adapter>::Node] value

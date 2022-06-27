@@ -72,6 +72,20 @@ module Shale
     # @api public
     attr_writer :yaml_adapter
 
+    # TOML adapter accessor.
+    #
+    # @param [@see Shale::Adapter::TomlRB] adapter
+    #
+    # @example setting adapter
+    #   Shale.toml_adapter = Shale::Adapter::TomlRB
+    #
+    # @example getting adapter
+    #   Shale.toml_adapter
+    #   # => Shale::Adapter::TomlRB
+    #
+    # @api public
+    attr_accessor :toml_adapter
+
     # XML adapter accessor. Available adapters are Shale::Adapter::REXML,
     # Shale::Adapter::Nokogiri and Shale::Adapter::Ox
     #

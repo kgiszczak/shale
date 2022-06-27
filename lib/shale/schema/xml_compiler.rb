@@ -200,7 +200,7 @@ module Shale
       # @api public
       def as_models(schemas)
         unless Shale.xml_adapter
-          raise AdapterError, ADAPTER_NOT_SET_MESSAGE
+          raise AdapterError, XML_ADAPTER_NOT_SET_MESSAGE
         end
 
         if Shale.xml_adapter.name == 'Shale::Adapter::Ox'

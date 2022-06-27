@@ -1,9 +1,20 @@
 # frozen_string_literal: true
 
 module Shale
-  # Error message displayed when adapter is not set
+  # Error message displayed when TOML adapter is not set
   # @api private
-  ADAPTER_NOT_SET_MESSAGE = <<~MSG
+  TOML_ADAPTER_NOT_SET_MESSAGE = <<~MSG
+    TOML Adapter is not set.
+    To use Shale with TOML documents you have to install parser and set adapter.
+
+    # Make sure toml-rb is installed eg. execute: gem install toml-rb
+    require 'shale/adapter/toml_rb'
+    Shale.toml_adapter = Shale::Adapter::TomlRB
+  MSG
+
+  # Error message displayed when XML adapter is not set
+  # @api private
+  XML_ADAPTER_NOT_SET_MESSAGE = <<~MSG
     XML Adapter is not set.
     To use Shale with XML documents you have to install parser and set adapter.
 

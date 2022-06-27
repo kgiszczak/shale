@@ -47,6 +47,18 @@ RSpec.describe Shale::Type::Value do
     end
   end
 
+  describe '.of_toml' do
+    it 'returns value' do
+      expect(described_class.of_toml(123)).to eq(123)
+    end
+  end
+
+  describe '.as_toml' do
+    it 'returns value' do
+      expect(described_class.as_toml(123)).to eq(123)
+    end
+  end
+
   describe '.of_xml' do
     it 'extracts text from XML node' do
       element = ::REXML::Element.new('name')

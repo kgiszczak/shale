@@ -42,6 +42,14 @@ module ShaleMapperTesting
     end
   end
 
+  class TomlMapping < Shale::Mapper
+    attribute :foo, Shale::Type::String
+
+    toml do
+      map 'bar', to: :foo
+    end
+  end
+
   class XmlMapping < Shale::Mapper
     attribute :foo_element, Shale::Type::String
     attribute :ns2_element, Shale::Type::String
@@ -119,6 +127,23 @@ RSpec.describe Shale::Mapper do
       expect(ShaleMapperTesting::Child.yaml_mapping.keys['baz'].attribute).to eq(:baz)
       expect(ShaleMapperTesting::Child.yaml_mapping.keys['foo_int'].attribute).to eq(:foo_int)
       expect(ShaleMapperTesting::Child.yaml_mapping.keys['child_foo'].attribute).to eq(:child_foo)
+    end
+
+    it 'copies toml_mapping from parent' do
+      expect(ShaleMapperTesting::Parent.toml_mapping.keys.keys).to eq(%w[foo bar baz foo_int])
+      expect(ShaleMapperTesting::Parent.toml_mapping.keys['foo'].attribute).to eq(:foo)
+      expect(ShaleMapperTesting::Parent.toml_mapping.keys['bar'].attribute).to eq(:bar)
+      expect(ShaleMapperTesting::Parent.toml_mapping.keys['baz'].attribute).to eq(:baz)
+      expect(ShaleMapperTesting::Parent.toml_mapping.keys['foo_int'].attribute).to eq(:foo_int)
+
+      expect(ShaleMapperTesting::Child.toml_mapping.keys.keys).to(
+        eq(%w[foo bar baz foo_int child_foo])
+      )
+      expect(ShaleMapperTesting::Child.toml_mapping.keys['foo'].attribute).to eq(:foo)
+      expect(ShaleMapperTesting::Child.toml_mapping.keys['bar'].attribute).to eq(:bar)
+      expect(ShaleMapperTesting::Child.toml_mapping.keys['baz'].attribute).to eq(:baz)
+      expect(ShaleMapperTesting::Child.toml_mapping.keys['foo_int'].attribute).to eq(:foo_int)
+      expect(ShaleMapperTesting::Child.toml_mapping.keys['child_foo'].attribute).to eq(:child_foo)
     end
 
     it 'copies xml_mapping from parent' do
@@ -218,6 +243,14 @@ RSpec.describe Shale::Mapper do
         expect(ShaleMapperTesting::Parent.yaml_mapping.keys['foo_int'].attribute).to eq(:foo_int)
       end
 
+      it 'default toml mapping' do
+        expect(ShaleMapperTesting::Parent.toml_mapping.keys.keys).to eq(%w[foo bar baz foo_int])
+        expect(ShaleMapperTesting::Parent.toml_mapping.keys['foo'].attribute).to eq(:foo)
+        expect(ShaleMapperTesting::Parent.toml_mapping.keys['bar'].attribute).to eq(:bar)
+        expect(ShaleMapperTesting::Parent.toml_mapping.keys['baz'].attribute).to eq(:baz)
+        expect(ShaleMapperTesting::Parent.toml_mapping.keys['foo_int'].attribute).to eq(:foo_int)
+      end
+
       it 'default xml mapping' do
         expect(ShaleMapperTesting::Parent.xml_mapping.elements.keys).to eq(%w[foo bar baz foo_int])
 
@@ -251,6 +284,13 @@ RSpec.describe Shale::Mapper do
     it 'declares custom YAML mapping' do
       expect(ShaleMapperTesting::YamlMapping.yaml_mapping.keys.keys).to eq(['bar'])
       expect(ShaleMapperTesting::YamlMapping.yaml_mapping.keys['bar'].attribute).to eq(:foo)
+    end
+  end
+
+  describe '.toml' do
+    it 'declares custom TOML mapping' do
+      expect(ShaleMapperTesting::TomlMapping.toml_mapping.keys.keys).to eq(['bar'])
+      expect(ShaleMapperTesting::TomlMapping.toml_mapping.keys['bar'].attribute).to eq(:foo)
     end
   end
 
