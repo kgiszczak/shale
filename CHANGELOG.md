@@ -1,3 +1,14 @@
+## [0.5.0] - 2022-06-28
+
+### Added
+- Allow to generate Shale model from XML Schema
+
+### Changed
+- Shale doesn't defaults to REXML anymore - XML adapter needs to be set explicitly
+- Rename "JSONSchemaError" to "SchemaError"
+- Rename "Composite" type to "Complex"
+- Drop support for Ruby 2.6
+
 ## [0.4.0] - 2022-05-30
 
 ### Added
