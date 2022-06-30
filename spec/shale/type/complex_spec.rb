@@ -182,6 +182,28 @@ module ShaleComplexTesting
       doc.add_element(parent, element)
     end
   end
+
+  class CdataChild < Shale::Mapper
+    attribute :element1, Shale::Type::String
+
+    xml do
+      map_content to: :element1, cdata: true
+    end
+  end
+
+  class CdataParent < Shale::Mapper
+    attribute :element1, Shale::Type::String
+    attribute :element2, Shale::Type::String, collection: true
+    attribute :cdata_child, CdataChild
+
+    xml do
+      root 'cdata_parent'
+
+      map_element 'element1', to: :element1, cdata: true
+      map_element 'element2', to: :element2, cdata: true
+      map_element 'cdata_child', to: :cdata_child
+    end
+  end
 end
 
 RSpec.describe Shale::Type::Complex do
@@ -456,6 +478,28 @@ RSpec.describe Shale::Type::Complex do
           expect(instance.element_namespaced.ns2_one).to eq('ns2 element one')
         end
       end
+
+      context 'with CDATA elements' do
+        let(:xml) do
+          <<~XML
+            <cdata_type>
+              <element1>foo</element1>
+              <element2>one</element2>
+              <element2>two</element2>
+              <element2>three</element2>
+              <cdata_child>child</cdata_child>
+            </cdata_type>
+          XML
+        end
+
+        it 'maps xml to object' do
+          instance = ShaleComplexTesting::CdataParent.from_xml(xml)
+
+          expect(instance.element1).to eq('foo')
+          expect(instance.element2).to eq(%w[one two three])
+          expect(instance.cdata_child.element1).to eq('child')
+        end
+      end
     end
 
     describe '.to_xml' do
@@ -563,6 +607,28 @@ RSpec.describe Shale::Type::Complex do
           XML
 
           expect(instance.to_xml(:pretty, :declaration)).to eq(xml)
+        end
+      end
+
+      context 'with CDATA elements' do
+        it 'converts objects to xml' do
+          instance = ShaleComplexTesting::CdataParent.new(
+            element1: 'foo',
+            element2: %w[one two three],
+            cdata_child: ShaleComplexTesting::CdataChild.new(element1: 'child')
+          )
+
+          xml = <<~XML.sub(/\n\z/, '')
+            <cdata_parent>
+              <element1><![CDATA[foo]]></element1>
+              <element2><![CDATA[one]]></element2>
+              <element2><![CDATA[two]]></element2>
+              <element2><![CDATA[three]]></element2>
+              <cdata_child><![CDATA[child]]></cdata_child>
+            </cdata_parent>
+          XML
+
+          expect(instance.to_xml(:pretty)).to eq(xml)
         end
       end
     end

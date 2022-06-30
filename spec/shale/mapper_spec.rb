@@ -305,7 +305,7 @@ RSpec.describe Shale::Mapper do
       expect(elements['http://ns2.com:ns2_bar'].attribute).to eq(:ns2_element)
       expect(attributes.keys).to eq(['bar'])
       expect(attributes['bar'].attribute).to eq(:foo_attribute)
-      expect(ShaleMapperTesting::XmlMapping.xml_mapping.content).to eq(:foo_content)
+      expect(ShaleMapperTesting::XmlMapping.xml_mapping.content.attribute).to eq(:foo_content)
       expect(ShaleMapperTesting::XmlMapping.xml_mapping.prefixed_root).to eq('ns1:foobar')
       expect(namespace.name).to eq('http://ns1.com')
       expect(namespace.prefix).to eq('ns1')

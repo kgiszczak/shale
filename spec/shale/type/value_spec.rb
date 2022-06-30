@@ -77,10 +77,20 @@ RSpec.describe Shale::Type::Value do
   end
 
   describe '.as_xml' do
-    it 'converts text to XML node' do
-      doc = Shale::Adapter::REXML.create_document
-      res = described_class.as_xml(123, 'foobar', doc).to_s
-      expect(res).to eq('<foobar>123</foobar>')
+    context 'with no cdata' do
+      it 'converts text to XML node' do
+        doc = Shale::Adapter::REXML.create_document
+        res = described_class.as_xml(123, 'foobar', doc).to_s
+        expect(res).to eq('<foobar>123</foobar>')
+      end
+    end
+
+    context 'with cdata set to true' do
+      it 'converts text to XML node' do
+        doc = Shale::Adapter::REXML.create_document
+        res = described_class.as_xml(123, 'foobar', doc, true).to_s
+        expect(res).to eq('<foobar><![CDATA[123]]></foobar>')
+      end
     end
   end
 end

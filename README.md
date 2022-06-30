@@ -455,6 +455,37 @@ DATA
 - `map_attribute` - map element's attribute to attribute
 - `map_content` - map first text node to attribute
 
+You can use `cdata: true` option on `map_element` and `map_content` to handle CDATA nodes:
+
+```ruby
+class Address < Shale::Mapper
+  attribute :content, Shale::Type::String
+
+  xml do
+    map_content to: :content, cdata: true
+  end
+end
+
+class Person < Shale::Mapper
+  attribute :first_name, Shale::Type::String, cdata: true
+  attribute :address, Address
+
+  xml do
+    root 'Person'
+
+    map_element 'FirstName', to: :first_name, cdata: true
+    map_element 'Address', to: :address
+  end
+end
+
+person = Person.from_xml(<<~DATA)
+<Person>
+  <FirstName><![CDATA[John]]></FirstName>
+  <Address><![CDATA[Oxford Street]]></Address>
+</person>
+DATA
+```
+
 ### Using XML namespaces
 
 To map namespaced elements and attributes use `namespace` and `prefix` properties on

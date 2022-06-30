@@ -89,7 +89,7 @@ module Shale
           first = @node
             .children
             .to_a
-            .filter(&:text?)
+            .filter { |e| e.text? || e.cdata? }
             .first
 
           first&.text

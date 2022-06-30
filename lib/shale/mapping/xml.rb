@@ -76,7 +76,14 @@ module Shale
       # @raise [IncorrectMappingArgumentsError] when arguments are incorrect
       #
       # @api private
-      def map_element(element, to: nil, using: nil, namespace: :undefined, prefix: :undefined)
+      def map_element(
+        element,
+        to: nil,
+        using: nil,
+        namespace: :undefined,
+        prefix: :undefined,
+        cdata: false
+      )
         Validator.validate_arguments(element, to, using)
         Validator.validate_namespace(element, namespace, prefix)
 
@@ -94,7 +101,8 @@ module Shale
           name: element,
           attribute: to,
           methods: using,
-          namespace: Descriptor::XmlNamespace.new(nsp, pfx)
+          namespace: Descriptor::XmlNamespace.new(nsp, pfx),
+          cdata: cdata
         )
       end
 
@@ -119,7 +127,8 @@ module Shale
           name: attribute,
           attribute: to,
           methods: using,
-          namespace: Descriptor::XmlNamespace.new(namespace, prefix)
+          namespace: Descriptor::XmlNamespace.new(namespace, prefix),
+          cdata: false
         )
       end
 
@@ -128,8 +137,14 @@ module Shale
       # @param [Symbol] to Object's attribute
       #
       # @api private
-      def map_content(to:)
-        @content = to
+      def map_content(to:, cdata: false)
+        @content = Descriptor::Xml.new(
+          name: nil,
+          attribute: to,
+          methods: nil,
+          namespace: nil,
+          cdata: cdata
+        )
       end
 
       # Set the name for root element

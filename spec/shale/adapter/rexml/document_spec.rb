@@ -37,6 +37,14 @@ RSpec.describe Shale::Adapter::REXML::Document do
     end
   end
 
+  describe '#create_cdata' do
+    it 'wraps text with CDATA and adds it to parent' do
+      el = doc.create_element('foo')
+      doc.create_cdata('bar', el)
+      expect(el.to_s).to eq('<foo><![CDATA[bar]]></foo>')
+    end
+  end
+
   describe '#add_namespace' do
     context 'when prefix is nil' do
       it 'does not add namespace to root element' do

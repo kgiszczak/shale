@@ -138,11 +138,18 @@ module Shale
         # @param [#to_s] value Value to convert to XML
         # @param [String] name Name of the element
         # @param [Shale::Adapter::<XML adapter>::Document] doc Document
+        # @param [true, false] cdata
         #
         # @api private
-        def as_xml(value, name, doc)
+        def as_xml(value, name, doc, cdata = false)
           element = doc.create_element(name)
-          doc.add_text(element, as_xml_value(value))
+
+          if cdata
+            doc.create_cdata(as_xml_value(value), element)
+          else
+            doc.add_text(element, as_xml_value(value))
+          end
+
           element
         end
       end

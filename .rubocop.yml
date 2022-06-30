@@ -43,6 +43,8 @@ Style/HashEachMethods:
   Enabled: false
 Style/IfUnlessModifier:
   Enabled: false
+Style/OptionalBooleanParameter:
+  AllowedMethods: ['as_xml']
 Style/SymbolProc:
   Enabled: false
 Style/TrailingCommaInArrayLiteral:

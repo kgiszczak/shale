@@ -32,6 +32,16 @@ module Shale
           ::Ox::Element.new(name)
         end
 
+        # Create CDATA node and add it to parent
+        #
+        # @param [String] text
+        # @param [::Ox::Element] parent
+        #
+        # @api private
+        def create_cdata(text, parent)
+          parent << ::Ox::CData.new(text)
+        end
+
         # Add XML namespace to document
         #
         # Ox doesn't support XML namespaces so this method does nothing.

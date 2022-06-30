@@ -42,6 +42,16 @@ module Shale
           ::REXML::Element.new(name, nil, attribute_quote: :quote)
         end
 
+        # Create CDATA node and add it to parent
+        #
+        # @param [String] text
+        # @param [::REXML::Element] parent
+        #
+        # @api private
+        def create_cdata(text, parent)
+          ::REXML::CData.new(text, true, parent)
+        end
+
         # Add XML namespace to document
         #
         # @param [String] prefix

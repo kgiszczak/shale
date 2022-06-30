@@ -80,7 +80,16 @@ module Shale
         #
         # @api private
         def text
-          @node.text
+          texts = @node.nodes.map do |e|
+            case e
+            when ::Ox::CData
+              e.value
+            when ::String
+              e
+            end
+          end
+
+          texts.compact.first
         end
       end
     end

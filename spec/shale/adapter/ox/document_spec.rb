@@ -20,6 +20,14 @@ RSpec.describe Shale::Adapter::Ox::Document do
     end
   end
 
+  describe '#create_cdata' do
+    it 'wraps text with CDATA and adds it to parent' do
+      el = doc.create_element('foo')
+      doc.create_cdata('bar', el)
+      expect(::Ox.dump(el)).to eq("\n<foo>\n  <![CDATA[bar]]>\n</foo>\n")
+    end
+  end
+
   # make sure the method is defined and accepts two arguments
   describe '#add_namespace' do
     it 'does nothing' do

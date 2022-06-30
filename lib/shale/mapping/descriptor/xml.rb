@@ -16,17 +16,26 @@ module Shale
         # @api private
         attr_reader :namespace
 
+        # Return cdata
+        #
+        # @return [true, false]
+        #
+        # @api private
+        attr_reader :cdata
+
         # Initialize instance
         #
         # @param [String] name
         # @param [Symbol, String] attribute
         # @param [Hash, nil] methods
         # @param [Shale::Mapping::XmlNamespace] namespace
+        # @param [true, false] cdata
         #
         # @api private
-        def initialize(name:, attribute:, methods:, namespace:)
+        def initialize(name:, attribute:, methods:, namespace:, cdata:)
           super(name: name, attribute: attribute, methods: methods)
           @namespace = namespace
+          @cdata = cdata
         end
 
         # Return name with XML prefix

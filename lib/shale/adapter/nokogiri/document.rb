@@ -41,6 +41,16 @@ module Shale
           ::Nokogiri::XML::Element.new(name, @doc)
         end
 
+        # Create CDATA node and add it to parent
+        #
+        # @param [String] text
+        # @param [::Nokogiri::XML::Element] parent
+        #
+        # @api private
+        def create_cdata(text, parent)
+          parent.add_child(::Nokogiri::XML::CDATA.new(@doc, text))
+        end
+
         # Add XML namespace to document
         #
         # @param [String] prefix

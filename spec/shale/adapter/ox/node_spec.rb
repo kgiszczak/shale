@@ -61,10 +61,20 @@ RSpec.describe Shale::Adapter::Ox::Node do
   end
 
   describe '#text' do
-    it 'returns text nodes' do
-      doc = ::Ox.parse('<root><a/>text1<b/>text2<c/></root>')
-      node = described_class.new(doc)
-      expect(node.text).to eq('text1')
+    context 'with plain text' do
+      it 'returns text nodes' do
+        doc = ::Ox.parse('<root><a/>text1<b/>text2<c/></root>')
+        node = described_class.new(doc)
+        expect(node.text).to eq('text1')
+      end
+    end
+
+    context 'with cdata' do
+      it 'returns text nodes' do
+        doc = ::Ox.parse('<root><a/><![CDATA[text1]]><b/>text2<c/></root>')
+        node = described_class.new(doc)
+        expect(node.text).to eq('text1')
+      end
     end
   end
 end

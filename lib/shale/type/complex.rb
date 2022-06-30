@@ -189,8 +189,10 @@ module Shale
             end
           end
 
-          if xml_mapping.content
-            attribute = attributes[xml_mapping.content]
+          content_mapping = xml_mapping.content
+
+          if content_mapping
+            attribute = attributes[content_mapping.attribute]
 
             if attribute
               instance.send(attribute.setter, attribute.type.of_xml(element))
@@ -242,7 +244,7 @@ module Shale
         # @return [::REXML::Document, ::Nokogiri::Document, ::Ox::Document]
         #
         # @api public
-        def as_xml(instance, node_name = nil, doc = nil)
+        def as_xml(instance, node_name = nil, doc = nil, _cdata = nil)
           unless doc
             doc = Shale.xml_adapter.create_document
             doc.add_element(doc.doc, as_xml(instance, xml_mapping.prefixed_root, doc))
@@ -250,7 +252,11 @@ module Shale
           end
 
           element = doc.create_element(node_name)
-          doc.add_namespace(xml_mapping.default_namespace.prefix, xml_mapping.default_namespace.name)
+
+          doc.add_namespace(
+            xml_mapping.default_namespace.prefix,
+            xml_mapping.default_namespace.name
+          )
 
           xml_mapping.attributes.each_value do |mapping|
             if mapping.method_to
@@ -267,12 +273,19 @@ module Shale
             end
           end
 
-          if xml_mapping.content
-            attribute = instance.class.attributes[xml_mapping.content]
+          content_mapping = xml_mapping.content
+
+          if content_mapping
+            attribute = instance.class.attributes[content_mapping.attribute]
 
             if attribute
               value = instance.send(attribute.name)
-              doc.add_text(element, value.to_s) if value
+
+              if content_mapping.cdata
+                doc.create_cdata(value.to_s, element)
+              else
+                doc.add_text(element, value.to_s)
+              end
             end
           end
 
@@ -291,10 +304,12 @@ module Shale
               if attribute.collection?
                 [*value].each do |v|
                   next if v.nil?
-                  doc.add_element(element, attribute.type.as_xml(v, mapping.prefixed_name, doc))
+                  child = attribute.type.as_xml(v, mapping.prefixed_name, doc, mapping.cdata)
+                  doc.add_element(element, child)
                 end
               else
-                doc.add_element(element, attribute.type.as_xml(value, mapping.prefixed_name, doc))
+                child = attribute.type.as_xml(value, mapping.prefixed_name, doc, mapping.cdata)
+                doc.add_element(element, child)
               end
             end
           end

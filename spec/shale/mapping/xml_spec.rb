@@ -175,6 +175,15 @@ RSpec.describe Shale::Mapping::Xml do
         expect(obj.elements['http://custom.com:foo'].namespace.prefix).to eq('custom')
       end
     end
+
+    context 'when :cdata is set' do
+      it 'adds mapping to elements hash' do
+        obj = described_class.new
+        obj.map_element('foo', to: :bar, cdata: true)
+        expect(obj.elements.keys).to eq(['foo'])
+        expect(obj.elements['foo'].cdata).to eq(true)
+      end
+    end
   end
 
   describe '#map_attribute' do
@@ -276,10 +285,20 @@ RSpec.describe Shale::Mapping::Xml do
   end
 
   describe '#map_content' do
-    it 'adds mapping to attributes hash' do
-      obj = described_class.new
-      obj.map_content(to: :bar)
-      expect(obj.content).to eq(:bar)
+    context 'when :to is set' do
+      it 'adds mapping to attributes hash' do
+        obj = described_class.new
+        obj.map_content(to: :bar)
+        expect(obj.content.attribute).to eq(:bar)
+      end
+    end
+
+    context 'when :cdata is set' do
+      it 'adds mapping to elements hash' do
+        obj = described_class.new
+        obj.map_content(to: :bar, cdata: true)
+        expect(obj.content.cdata).to eq(true)
+      end
     end
   end
 
@@ -301,10 +320,6 @@ RSpec.describe Shale::Mapping::Xml do
       original.map_content(to: :content)
 
       duplicate = original.dup
-      duplicate.root('root_dup')
-      duplicate.map_element('element_dup', to: :element_dup)
-      duplicate.map_attribute('attribute_dup', to: :attribute_dup)
-      duplicate.map_content(to: :content_dup)
 
       expect(original.prefixed_root).to eq('original:root')
       expect(original.default_namespace.name).to eq('http://original.com')
@@ -313,7 +328,19 @@ RSpec.describe Shale::Mapping::Xml do
       expect(original.elements['http://original.com:element'].attribute).to eq(:element)
       expect(original.attributes.keys).to eq(['attribute'])
       expect(original.attributes['attribute'].attribute).to eq(:attribute)
-      expect(original.content).to eq(:content)
+      expect(original.content.attribute).to eq(:content)
+
+      expect(duplicate.prefixed_root).to eq('original:root')
+      expect(duplicate.elements.keys).to eq(%w[http://original.com:element])
+      expect(duplicate.elements['http://original.com:element'].attribute).to eq(:element)
+      expect(duplicate.attributes.keys).to eq(%w[attribute])
+      expect(duplicate.attributes['attribute'].attribute).to eq(:attribute)
+      expect(duplicate.content.attribute).to eq(:content)
+
+      duplicate.root('root_dup')
+      duplicate.map_element('element_dup', to: :element_dup)
+      duplicate.map_attribute('attribute_dup', to: :attribute_dup)
+      duplicate.map_content(to: :content_dup)
 
       expect(duplicate.prefixed_root).to eq('original:root_dup')
       expect(duplicate.elements.keys).to(
@@ -324,7 +351,7 @@ RSpec.describe Shale::Mapping::Xml do
       expect(duplicate.attributes.keys).to eq(%w[attribute attribute_dup])
       expect(duplicate.attributes['attribute'].attribute).to eq(:attribute)
       expect(duplicate.attributes['attribute_dup'].attribute).to eq(:attribute_dup)
-      expect(duplicate.content).to eq(:content_dup)
+      expect(duplicate.content.attribute).to eq(:content_dup)
     end
   end
 end
