@@ -285,16 +285,57 @@ RSpec.describe Shale::Mapping::Xml do
   end
 
   describe '#map_content' do
-    context 'when :to is set' do
-      it 'adds mapping to attributes hash' do
+    context 'when :to and :using is nil' do
+      it 'raises an error' do
+        obj = described_class.new
+
+        expect do
+          obj.map_content
+        end.to raise_error(Shale::IncorrectMappingArgumentsError)
+      end
+    end
+
+    context 'when :to is not nil' do
+      it 'adds content mapping' do
         obj = described_class.new
         obj.map_content(to: :bar)
         expect(obj.content.attribute).to eq(:bar)
       end
     end
 
+    context 'when :using is not nil' do
+      context 'when using: { from: } is nil' do
+        it 'raises an error' do
+          obj = described_class.new
+
+          expect do
+            obj.map_content(using: { to: :foo })
+          end.to raise_error(Shale::IncorrectMappingArgumentsError)
+        end
+      end
+
+      context 'when using: { to: } is nil' do
+        it 'raises an error' do
+          obj = described_class.new
+
+          expect do
+            obj.map_content(using: { from: :foo })
+          end.to raise_error(Shale::IncorrectMappingArgumentsError)
+        end
+      end
+
+      context 'when :using is correct' do
+        it 'adds content mapping' do
+          obj = described_class.new
+          obj.map_content(using: { from: :foo, to: :bar })
+          expect(obj.content.method_from).to eq(:foo)
+          expect(obj.content.method_to).to eq(:bar)
+        end
+      end
+    end
+
     context 'when :cdata is set' do
-      it 'adds mapping to elements hash' do
+      it 'adds content mapping' do
         obj = described_class.new
         obj.map_content(to: :bar, cdata: true)
         expect(obj.content.cdata).to eq(true)

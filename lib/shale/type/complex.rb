@@ -192,10 +192,14 @@ module Shale
           content_mapping = xml_mapping.content
 
           if content_mapping
-            attribute = attributes[content_mapping.attribute]
+            if content_mapping.method_from
+              instance.send(content_mapping.method_from, element)
+            else
+              attribute = attributes[content_mapping.attribute]
 
-            if attribute
-              instance.send(attribute.setter, attribute.type.of_xml(element))
+              if attribute
+                instance.send(attribute.setter, attribute.type.of_xml(element))
+              end
             end
           end
 
@@ -276,15 +280,21 @@ module Shale
           content_mapping = xml_mapping.content
 
           if content_mapping
-            attribute = instance.class.attributes[content_mapping.attribute]
+            if content_mapping.method_to
+              instance.send(content_mapping.method_to, element, doc)
+            else
+              attribute = instance.class.attributes[content_mapping.attribute]
 
-            if attribute
-              value = instance.send(attribute.name)
+              if attribute
+                value = instance.send(attribute.name)
 
-              if content_mapping.cdata
-                doc.create_cdata(value.to_s, element)
-              else
-                doc.add_text(element, value.to_s)
+                # rubocop:disable Metrics/BlockNesting
+                if content_mapping.cdata
+                  doc.create_cdata(value.to_s, element)
+                else
+                  doc.add_text(element, value.to_s)
+                end
+                # rubocop:enable Metrics/BlockNesting
               end
             end
           end

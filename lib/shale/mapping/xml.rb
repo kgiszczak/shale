@@ -137,11 +137,13 @@ module Shale
       # @param [Symbol] to Object's attribute
       #
       # @api private
-      def map_content(to:, cdata: false)
+      def map_content(to: nil, using: nil, cdata: false)
+        Validator.validate_arguments('content', to, using)
+
         @content = Descriptor::Xml.new(
           name: nil,
           attribute: to,
-          methods: nil,
+          methods: using,
           namespace: nil,
           cdata: cdata
         )

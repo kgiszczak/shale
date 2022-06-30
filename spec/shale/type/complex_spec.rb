@@ -204,6 +204,24 @@ module ShaleComplexTesting
       map_element 'cdata_child', to: :cdata_child
     end
   end
+
+  class ContentUsing < Shale::Mapper
+    attribute :content, Shale::Type::String
+
+    xml do
+      root 'content_using'
+
+      map_content using: { from: :content_from_xml, to: :content_to_xml }
+    end
+
+    def content_from_xml(element)
+      self.content = element.text.gsub(',', '|')
+    end
+
+    def content_to_xml(element, doc)
+      doc.add_text(element, self.content.gsub('|', ','))
+    end
+  end
 end
 
 RSpec.describe Shale::Type::Complex do
@@ -500,6 +518,20 @@ RSpec.describe Shale::Type::Complex do
           expect(instance.cdata_child.element1).to eq('child')
         end
       end
+
+      context 'with content using methods' do
+        let(:xml) do
+          <<~XML
+            <content_using>foo,bar,baz</content_using>
+          XML
+        end
+
+        it 'maps xml to object' do
+          instance = ShaleComplexTesting::ContentUsing.from_xml(xml)
+
+          expect(instance.content).to eq('foo|bar|baz')
+        end
+      end
     end
 
     describe '.to_xml' do
@@ -626,6 +658,18 @@ RSpec.describe Shale::Type::Complex do
               <element2><![CDATA[three]]></element2>
               <cdata_child><![CDATA[child]]></cdata_child>
             </cdata_parent>
+          XML
+
+          expect(instance.to_xml(:pretty)).to eq(xml)
+        end
+      end
+
+      context 'with content using methods' do
+        it 'converts objects to xml' do
+          instance = ShaleComplexTesting::ContentUsing.new(content: 'foo|bar|baz')
+
+          xml = <<~XML.sub(/\n\z/, '')
+            <content_using>foo,bar,baz</content_using>
           XML
 
           expect(instance.to_xml(:pretty)).to eq(xml)
