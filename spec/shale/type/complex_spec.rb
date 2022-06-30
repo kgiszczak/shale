@@ -219,7 +219,7 @@ module ShaleComplexTesting
     end
 
     def content_to_xml(element, doc)
-      doc.add_text(element, self.content.gsub('|', ','))
+      doc.add_text(element, content.gsub('|', ','))
     end
   end
 end
