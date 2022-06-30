@@ -467,7 +467,7 @@ class Address < Shale::Mapper
 end
 
 class Person < Shale::Mapper
-  attribute :first_name, Shale::Type::String, cdata: true
+  attribute :first_name, Shale::Type::String
   attribute :address, Address
 
   xml do
