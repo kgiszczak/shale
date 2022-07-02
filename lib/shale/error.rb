@@ -63,6 +63,12 @@ module Shale
     end
   end
 
+  # Error for passing incorrect model type
+  #
+  # @api private
+  class IncorrectModelError < StandardError
+  end
+
   # Error for passing incorrect arguments to map functions
   #
   # @api private

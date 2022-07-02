@@ -1,19 +1,19 @@
-require_relative 'data_model'
+require_relative 'models'
 
 module FromHash
   class << self
     def build_address(json)
       Address.new(
         city: json['city'],
-        street:  json['street'],
-        zip:  json['zip'],
-        state:  json['state'],
-        state_abbr:  json['state_abbr'],
-        country:  json['country'],
-        country_code:  json['country_code'],
-        time_zone:  json['time_zone'],
-        latitude:  json['latitude'],
-        longitude:  json['longitude'],
+        street: json['street'],
+        zip: json['zip'],
+        state: json['state'],
+        state_abbr: json['state_abbr'],
+        country: json['country'],
+        country_code: json['country_code'],
+        time_zone: json['time_zone'],
+        latitude: json['latitude'],
+        longitude: json['longitude'],
       )
     end
 

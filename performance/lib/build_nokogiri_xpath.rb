@@ -1,4 +1,4 @@
-require_relative 'data_model'
+require_relative 'models'
 
 module BuildNokogiriXpath
   class << self

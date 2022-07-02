@@ -43,6 +43,7 @@ module Shale
   #
   # @api public
   class Mapper < Type::Complex
+    @model = nil
     @attributes = {}
     @hash_mapping = Mapping::Dict.new
     @json_mapping = Mapping::Dict.new
@@ -96,6 +97,8 @@ module Shale
       # @api private
       def inherited(subclass)
         super
+
+        subclass.instance_variable_set('@model', subclass)
         subclass.instance_variable_set('@attributes', @attributes.dup)
 
         subclass.instance_variable_set('@__hash_mapping_init', @hash_mapping.dup)
@@ -113,6 +116,15 @@ module Shale
         xml_mapping.root(Utils.underscore(subclass.name || ''))
 
         subclass.instance_variable_set('@xml_mapping', xml_mapping.dup)
+      end
+
+      def model(klass = nil)
+        if klass
+          @model = klass
+          xml_mapping.root(Utils.underscore(@model.name))
+        else
+          @model
+        end
       end
 
       # Define attribute on class
@@ -281,6 +293,7 @@ module Shale
       # @api public
       def xml(&block)
         @xml_mapping = @__xml_mapping_init.dup
+        @xml_mapping.root('')
         @xml_mapping.instance_eval(&block)
       end
     end

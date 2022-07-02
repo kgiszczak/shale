@@ -21,7 +21,12 @@ module Shale
             #
             # @api public
             def of_#{format}(hash)
-              instance = new
+              instance = model.new
+
+              attributes
+                .values
+                .select { |attr| attr.default }
+                .each { |attr| instance.send(attr.setter, attr.default.call) }
 
               mapping_keys = #{format}_mapping.keys
 
@@ -30,7 +35,7 @@ module Shale
                 next unless mapping
 
                 if mapping.method_from
-                  instance.send(mapping.method_from, value)
+                  new.send(mapping.method_from, instance, value)
                 else
                   attribute = attributes[mapping.attribute]
                   next unless attribute
@@ -44,7 +49,7 @@ module Shale
                     end
                   else
                     val = attribute.type.of_#{format}(value)
-                    instance.send(attribute.setter, val)
+                    instance.send(attribute.setter, attribute.type.cast(val))
                   end
                 end
               end
@@ -54,19 +59,26 @@ module Shale
 
             # Convert Object to Hash using Hash/JSON/YAML/TOML mapping
             #
-            # @param [Shale::Mapper] instance Object to convert
+            # @param [any] instance Object to convert
+            #
+            # @raise [IncorrectModelError]
             #
             # @return [Hash]
             #
             # @api public
             def as_#{format}(instance)
+              unless instance.is_a?(model)
+                msg = "argument is a '\#{instance.class}' but should be a '\#{model}'"
+                raise IncorrectModelError, msg
+              end
+
               hash = {}
 
-              instance.class.#{format}_mapping.keys.each_value do |mapping|
+              #{format}_mapping.keys.each_value do |mapping|
                 if mapping.method_to
-                  hash[mapping.name] = instance.send(mapping.method_to)
+                  hash[mapping.name] = new.send(mapping.method_to, instance)
                 else
-                  attribute = instance.class.attributes[mapping.attribute]
+                  attribute = attributes[mapping.attribute]
                   next unless attribute
 
                   value = instance.send(attribute.name)
@@ -169,14 +181,19 @@ module Shale
         #
         # @api public
         def of_xml(element)
-          instance = new
+          instance = model.new
+
+          attributes
+            .values
+            .select { |attr| attr.default }
+            .each { |attr| instance.send(attr.setter, attr.default.call) }
 
           element.attributes.each do |key, value|
             mapping = xml_mapping.attributes[key.to_s]
             next unless mapping
 
             if mapping.method_from
-              instance.send(mapping.method_from, value)
+              new.send(mapping.method_from, instance, value)
             else
               attribute = attributes[mapping.attribute]
               next unless attribute
@@ -184,7 +201,7 @@ module Shale
               if attribute.collection?
                 instance.send(attribute.name) << attribute.type.cast(value)
               else
-                instance.send(attribute.setter, value)
+                instance.send(attribute.setter, attribute.type.cast(value))
               end
             end
           end
@@ -193,12 +210,13 @@ module Shale
 
           if content_mapping
             if content_mapping.method_from
-              instance.send(content_mapping.method_from, element)
+              new.send(content_mapping.method_from, instance, element)
             else
               attribute = attributes[content_mapping.attribute]
 
               if attribute
-                instance.send(attribute.setter, attribute.type.of_xml(element))
+                value = attribute.type.of_xml(element)
+                instance.send(attribute.setter, attribute.type.cast(value))
               end
             end
           end
@@ -208,16 +226,17 @@ module Shale
             next unless mapping
 
             if mapping.method_from
-              instance.send(mapping.method_from, node)
+              new.send(mapping.method_from, instance, node)
             else
               attribute = attributes[mapping.attribute]
               next unless attribute
 
+              value = attribute.type.of_xml(node)
+
               if attribute.collection?
-                value = attribute.type.of_xml(node)
                 instance.send(attribute.name) << attribute.type.cast(value)
               else
-                instance.send(attribute.setter, attribute.type.of_xml(node))
+                instance.send(attribute.setter, attribute.type.cast(value))
               end
             end
           end
@@ -241,14 +260,21 @@ module Shale
 
         # Convert Object to XML document
         #
-        # @param [Shale::Mapper] instance Object to convert
+        # @param [any] instance Object to convert
         # @param [String, nil] node_name XML node name
         # @param [Shale::Adapter::<xml adapter>::Document, nil] doc Object to convert
+        #
+        # @raise [IncorrectModelError]
         #
         # @return [::REXML::Document, ::Nokogiri::Document, ::Ox::Document]
         #
         # @api public
         def as_xml(instance, node_name = nil, doc = nil, _cdata = nil)
+          unless instance.is_a?(model)
+            msg = "argument is a '#{instance.class}' but should be a '#{model}'"
+            raise IncorrectModelError, msg
+          end
+
           unless doc
             doc = Shale.xml_adapter.create_document
             doc.add_element(doc.doc, as_xml(instance, xml_mapping.prefixed_root, doc))
@@ -264,9 +290,9 @@ module Shale
 
           xml_mapping.attributes.each_value do |mapping|
             if mapping.method_to
-              instance.send(mapping.method_to, element, doc)
+              new.send(mapping.method_to, instance, element, doc)
             else
-              attribute = instance.class.attributes[mapping.attribute]
+              attribute = attributes[mapping.attribute]
               next unless attribute
 
               value = instance.send(attribute.name)
@@ -281,9 +307,9 @@ module Shale
 
           if content_mapping
             if content_mapping.method_to
-              instance.send(content_mapping.method_to, element, doc)
+              new.send(content_mapping.method_to, instance, element, doc)
             else
-              attribute = instance.class.attributes[content_mapping.attribute]
+              attribute = attributes[content_mapping.attribute]
 
               if attribute
                 value = instance.send(attribute.name)
@@ -301,9 +327,9 @@ module Shale
 
           xml_mapping.elements.each_value do |mapping|
             if mapping.method_to
-              instance.send(mapping.method_to, element, doc)
+              new.send(mapping.method_to, instance, element, doc)
             else
-              attribute = instance.class.attributes[mapping.attribute]
+              attribute = attributes[mapping.attribute]
               next unless attribute
 
               value = instance.send(attribute.name)

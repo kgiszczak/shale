@@ -1,5 +1,7 @@
 require 'benchmark/ips'
 require 'ox'
+require 'json'
+require 'yaml'
 
 require_relative 'lib/from_hash'
 require_relative 'lib/to_hash'
@@ -8,6 +10,7 @@ require_relative 'lib/build_nokogiri_xpath'
 require_relative 'lib/build_ox'
 require_relative 'lib/build_rexml'
 require_relative 'lib/validator'
+require_relative 'lib/mappers'
 
 json = File.read('./data/report.json')
 yaml = File.read('./data/report.yml')
@@ -18,7 +21,7 @@ yaml_hash = YAML.load(yaml)
 
 puts "JSON: building object model by hand vs using Shale.of_json\n\n"
 
-Validator.validate!(FromHash.build_report(json_hash), Report.of_json(json_hash))
+Validator.validate!(FromHash.build_report(json_hash), ReportMapper.of_json(json_hash))
 
 Benchmark.ips do |x|
   x.report('build JSON') do
@@ -26,7 +29,7 @@ Benchmark.ips do |x|
   end
 
   x.report('Shale of_json') do
-    Report.of_json(json_hash)
+    ReportMapper.of_json(json_hash)
   end
 
   x.compare!
@@ -34,7 +37,7 @@ end
 
 puts "JSON: building Hash by hand vs using Shale.as_json\n\n"
 
-report = Report.of_json(json_hash)
+report = ReportMapper.of_json(json_hash)
 
 Benchmark.ips do |x|
   x.report('build JSON') do
@@ -42,7 +45,7 @@ Benchmark.ips do |x|
   end
 
   x.report('Shale as_json') do
-    Report.as_json(report)
+    ReportMapper.as_json(report)
   end
 
   x.compare!
@@ -60,7 +63,7 @@ Benchmark.ips do |x|
   end
 
   x.report('Shale from_xml') do
-    Report.from_xml(xml)
+    ReportMapper.from_xml(xml)
   end
 
   x.compare!
@@ -80,7 +83,7 @@ Benchmark.ips do |x|
   end
 
   x.report('Shale from_xml') do
-    Report.from_xml(xml)
+    ReportMapper.from_xml(xml)
   end
 
   x.compare!
@@ -97,7 +100,7 @@ Benchmark.ips do |x|
   end
 
   x.report('Shale from_xml') do
-    Report.from_xml(xml)
+    ReportMapper.from_xml(xml)
   end
 
   x.compare!
@@ -115,7 +118,7 @@ Benchmark.ips do |x|
   end
 
   x.report('Shale from_xml') do
-    Report.from_xml(xml)
+    ReportMapper.from_xml(xml)
   end
 
   x.compare!
