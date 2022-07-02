@@ -346,6 +346,8 @@ person.to_xml
 
 By default keys are named the same as attributes. To use custom keys use:
 
+:warning: **Declaring custom mapping removes default mapping completely!**
+
 ```ruby
 class Person < Shale::Mapper
   attribute :first_name, Shale::Type::String
