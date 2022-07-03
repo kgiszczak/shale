@@ -63,6 +63,7 @@ module Shale
         @content = nil
         @root = ''
         @default_namespace = Descriptor::XmlNamespace.new
+        @finalized = false
       end
 
       # Map element to attribute
@@ -169,6 +170,22 @@ module Shale
         @default_namespace.prefix = prefix
       end
 
+      # Set the "finalized" instance variable to true
+      #
+      # @api private
+      def finalize!
+        @finalized = true
+      end
+
+      # Query the "finalized" instance variable
+      #
+      # @return [truem false]
+      #
+      # @api private
+      def finalized?
+        @finalized
+      end
+
       # @api private
       def initialize_dup(other)
         @elements = other.instance_variable_get('@elements').dup
@@ -176,6 +193,7 @@ module Shale
         @content = other.instance_variable_get('@content').dup
         @root = other.instance_variable_get('@root').dup
         @default_namespace = other.instance_variable_get('@default_namespace').dup
+        @finalized = false
 
         super
       end

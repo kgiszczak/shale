@@ -22,6 +22,7 @@ module Shale
       def initialize
         super
         @keys = {}
+        @finalized = false
       end
 
       # Map key to attribute
@@ -38,9 +39,26 @@ module Shale
         @keys[key] = Descriptor::Dict.new(name: key, attribute: to, methods: using)
       end
 
+      # Set the "finalized" instance variable to true
+      #
+      # @api private
+      def finalize!
+        @finalized = true
+      end
+
+      # Query the "finalized" instance variable
+      #
+      # @return [truem false]
+      #
+      # @api private
+      def finalized?
+        @finalized
+      end
+
       # @api private
       def initialize_dup(other)
         @keys = other.instance_variable_get('@keys').dup
+        @finalized = false
         super
       end
     end

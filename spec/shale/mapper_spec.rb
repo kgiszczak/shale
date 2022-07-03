@@ -123,6 +123,54 @@ module ShaleMapperTesting
   class MapperWithModel < Shale::Mapper
     model Model
   end
+
+  # rubocop:disable Lint/EmptyBlock
+  class FinalizedParent1 < Shale::Mapper
+    attribute :one, Shale::Type::String
+
+    hsh do
+    end
+
+    json do
+    end
+
+    yaml do
+    end
+
+    toml do
+    end
+
+    xml do
+    end
+  end
+
+  class FinalizedParent2 < Shale::Mapper
+    hsh do
+    end
+
+    json do
+    end
+
+    yaml do
+    end
+
+    toml do
+    end
+
+    xml do
+    end
+
+    attribute :one, Shale::Type::String
+  end
+  # rubocop:enable Lint/EmptyBlock
+
+  class FinalizedChild1 < FinalizedParent1
+    attribute :two, Shale::Type::String
+  end
+
+  class FinalizedChild2 < FinalizedParent2
+    attribute :two, Shale::Type::String
+  end
 end
 
 RSpec.describe Shale::Mapper do
@@ -520,6 +568,34 @@ RSpec.describe Shale::Mapper do
         subject = ShaleMapperTesting::Parent.new(foo: 'foo')
         expect(subject.foo).to eq('foo')
       end
+    end
+  end
+
+  context 'finalized mapping' do
+    it 'finalizes maping' do
+      expect(ShaleMapperTesting::FinalizedParent1.hash_mapping.keys.keys).to eq([])
+      expect(ShaleMapperTesting::FinalizedParent1.json_mapping.keys.keys).to eq([])
+      expect(ShaleMapperTesting::FinalizedParent1.yaml_mapping.keys.keys).to eq([])
+      expect(ShaleMapperTesting::FinalizedParent1.toml_mapping.keys.keys).to eq([])
+      expect(ShaleMapperTesting::FinalizedParent1.xml_mapping.elements.keys).to eq([])
+
+      expect(ShaleMapperTesting::FinalizedParent2.hash_mapping.keys.keys).to eq([])
+      expect(ShaleMapperTesting::FinalizedParent2.json_mapping.keys.keys).to eq([])
+      expect(ShaleMapperTesting::FinalizedParent2.yaml_mapping.keys.keys).to eq([])
+      expect(ShaleMapperTesting::FinalizedParent2.toml_mapping.keys.keys).to eq([])
+      expect(ShaleMapperTesting::FinalizedParent2.xml_mapping.elements.keys).to eq([])
+
+      expect(ShaleMapperTesting::FinalizedChild1.hash_mapping.keys.keys).to eq(['two'])
+      expect(ShaleMapperTesting::FinalizedChild1.json_mapping.keys.keys).to eq(['two'])
+      expect(ShaleMapperTesting::FinalizedChild1.yaml_mapping.keys.keys).to eq(['two'])
+      expect(ShaleMapperTesting::FinalizedChild1.toml_mapping.keys.keys).to eq(['two'])
+      expect(ShaleMapperTesting::FinalizedChild1.xml_mapping.elements.keys).to eq(['two'])
+
+      expect(ShaleMapperTesting::FinalizedChild2.hash_mapping.keys.keys).to eq(['two'])
+      expect(ShaleMapperTesting::FinalizedChild2.json_mapping.keys.keys).to eq(['two'])
+      expect(ShaleMapperTesting::FinalizedChild2.yaml_mapping.keys.keys).to eq(['two'])
+      expect(ShaleMapperTesting::FinalizedChild2.toml_mapping.keys.keys).to eq(['two'])
+      expect(ShaleMapperTesting::FinalizedChild2.xml_mapping.elements.keys).to eq(['two'])
     end
   end
 end

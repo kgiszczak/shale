@@ -351,9 +351,25 @@ RSpec.describe Shale::Mapping::Xml do
     end
   end
 
+  describe '#finalize!' do
+    it 'sets the "finalized" to true' do
+      obj = described_class.new
+      obj.finalize!
+      expect(obj.finalized?).to eq(true)
+    end
+  end
+
+  describe '#finalized?' do
+    it 'returns value of "finalized" variable' do
+      obj = described_class.new
+      expect(obj.finalized?).to eq(false)
+    end
+  end
+
   describe '#initialize_dup' do
     it 'duplicates instance variables' do
       original = described_class.new
+      original.finalize!
       original.root('root')
       original.namespace('http://original.com', 'original')
       original.map_element('element', to: :element)
@@ -370,6 +386,7 @@ RSpec.describe Shale::Mapping::Xml do
       expect(original.attributes.keys).to eq(['attribute'])
       expect(original.attributes['attribute'].attribute).to eq(:attribute)
       expect(original.content.attribute).to eq(:content)
+      expect(original.finalized?).to eq(true)
 
       expect(duplicate.prefixed_root).to eq('original:root')
       expect(duplicate.elements.keys).to eq(%w[http://original.com:element])
@@ -393,6 +410,7 @@ RSpec.describe Shale::Mapping::Xml do
       expect(duplicate.attributes['attribute'].attribute).to eq(:attribute)
       expect(duplicate.attributes['attribute_dup'].attribute).to eq(:attribute_dup)
       expect(duplicate.content.attribute).to eq(:content_dup)
+      expect(duplicate.finalized?).to eq(false)
     end
   end
 end

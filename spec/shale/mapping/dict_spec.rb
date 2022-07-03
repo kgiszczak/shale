@@ -65,9 +65,25 @@ RSpec.describe Shale::Mapping::Dict do
     end
   end
 
+  describe '#finalize!' do
+    it 'sets the "finalized" to true' do
+      obj = described_class.new
+      obj.finalize!
+      expect(obj.finalized?).to eq(true)
+    end
+  end
+
+  describe '#finalized?' do
+    it 'returns value of "finalized" variable' do
+      obj = described_class.new
+      expect(obj.finalized?).to eq(false)
+    end
+  end
+
   describe '#initialize_dup' do
     it 'duplicates keys instance variable' do
       original = described_class.new
+      original.finalize!
       original.map('foo', to: :bar)
 
       duplicate = original.dup
@@ -75,10 +91,12 @@ RSpec.describe Shale::Mapping::Dict do
 
       expect(original.keys.keys).to eq(['foo'])
       expect(original.keys['foo'].attribute).to eq(:bar)
+      expect(original.finalized?).to eq(true)
 
       expect(duplicate.keys.keys).to eq(%w[foo baz])
       expect(duplicate.keys['foo'].attribute).to eq(:bar)
       expect(duplicate.keys['baz'].attribute).to eq(:qux)
+      expect(duplicate.finalized?).to eq(false)
     end
   end
 end

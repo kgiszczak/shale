@@ -165,11 +165,11 @@ module Shale
 
         @attributes[name] = Attribute.new(name, type, collection, default)
 
-        @hash_mapping.map(name.to_s, to: name)
-        @json_mapping.map(name.to_s, to: name)
-        @yaml_mapping.map(name.to_s, to: name)
-        @toml_mapping.map(name.to_s, to: name)
-        @xml_mapping.map_element(name.to_s, to: name)
+        @hash_mapping.map(name.to_s, to: name) unless @hash_mapping.finalized?
+        @json_mapping.map(name.to_s, to: name) unless @json_mapping.finalized?
+        @yaml_mapping.map(name.to_s, to: name) unless @yaml_mapping.finalized?
+        @toml_mapping.map(name.to_s, to: name) unless @toml_mapping.finalized?
+        @xml_mapping.map_element(name.to_s, to: name) unless @xml_mapping.finalized?
 
         class_eval(<<-RUBY, __FILE__, __LINE__ + 1)
           attr_reader :#{name}
@@ -200,6 +200,7 @@ module Shale
       # @api public
       def hsh(&block)
         @hash_mapping = @__hash_mapping_init.dup
+        @hash_mapping.finalize!
         @hash_mapping.instance_eval(&block)
       end
 
@@ -223,6 +224,7 @@ module Shale
       # @api public
       def json(&block)
         @json_mapping = @__json_mapping_init.dup
+        @json_mapping.finalize!
         @json_mapping.instance_eval(&block)
       end
 
@@ -246,6 +248,7 @@ module Shale
       # @api public
       def yaml(&block)
         @yaml_mapping = @__yaml_mapping_init.dup
+        @yaml_mapping.finalize!
         @yaml_mapping.instance_eval(&block)
       end
 
@@ -269,6 +272,7 @@ module Shale
       # @api public
       def toml(&block)
         @toml_mapping = @__toml_mapping_init.dup
+        @toml_mapping.finalize!
         @toml_mapping.instance_eval(&block)
       end
 
@@ -293,6 +297,7 @@ module Shale
       # @api public
       def xml(&block)
         @xml_mapping = @__xml_mapping_init.dup
+        @xml_mapping.finalize!
         @xml_mapping.root('')
         @xml_mapping.instance_eval(&block)
       end
