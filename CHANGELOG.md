@@ -1,3 +1,14 @@
+## [0.6.0] - 2022-07-05
+
+### Added
+- Support for TOML
+- Support for CDATA nodes in XML documents
+- Support for using custom models
+
+### Fixed
+- Allow to map XML content using methods
+- Prevent adding default mapping after mapping block was declared
+
 ## [0.5.0] - 2022-06-28
 
 ### Added
