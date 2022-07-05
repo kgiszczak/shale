@@ -241,18 +241,16 @@ person.to_toml
 
 # =>
 #
-# ---
-# first_name: John
-# last_name: Doe
-# age: 50
-# married: false
-# hobbies:
-# - Singing
-# - Dancing
-# address:
-#   city: London
-#   street: Oxford Street
-#   zip: E1 6AN
+# first_name = "John"
+# last_name = "Doe"
+# age = 50
+# married = false
+# hobbies = [ "Singing", "Dancing" ]
+#
+# [address]
+# city = "London"
+# street = "Oxford Street"
+# zip = "E1 6AN"
 ```
 
 ### Converting Hash to object
