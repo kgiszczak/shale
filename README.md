@@ -12,7 +12,7 @@ Documentation with interactive examples is available at [Shale website](https://
 * Convert Ruby data model to JSON, YAML, TOML and XML
 * Generate JSON and XML Schema from Ruby models
 * Compile JSON and XML Schema into Ruby models
-* Out of the box support for JSON, YAML, toml-rb, Nokogiri, REXML and Ox parsers
+* Out of the box support for JSON, YAML, Tomlib, toml-rb, Nokogiri, REXML and Ox parsers
 * Support for custom adapters
 
 ## Installation
@@ -202,18 +202,23 @@ person.to_yaml
 ### Converting TOML to object
 
 To use TOML with Shale you have to set adapter you want to use.
-Shale comes with adapter for [toml-rb](https://github.com/emancu/toml-rb).
+Out of the box Shale suports [Tomlib](https://github.com/kgiszczak/tomlib).
+It also comes with adapter for [toml-rb](https://github.com/emancu/toml-rb) if you prefer that.
 For details see [Adapters](#adapters) section.
 
-To set it, first make sure toml-rb gem is installed:
+To set it, first make sure Tomlib gem is installed:
 
 ```
-$ gem install shale
+$ gem install tomlib
 ```
 
 then setup adapter:
 
 ```ruby
+require 'tomlib'
+Shale.toml_adapter = Tomlib
+
+# Alternatively if you'd like to use toml-rb, use:
 require 'shale/adapter/toml_rb'
 Shale.toml_adapter = Shale::Adapter::TomlRB
 ```
@@ -779,12 +784,17 @@ Shale.json_adapter = MultiJson
 Shale.yaml_adapter = MyYamlAdapter
 ```
 
-To handle TOML documents you have to set TOML adapter.
-Shale provides adapter for `toml-rb` TOML parser:
+To handle TOML documents you have to set TOML adapter. Out of the box `Tomlib` is supported.
+Shale also provides adapter for `toml-rb` parser:
 
 ```ruby
 require 'shale'
 
+# if you want to use Tomlib
+require 'tomlib'
+Shale.toml_adapter = Tomlib
+
+# if you want to use toml-rb
 require 'shale/adapter/toml_rb'
 Shale.toml_adapter = Shale::Adapter::TomlRB
 ```
