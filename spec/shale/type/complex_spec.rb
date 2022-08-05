@@ -678,8 +678,8 @@ RSpec.describe Shale::Type::Complex do
 
           it 'converts blank attributes to xml' do
             instance = ShaleComplexTesting::RootType.new(root_attr1: '')
-            expected = '<root_type attr1="" attribute_using="" collection="[]">' +
-              '<element_using/></root_type>'
+            expected = '<root_type attr1="" attribute_using="" collection="[]">' \
+                       '<element_using/></root_type>'
             expect(instance.to_xml).to eq(expected)
           end
         end
@@ -1140,11 +1140,11 @@ RSpec.describe Shale::Type::Complex do
       it 'converts objects to hash' do
         instance1 = ShaleComplexTesting::RenderNil.new(
           attr_true: nil,
-          attr_false: nil,
+          attr_false: nil
         )
         instance2 = ShaleComplexTesting::RenderNil.new(
           attr_true: 'foo',
-          attr_false: 'bar',
+          attr_false: 'bar'
         )
 
         expect(instance1.to_hash).to eq(expected_nil)
@@ -1173,11 +1173,11 @@ RSpec.describe Shale::Type::Complex do
       it 'converts objects to JSON' do
         instance1 = ShaleComplexTesting::RenderNil.new(
           attr_true: nil,
-          attr_false: nil,
+          attr_false: nil
         )
         instance2 = ShaleComplexTesting::RenderNil.new(
           attr_true: 'foo',
-          attr_false: 'bar',
+          attr_false: 'bar'
         )
 
         expect(instance1.to_json(:pretty)).to eq(expected_nil)
@@ -1204,11 +1204,11 @@ RSpec.describe Shale::Type::Complex do
       it 'converts objects to YAML' do
         instance1 = ShaleComplexTesting::RenderNil.new(
           attr_true: nil,
-          attr_false: nil,
+          attr_false: nil
         )
         instance2 = ShaleComplexTesting::RenderNil.new(
           attr_true: 'foo',
-          attr_false: 'bar',
+          attr_false: 'bar'
         )
 
         expect(instance1.to_yaml).to eq(expected_nil)
@@ -1233,11 +1233,11 @@ RSpec.describe Shale::Type::Complex do
       it 'converts objects to TOML' do
         instance1 = ShaleComplexTesting::RenderNil.new(
           attr_true: nil,
-          attr_false: nil,
+          attr_false: nil
         )
         instance2 = ShaleComplexTesting::RenderNil.new(
           attr_true: 'foo',
-          attr_false: 'bar',
+          attr_false: 'bar'
         )
 
         expect(instance1.to_toml).to eq(expected_nil)
@@ -1286,7 +1286,7 @@ RSpec.describe Shale::Type::Complex do
           ns_attr_true: nil,
           ns_attr_false: nil,
           ns_xml_attr_true: nil,
-          ns_xml_attr_false: nil,
+          ns_xml_attr_false: nil
         )
         instance2 = ShaleComplexTesting::RenderNil.new(
           attr_true: 'foo',
@@ -1297,7 +1297,7 @@ RSpec.describe Shale::Type::Complex do
           ns_attr_true: 'zed',
           ns_attr_false: 'led',
           ns_xml_attr_true: 'ked',
-          ns_xml_attr_false: 'mot',
+          ns_xml_attr_false: 'mot'
         )
 
         expect(instance1.to_xml).to eq(expected_nil)
