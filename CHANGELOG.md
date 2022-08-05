@@ -1,3 +1,8 @@
+## [0.7.0] - [unreleased]
+
+### Changed
+- RSpec: enable random spec execution and warnings
+
 ## [0.6.0] - 2022-07-05
 
 ### Added
