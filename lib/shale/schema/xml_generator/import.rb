@@ -35,8 +35,8 @@ module Shale
         def as_xml(doc)
           import = doc.create_element('xs:import')
 
-          doc.add_attribute(import, 'namespace', @namespace)
-          doc.add_attribute(import, 'schemaLocation', @location)
+          doc.add_attribute(import, 'namespace', @namespace) if @namespace
+          doc.add_attribute(import, 'schemaLocation', @location) if @location
 
           import
         end

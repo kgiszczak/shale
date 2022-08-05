@@ -84,7 +84,7 @@ module Shale
                   value = instance.send(attribute.name)
 
                   if value.nil?
-                    hash[mapping.name] = nil
+                    hash[mapping.name] = nil if mapping.render_nil?
                   elsif attribute.collection?
                     hash[mapping.name] = [*value].map do |v|
                       v ? attribute.type.as_#{format}(v) : v
@@ -296,10 +296,11 @@ module Shale
               next unless attribute
 
               value = instance.send(attribute.name)
-              next if value.nil?
 
-              doc.add_namespace(mapping.namespace.prefix, mapping.namespace.name)
-              doc.add_attribute(element, mapping.prefixed_name, value)
+              if mapping.render_nil? || !value.nil?
+                doc.add_namespace(mapping.namespace.prefix, mapping.namespace.name)
+                doc.add_attribute(element, mapping.prefixed_name, value)
+              end
             end
           end
 
@@ -333,11 +334,17 @@ module Shale
               next unless attribute
 
               value = instance.send(attribute.name)
-              next if value.nil?
 
-              doc.add_namespace(mapping.namespace.prefix, mapping.namespace.name)
+              if mapping.render_nil? || !value.nil?
+                doc.add_namespace(mapping.namespace.prefix, mapping.namespace.name)
+              end
 
-              if attribute.collection?
+              if value.nil?
+                if mapping.render_nil?
+                  child = doc.create_element(mapping.prefixed_name)
+                  doc.add_element(element, child)
+                end
+              elsif attribute.collection?
                 [*value].each do |v|
                   next if v.nil?
                   child = attribute.type.as_xml(v, mapping.prefixed_name, doc, mapping.cdata)

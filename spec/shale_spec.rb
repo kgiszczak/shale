@@ -6,6 +6,7 @@ RSpec.describe Shale do
   describe '.json_adapter' do
     context 'when adapter is not set' do
       it 'returns default adapter' do
+        described_class.json_adapter = nil
         expect(described_class.json_adapter).to eq(Shale::Adapter::JSON)
       end
     end
@@ -21,6 +22,7 @@ RSpec.describe Shale do
   describe '.yaml_adapter' do
     context 'when adapter is not set' do
       it 'returns default adapter' do
+        described_class.yaml_adapter = nil
         expect(described_class.yaml_adapter).to eq(YAML)
       end
     end

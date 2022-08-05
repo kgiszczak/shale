@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'shale/adapter/json'
 require 'shale/schema/json_generator'
 require 'shale/error'
 
@@ -65,6 +66,10 @@ module ShaleSchemaJSONGeneratorTesting
 end
 
 RSpec.describe Shale::Schema::JSONGenerator do
+  before(:each) do
+    Shale.json_adapter = Shale::Adapter::JSON
+  end
+
   let(:expected_schema_hash) do
     {
       '$schema' => 'https://json-schema.org/draft/2020-12/schema',

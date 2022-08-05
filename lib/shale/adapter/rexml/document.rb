@@ -70,7 +70,7 @@ module Shale
         #
         # @api private
         def add_attribute(element, name, value)
-          element.add_attribute(name, value)
+          element.add_attribute(name, value || '')
         end
 
         # Add child element to REXML element

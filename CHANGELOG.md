@@ -1,5 +1,8 @@
 ## [0.7.0] - [unreleased]
 
+### Added
+- `render_nil: true` option that allows to render nil values
+
 ### Changed
 - RSpec: enable random spec execution and warnings
 

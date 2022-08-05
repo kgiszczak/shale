@@ -58,6 +58,7 @@ GEM
     simplecov_json_formatter (0.1.4)
     toml-rb (2.1.2)
       citrus (~> 3.0, > 3.0)
+    tomlib (0.2.0)
     unicode-display_width (2.2.0)
 
 PLATFORMS
@@ -74,6 +75,7 @@ DEPENDENCIES
   shale!
   simplecov (~> 0.21.2)
   toml-rb
+  tomlib
 
 BUNDLED WITH
    2.3.16

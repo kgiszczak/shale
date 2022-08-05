@@ -62,6 +62,14 @@ RSpec.describe Shale::Mapping::Dict do
           expect(obj.keys['foo'].method_to).to eq(:bar)
         end
       end
+
+      context 'when :render_nil is set' do
+        it 'adds mapping to keys hash' do
+          obj = described_class.new
+          obj.map('foo', to: :foo, render_nil: true)
+          expect(obj.keys['foo'].render_nil?).to eq(true)
+        end
+      end
     end
   end
 

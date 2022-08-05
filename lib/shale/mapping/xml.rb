@@ -83,7 +83,8 @@ module Shale
         using: nil,
         namespace: :undefined,
         prefix: :undefined,
-        cdata: false
+        cdata: false,
+        render_nil: false
       )
         Validator.validate_arguments(element, to, using)
         Validator.validate_namespace(element, namespace, prefix)
@@ -103,7 +104,8 @@ module Shale
           attribute: to,
           methods: using,
           namespace: Descriptor::XmlNamespace.new(nsp, pfx),
-          cdata: cdata
+          cdata: cdata,
+          render_nil: render_nil
         )
       end
 
@@ -118,7 +120,14 @@ module Shale
       # @raise [IncorrectMappingArgumentsError] when arguments are incorrect
       #
       # @api private
-      def map_attribute(attribute, to: nil, using: nil, namespace: nil, prefix: nil)
+      def map_attribute(
+        attribute,
+        to: nil,
+        using: nil,
+        namespace: nil,
+        prefix: nil,
+        render_nil: false
+      )
         Validator.validate_arguments(attribute, to, using)
         Validator.validate_namespace(attribute, namespace, prefix)
 
@@ -129,7 +138,8 @@ module Shale
           attribute: to,
           methods: using,
           namespace: Descriptor::XmlNamespace.new(namespace, prefix),
-          cdata: false
+          cdata: false,
+          render_nil: render_nil
         )
       end
 
@@ -146,7 +156,8 @@ module Shale
           attribute: to,
           methods: using,
           namespace: nil,
-          cdata: cdata
+          cdata: cdata,
+          render_nil: false
         )
       end
 

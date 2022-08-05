@@ -78,10 +78,20 @@ RSpec.describe Shale::Adapter::REXML::Document do
   end
 
   describe '#add_attribute' do
-    it 'adds attribute to element' do
-      el = doc.create_element('foo')
-      doc.add_attribute(el, 'bar', 'baz')
-      expect(el['bar']).to eq('baz')
+    context 'when value is nil' do
+      it 'adds attribute to element' do
+        el = doc.create_element('foo')
+        doc.add_attribute(el, 'bar', nil)
+        expect(el['bar']).to eq('')
+      end
+    end
+
+    context 'when value is not nil' do
+      it 'adds attribute to element' do
+        el = doc.create_element('foo')
+        doc.add_attribute(el, 'bar', 'baz')
+        expect(el['bar']).to eq('baz')
+      end
     end
   end
 

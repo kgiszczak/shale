@@ -30,10 +30,11 @@ module Shale
         # @param [Hash, nil] methods
         # @param [Shale::Mapping::XmlNamespace] namespace
         # @param [true, false] cdata
+        # @param [true, false] render_nil
         #
         # @api private
-        def initialize(name:, attribute:, methods:, namespace:, cdata:)
-          super(name: name, attribute: attribute, methods: methods)
+        def initialize(name:, attribute:, methods:, namespace:, cdata:, render_nil:)
+          super(name: name, attribute: attribute, methods: methods, render_nil: render_nil)
           @namespace = namespace
           @cdata = cdata
         end

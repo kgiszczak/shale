@@ -30,13 +30,19 @@ module Shale
       # @param [String] key Document's key
       # @param [Symbol, nil] to Object's attribute
       # @param [Hash, nil] using
+      # @param [true, false] render_nil
       #
       # @raise [IncorrectMappingArgumentsError] when arguments are incorrect
       #
       # @api private
-      def map(key, to: nil, using: nil)
+      def map(key, to: nil, using: nil, render_nil: false)
         Validator.validate_arguments(key, to, using)
-        @keys[key] = Descriptor::Dict.new(name: key, attribute: to, methods: using)
+        @keys[key] = Descriptor::Dict.new(
+          name: key,
+          attribute: to,
+          methods: using,
+          render_nil: render_nil
+        )
       end
 
       # Set the "finalized" instance variable to true

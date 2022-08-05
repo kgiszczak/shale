@@ -184,6 +184,15 @@ RSpec.describe Shale::Mapping::Xml do
         expect(obj.elements['foo'].cdata).to eq(true)
       end
     end
+
+    context 'when :render_nil is set' do
+      it 'adds mapping to elements hash' do
+        obj = described_class.new
+        obj.map_element('foo', to: :bar, render_nil: true)
+        expect(obj.elements.keys).to eq(['foo'])
+        expect(obj.elements['foo'].render_nil?).to eq(true)
+      end
+    end
   end
 
   describe '#map_attribute' do
@@ -280,6 +289,15 @@ RSpec.describe Shale::Mapping::Xml do
         expect(obj.attributes.keys).to eq(['foo'])
         expect(obj.attributes['foo'].namespace.name).to eq(nil)
         expect(obj.attributes['foo'].namespace.prefix).to eq(nil)
+      end
+    end
+
+    context 'when :render_nil is set' do
+      it 'adds mapping to attributes hash' do
+        obj = described_class.new
+        obj.map_attribute('foo', to: :bar, render_nil: true)
+        expect(obj.attributes.keys).to eq(['foo'])
+        expect(obj.attributes['foo'].render_nil?).to eq(true)
       end
     end
   end

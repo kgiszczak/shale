@@ -40,16 +40,27 @@ module Shale
         # @param [String] name
         # @param [Symbol, nil] attribute
         # @param [Hash, nil] methods
+        # @param [true, false] render_nil
         #
         # @api private
-        def initialize(name:, attribute:, methods:)
+        def initialize(name:, attribute:, methods:, render_nil:)
           @name = name
           @attribute = attribute
+          @render_nil = render_nil
 
           if methods
             @method_from = methods[:from]
             @method_to = methods[:to]
           end
+        end
+
+        # Check render_nil
+        #
+        # @return [true, false]
+        #
+        # @api private
+        def render_nil?
+          @render_nil == true
         end
       end
     end

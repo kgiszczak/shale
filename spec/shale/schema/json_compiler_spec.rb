@@ -1,8 +1,13 @@
 # frozen_string_literal: true
 
+require 'shale/adapter/json'
 require 'shale/schema/json_compiler'
 
 RSpec.describe Shale::Schema::JSONCompiler do
+  before(:each) do
+    Shale.json_adapter = Shale::Adapter::JSON
+  end
+
   let(:schema) do
     <<~DATA
       {

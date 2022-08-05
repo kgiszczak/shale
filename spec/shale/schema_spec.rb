@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'shale/adapter/json'
 require 'shale/adapter/rexml'
 require 'shale/schema'
 
@@ -34,6 +35,7 @@ RSpec.describe Shale::Schema do
     end
 
     it 'generates JSON schema' do
+      Shale.json_adapter = Shale::Adapter::JSON
       schema = described_class.to_json(ShaleSchemaTesting::Root, pretty: true)
       expect(schema).to eq(expected_json_schema)
     end
@@ -66,6 +68,7 @@ RSpec.describe Shale::Schema do
     end
 
     it 'generates Shale models' do
+      Shale.json_adapter = Shale::Adapter::JSON
       models = described_class.from_json([schema], root_name: 'foo')
       expect(models.length).to eq(1)
       expect(models).to eq({ 'foo' => expected_shale_model })

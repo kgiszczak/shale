@@ -7,6 +7,11 @@ module Shale
     TOML Adapter is not set.
     To use Shale with TOML documents you have to install parser and set adapter.
 
+    # To use Tomlib:
+    # Make sure tomlib is installed eg. execute: gem install tomlib
+    Shale.toml_adapter = Tomlib
+
+    # To use toml-rb:
     # Make sure toml-rb is installed eg. execute: gem install toml-rb
     require 'shale/adapter/toml_rb'
     Shale.toml_adapter = Shale::Adapter::TomlRB
@@ -18,16 +23,16 @@ module Shale
     XML Adapter is not set.
     To use Shale with XML documents you have to install parser and set adapter.
 
-    To use REXML:
+    # To use REXML:
     require 'shale/adapter/rexml'
     Shale.xml_adapter = Shale::Adapter::REXML
 
-    To use Nokogiri:
+    # To use Nokogiri:
     # Make sure Nokogiri is installed eg. execute: gem install nokogiri
     require 'shale/adapter/nokogiri'
     Shale.xml_adapter = Shale::Adapter::Nokogiri
 
-    To use OX:
+    # To use OX:
     # Make sure Ox is installed eg. execute: gem install ox
     require 'shale/adapter/ox'
     Shale.xml_adapter = Shale::Adapter::Ox

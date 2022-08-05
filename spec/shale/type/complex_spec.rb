@@ -2,7 +2,7 @@
 
 require 'shale'
 require 'shale/adapter/rexml'
-require 'shale/adapter/toml_rb'
+require 'tomlib'
 
 module ShaleComplexTesting
   class ComplexType < Shale::Mapper
@@ -223,6 +223,56 @@ module ShaleComplexTesting
     end
   end
 
+  class RenderNil < Shale::Mapper
+    attribute :attr_true, Shale::Type::String
+    attribute :attr_false, Shale::Type::String
+    attribute :xml_attr_true, Shale::Type::String
+    attribute :xml_attr_false, Shale::Type::String
+
+    attribute :ns_attr_true, Shale::Type::String
+    attribute :ns_attr_false, Shale::Type::String
+    attribute :ns_xml_attr_true, Shale::Type::String
+    attribute :ns_xml_attr_false, Shale::Type::String
+
+    hsh do
+      map 'attr_true', to: :attr_true, render_nil: true
+      map 'attr_false', to: :attr_false, render_nil: false
+    end
+
+    json do
+      map 'attr_true', to: :attr_true, render_nil: true
+      map 'attr_false', to: :attr_false, render_nil: false
+    end
+
+    yaml do
+      map 'attr_true', to: :attr_true, render_nil: true
+      map 'attr_false', to: :attr_false, render_nil: false
+    end
+
+    toml do
+      map 'attr_true', to: :attr_true, render_nil: true
+      map 'attr_false', to: :attr_false, render_nil: false
+    end
+
+    xml do
+      root 'render_nil'
+
+      map_attribute 'xml_attr_true', to: :xml_attr_true, render_nil: true
+      map_attribute 'xml_attr_false', to: :xml_attr_false, render_nil: false
+      map_element 'attr_true', to: :attr_true, render_nil: true
+      map_element 'attr_false', to: :attr_false, render_nil: false
+
+      map_attribute 'ns_xml_attr_true',
+        to: :ns_xml_attr_true, namespace: 'http://ns1', prefix: 'ns1', render_nil: true
+      map_attribute 'ns_xml_attr_false',
+        to: :ns_xml_attr_false, namespace: 'http://ns2', prefix: 'ns2', render_nil: false
+      map_element 'ns_attr_true',
+        to: :ns_attr_true, namespace: 'http://ns3', prefix: 'ns3', render_nil: true
+      map_element 'ns_attr_false',
+        to: :ns_attr_false, namespace: 'http://ns4', prefix: 'ns4', render_nil: false
+    end
+  end
+
   class ComplexTypeModel
     attr_accessor :complex_attr1
 
@@ -272,6 +322,13 @@ module ShaleComplexTesting
 end
 
 RSpec.describe Shale::Type::Complex do
+  before(:each) do
+    Shale.json_adapter = Shale::Adapter::JSON
+    Shale.yaml_adapter = YAML
+    Shale.toml_adapter = Tomlib
+    Shale.xml_adapter = Shale::Adapter::REXML
+  end
+
   context 'with no custom models' do
     before(:each) do
       ShaleComplexTesting::RootType.model(ShaleComplexTesting::RootType)
@@ -284,7 +341,6 @@ RSpec.describe Shale::Type::Complex do
         {
           'root_attr1' => 'foo',
           'root_attr2' => %w[one two three],
-          'root_attr3' => nil,
           'root_bool' => false,
           'root_attr_complex' => { 'complex_attr1' => 'bar' },
           'root_attr_using' => 'using_foo',
@@ -332,7 +388,6 @@ RSpec.describe Shale::Type::Complex do
               "two",
               "three"
             ],
-            "root_attr3": null,
             "root_bool": false,
             "root_attr_complex": {
               "complex_attr1": "bar"
@@ -399,7 +454,6 @@ RSpec.describe Shale::Type::Complex do
           - one
           - two
           - three
-          root_attr3:
           root_bool: false
           root_attr_complex:
             complex_attr1: bar
@@ -453,20 +507,16 @@ RSpec.describe Shale::Type::Complex do
       let(:to_toml) do
         <<~TOML
           root_attr1 = "foo"
-          root_attr2 = ["one", "two", "three"]
-          root_attr3 = nil
-          root_attr_using = "using_foo"
+          root_attr2 = [ "one", "two", "three" ]
           root_bool = false
+          root_attr_using = "using_foo"
+
           [root_attr_complex]
           complex_attr1 = "bar"
         TOML
       end
 
       describe '.from_toml' do
-        before(:each) do
-          Shale.toml_adapter = Shale::Adapter::TomlRB
-        end
-
         it 'maps toml to object' do
           instance = ShaleComplexTesting::RootType.from_toml(from_toml)
 
@@ -482,10 +532,6 @@ RSpec.describe Shale::Type::Complex do
       end
 
       describe '.to_toml' do
-        before(:each) do
-          Shale.toml_adapter = Shale::Adapter::TomlRB
-        end
-
         it 'converts objects to toml' do
           instance = ShaleComplexTesting::RootType.new(
             root_attr1: 'foo',
@@ -525,10 +571,6 @@ RSpec.describe Shale::Type::Complex do
       end
 
       describe '.from_xml' do
-        before(:each) do
-          Shale.xml_adapter = Shale::Adapter::REXML
-        end
-
         context 'when XML adapter is not set' do
           it 'raises an error' do
             Shale.xml_adapter = nil
@@ -600,10 +642,6 @@ RSpec.describe Shale::Type::Complex do
       end
 
       describe '.to_xml' do
-        before(:each) do
-          Shale.xml_adapter = Shale::Adapter::REXML
-        end
-
         context 'when XML adapter is not set' do
           it 'raises an error' do
             Shale.xml_adapter = nil
@@ -640,7 +678,8 @@ RSpec.describe Shale::Type::Complex do
 
           it 'converts blank attributes to xml' do
             instance = ShaleComplexTesting::RootType.new(root_attr1: '')
-            expected = '<root_type attr1="" collection="[]"><element_using/></root_type>'
+            expected = '<root_type attr1="" attribute_using="" collection="[]">' +
+              '<element_using/></root_type>'
             expect(instance.to_xml).to eq(expected)
           end
         end
@@ -756,7 +795,6 @@ RSpec.describe Shale::Type::Complex do
         {
           'root_attr1' => 'foo',
           'root_attr2' => %w[one two three],
-          'root_attr3' => nil,
           'root_bool' => false,
           'root_attr_complex' => { 'complex_attr1' => 'bar' },
           'root_attr_using' => 'using_foo',
@@ -816,7 +854,6 @@ RSpec.describe Shale::Type::Complex do
               "two",
               "three"
             ],
-            "root_attr3": null,
             "root_bool": false,
             "root_attr_complex": {
               "complex_attr1": "bar"
@@ -879,7 +916,6 @@ RSpec.describe Shale::Type::Complex do
           - one
           - two
           - three
-          root_attr3:
           root_bool: false
           root_attr_complex:
             complex_attr1: bar
@@ -946,20 +982,16 @@ RSpec.describe Shale::Type::Complex do
       let(:to_toml) do
         <<~TOML
           root_attr1 = "foo"
-          root_attr2 = ["one", "two", "three"]
-          root_attr3 = nil
-          root_attr_using = "using_foo"
+          root_attr2 = [ "one", "two", "three" ]
           root_bool = false
+          root_attr_using = "using_foo"
+
           [root_attr_complex]
           complex_attr1 = "bar"
         TOML
       end
 
       describe '.from_toml' do
-        before(:each) do
-          Shale.toml_adapter = Shale::Adapter::TomlRB
-        end
-
         it 'maps toml to object' do
           instance = ShaleComplexTesting::RootType.from_toml(from_toml)
 
@@ -975,10 +1007,6 @@ RSpec.describe Shale::Type::Complex do
       end
 
       describe '.to_toml' do
-        before(:each) do
-          Shale.toml_adapter = Shale::Adapter::TomlRB
-        end
-
         context 'with wrong model' do
           it 'raises an exception' do
             msg = /argument is a 'String' but should be a 'ShaleComplexTesting::RootTypeModel/
@@ -1030,10 +1058,6 @@ RSpec.describe Shale::Type::Complex do
       end
 
       describe '.from_xml' do
-        before(:each) do
-          Shale.xml_adapter = Shale::Adapter::REXML
-        end
-
         it 'maps xml to object' do
           instance = ShaleComplexTesting::RootType.from_xml(xml)
 
@@ -1059,10 +1083,6 @@ RSpec.describe Shale::Type::Complex do
       end
 
       describe '.to_xml' do
-        before(:each) do
-          Shale.xml_adapter = Shale::Adapter::REXML
-        end
-
         context 'with wrong model' do
           it 'raises an exception' do
             msg = /argument is a 'String' but should be a 'ShaleComplexTesting::RootTypeModel/
@@ -1098,6 +1118,190 @@ RSpec.describe Shale::Type::Complex do
             expect(result).to eq(xml.gsub(/>\s+/, '>').gsub(/"\s+/, '" '))
           end
         end
+      end
+    end
+  end
+
+  context 'with render_nil' do
+    describe '.to_hash' do
+      let(:expected_nil) do
+        {
+          'attr_true' => nil,
+        }
+      end
+
+      let(:expected_set) do
+        {
+          'attr_true' => 'foo',
+          'attr_false' => 'bar',
+        }
+      end
+
+      it 'converts objects to hash' do
+        instance1 = ShaleComplexTesting::RenderNil.new(
+          attr_true: nil,
+          attr_false: nil,
+        )
+        instance2 = ShaleComplexTesting::RenderNil.new(
+          attr_true: 'foo',
+          attr_false: 'bar',
+        )
+
+        expect(instance1.to_hash).to eq(expected_nil)
+        expect(instance2.to_hash).to eq(expected_set)
+      end
+    end
+
+    describe '.to_json' do
+      let(:expected_nil) do
+        <<~JSON.sub(/\n\z/, '')
+          {
+            "attr_true": null
+          }
+        JSON
+      end
+
+      let(:expected_set) do
+        <<~JSON.sub(/\n\z/, '')
+          {
+            "attr_true": "foo",
+            "attr_false": "bar"
+          }
+        JSON
+      end
+
+      it 'converts objects to JSON' do
+        instance1 = ShaleComplexTesting::RenderNil.new(
+          attr_true: nil,
+          attr_false: nil,
+        )
+        instance2 = ShaleComplexTesting::RenderNil.new(
+          attr_true: 'foo',
+          attr_false: 'bar',
+        )
+
+        expect(instance1.to_json(:pretty)).to eq(expected_nil)
+        expect(instance2.to_json(:pretty)).to eq(expected_set)
+      end
+    end
+
+    describe '.to_yaml' do
+      let(:expected_nil) do
+        <<~YAML
+          ---
+          attr_true:
+        YAML
+      end
+
+      let(:expected_set) do
+        <<~YAML
+          ---
+          attr_true: foo
+          attr_false: bar
+        YAML
+      end
+
+      it 'converts objects to YAML' do
+        instance1 = ShaleComplexTesting::RenderNil.new(
+          attr_true: nil,
+          attr_false: nil,
+        )
+        instance2 = ShaleComplexTesting::RenderNil.new(
+          attr_true: 'foo',
+          attr_false: 'bar',
+        )
+
+        expect(instance1.to_yaml).to eq(expected_nil)
+        expect(instance2.to_yaml).to eq(expected_set)
+      end
+    end
+
+    describe '.to_toml' do
+      let(:expected_nil) do
+        <<~TOML
+          attr_true = ""
+        TOML
+      end
+
+      let(:expected_set) do
+        <<~TOML
+          attr_true = "foo"
+          attr_false = "bar"
+        TOML
+      end
+
+      it 'converts objects to TOML' do
+        instance1 = ShaleComplexTesting::RenderNil.new(
+          attr_true: nil,
+          attr_false: nil,
+        )
+        instance2 = ShaleComplexTesting::RenderNil.new(
+          attr_true: 'foo',
+          attr_false: 'bar',
+        )
+
+        expect(instance1.to_toml).to eq(expected_nil)
+        expect(instance2.to_toml).to eq(expected_set)
+      end
+    end
+
+    describe '.to_xml' do
+      let(:expected_nil) do
+        <<~XML.gsub(/>\s+/, '>').gsub(/"\s+/, '" ')
+          <render_nil xmlns:ns1="http://ns1"
+            xmlns:ns3="http://ns3"
+            ns1:ns_xml_attr_true=""
+            xml_attr_true="">
+            <attr_true/>
+            <ns3:ns_attr_true/>
+          </render_nil>
+        XML
+      end
+
+      let(:expected_set) do
+        <<~XML.gsub(/>\s+/, '>').gsub(/"\s+/, '" ')
+          <render_nil xmlns:ns1="http://ns1"
+            xmlns:ns2="http://ns2"
+            xmlns:ns3="http://ns3"
+            xmlns:ns4="http://ns4"
+            ns2:ns_xml_attr_false="mot"
+            ns1:ns_xml_attr_true="ked"
+            xml_attr_false="nab"
+            xml_attr_true="baz">
+            <attr_true>foo</attr_true>
+            <attr_false>bar</attr_false>
+            <ns3:ns_attr_true>zed</ns3:ns_attr_true>
+            <ns4:ns_attr_false>led</ns4:ns_attr_false>
+          </render_nil>
+        XML
+      end
+
+      it 'converts objects to XML' do
+        instance1 = ShaleComplexTesting::RenderNil.new(
+          attr_true: nil,
+          attr_false: nil,
+          xml_attr_true: nil,
+          xml_attr_false: nil,
+
+          ns_attr_true: nil,
+          ns_attr_false: nil,
+          ns_xml_attr_true: nil,
+          ns_xml_attr_false: nil,
+        )
+        instance2 = ShaleComplexTesting::RenderNil.new(
+          attr_true: 'foo',
+          attr_false: 'bar',
+          xml_attr_true: 'baz',
+          xml_attr_false: 'nab',
+
+          ns_attr_true: 'zed',
+          ns_attr_false: 'led',
+          ns_xml_attr_true: 'ked',
+          ns_xml_attr_false: 'mot',
+        )
+
+        expect(instance1.to_xml).to eq(expected_nil)
+        expect(instance2.to_xml).to eq(expected_set)
       end
     end
   end

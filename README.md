@@ -57,6 +57,7 @@ $ gem install shale
 * [Mapping Hash keys to object attributes](#mapping-hash-keys-to-object-attributes)
 * [Mapping XML elements and attributes to object attributes](#mapping-xml-elements-and-attributes-to-object-attributes)
 * [Using XML namespaces](#using-xml-namespaces)
+* [Rendering nil values](#rendering-nil-values)
 * [Using methods to extract and generate data](#using-methods-to-extract-and-generate-data)
 * [Pretty printing and XML declaration](#pretty-printing-and-xml-declaration)
 * [Using custom models](#using-custom-models)
@@ -556,6 +557,52 @@ person = Person.from_xml(<<~DATA)
   <ns2:last_name>Doe</ns2:last_name>
 </ns1:person>
 DATA
+```
+
+### Rendering nil values
+
+By default elements with nil value are not rendered. You can change this behavior
+by using `render_nil: true` on a mapping.
+
+```ruby
+class Person < Shale::Mapper
+  attribute :first_name, Shale::Type::String
+  attribute :last_name, Shale::Type::String
+  attribute :age, Shale::Type::Integer
+
+  json do
+    map 'first_name', to: :first_name, render_nil: true
+    map 'last_name', to: :last_name, render_nil: false
+    map 'age', to: :age, render_nil: true
+  end
+
+  xml do
+    root 'person'
+
+    map_element 'first_name', to: :first_name, render_nil: true
+    map_element 'last_name', to: :last_name, render_nil: false
+    map_attribute 'age', to: :age, render_nil: true
+  end
+end
+
+person = Person.new(first_name: nil, last_name: nil, age: nil)
+
+puts person.to_json(:pretty)
+
+# =>
+#
+# {
+#   "first_name": null,
+#   "age": "null"
+# }
+
+puts person.to_xml(:pretty)
+
+# =>
+#
+# <person age="">
+#   <first_name/>
+# </person>
 ```
 
 ### Using methods to extract and generate data
