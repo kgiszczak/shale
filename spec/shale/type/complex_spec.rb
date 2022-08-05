@@ -1211,7 +1211,7 @@ RSpec.describe Shale::Type::Complex do
           attr_false: 'bar'
         )
 
-        expect(instance1.to_yaml).to eq(expected_nil)
+        expect(instance1.to_yaml.gsub(/ +$/, '')).to eq(expected_nil)
         expect(instance2.to_yaml).to eq(expected_set)
       end
     end
