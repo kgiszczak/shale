@@ -561,7 +561,7 @@ DATA
 
 ### Rendering nil values
 
-By default elements with nil value are not rendered. You can change this behavior
+By default elements with `nil` value are not rendered. You can change this behavior
 by using `render_nil: true` on a mapping.
 
 ```ruby
