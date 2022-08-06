@@ -36,25 +36,26 @@ module Shale
       # Serialize Nokogiri document into XML
       #
       # @param [::Nokogiri::XML::Document] doc Nokogiri document
-      # @param [Array<Symbol>] options
+      # @param [true, false] pretty
+      # @param [true, false] declaration
       #
       # @return [String]
       #
       # @api private
-      def self.dump(doc, *options)
+      def self.dump(doc, pretty: false, declaration: false)
         save_with = ::Nokogiri::XML::Node::SaveOptions::AS_XML
 
-        if options.include?(:pretty)
+        if pretty
           save_with |= ::Nokogiri::XML::Node::SaveOptions::FORMAT
         end
 
-        unless options.include?(:declaration)
+        unless declaration
           save_with |= ::Nokogiri::XML::Node::SaveOptions::NO_DECLARATION
         end
 
         result = doc.to_xml(save_with: save_with)
 
-        unless options.include?(:pretty)
+        unless pretty
           result = result.sub(/\n/, '')
         end
 

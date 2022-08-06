@@ -39,9 +39,9 @@ RSpec.describe Shale::Adapter::Ox do
       end
     end
 
-    context 'with :pretty param' do
+    context 'with pretty: true param' do
       it 'generates XML document and formats it' do
-        xml = described_class.dump(doc, :pretty)
+        xml = described_class.dump(doc, pretty: true)
         expected = <<~XML
           <foo>
             <bar>Hello</bar>
@@ -52,16 +52,16 @@ RSpec.describe Shale::Adapter::Ox do
       end
     end
 
-    context 'with :declaration param' do
+    context 'with declaration: true param' do
       it 'generates XML document with declaration' do
-        xml = described_class.dump(doc, :declaration)
+        xml = described_class.dump(doc, declaration: true)
         expect(xml).to eq('<?xml version="1.0"?><foo><bar>Hello</bar></foo>')
       end
     end
 
-    context 'with :pretty and :declaration param' do
+    context 'with pretty: true and declaration: true param' do
       it 'generates XML document with declaration and formats it' do
-        xml = described_class.dump(doc, :pretty, :declaration)
+        xml = described_class.dump(doc, pretty: true, declaration: true)
         expected = <<~XML
           <?xml version="1.0"?>
           <foo>

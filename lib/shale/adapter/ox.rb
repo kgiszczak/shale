@@ -30,19 +30,20 @@ module Shale
       # Serialize Ox document into XML
       #
       # @param [::Ox::Document, ::Ox::Element] doc Ox document
-      # @param [Array<Symbol>] options
+      # @param [true, false] pretty
+      # @param [true, false] declaration
       #
       # @return [String]
       #
       # @api private
-      def self.dump(doc, *options)
+      def self.dump(doc, pretty: false, declaration: false)
         opts = { indent: -1, with_xml: false }
 
-        if options.include?(:pretty)
+        if pretty
           opts[:indent] = 2
         end
 
-        if options.include?(:declaration)
+        if declaration
           doc[:version] = '1.0'
           opts[:with_xml] = true
         end

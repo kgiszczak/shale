@@ -290,7 +290,7 @@ RSpec.describe Shale::Schema::JSONGenerator do
           pretty: true
         )
 
-        expect(schema).to eq(Shale.json_adapter.dump(expected_schema_hash, :pretty))
+        expect(schema).to eq(Shale.json_adapter.dump(expected_schema_hash, pretty: true))
       end
     end
 

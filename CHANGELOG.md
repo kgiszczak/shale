@@ -4,6 +4,7 @@
 - `render_nil: true` option that allows to render nil values
 
 ### Changed
+- Convert splat arguments to keyword arguments
 - RSpec: enable random spec execution and warnings
 
 ## [0.6.0] - 2022-07-05

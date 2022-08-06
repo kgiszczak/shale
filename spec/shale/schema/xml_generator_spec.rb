@@ -235,8 +235,8 @@ RSpec.describe Shale::Schema::XMLGenerator do
       it 'generates XML schema' do
         schemas = described_class.new.as_schemas(ShaleSchemaXMLGeneratorTesting::Root)
 
-        schema0 = Shale.xml_adapter.dump(schemas[0].as_xml, :pretty)
-        schema1 = Shale.xml_adapter.dump(schemas[1].as_xml, :pretty)
+        schema0 = Shale.xml_adapter.dump(schemas[0].as_xml, pretty: true)
+        schema1 = Shale.xml_adapter.dump(schemas[1].as_xml, pretty: true)
 
         expect(schema0).to eq(expected_schema0)
         expect(schema1).to eq(expected_schema1)
@@ -249,7 +249,7 @@ RSpec.describe Shale::Schema::XMLGenerator do
           ShaleSchemaXMLGeneratorTesting::CircularDependencyA
         )
 
-        schema0 = Shale.xml_adapter.dump(schemas[0].as_xml, :pretty)
+        schema0 = Shale.xml_adapter.dump(schemas[0].as_xml, pretty: true)
 
         expect(schema0).to eq(expected_schema_circular)
       end
@@ -265,7 +265,7 @@ RSpec.describe Shale::Schema::XMLGenerator do
           pretty: true
         )
 
-        expected = Shale.xml_adapter.dump(schemas[0].as_xml, :pretty)
+        expected = Shale.xml_adapter.dump(schemas[0].as_xml, pretty: true)
         expect(schemas_xml.values[0]).to eq(expected)
       end
     end
@@ -278,7 +278,7 @@ RSpec.describe Shale::Schema::XMLGenerator do
           declaration: true
         )
 
-        expected = Shale.xml_adapter.dump(schemas[0].as_xml, :declaration)
+        expected = Shale.xml_adapter.dump(schemas[0].as_xml, declaration: true)
         expect(schemas_xml.values[0]).to eq(expected)
       end
     end

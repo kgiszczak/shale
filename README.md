@@ -587,7 +587,7 @@ end
 
 person = Person.new(first_name: nil, last_name: nil, age: nil)
 
-puts person.to_json(:pretty)
+puts person.to_json(pretty: true)
 
 # =>
 #
@@ -596,7 +596,7 @@ puts person.to_json(:pretty)
 #   "age": "null"
 # }
 
-puts person.to_xml(:pretty)
+puts person.to_xml(pretty: true)
 
 # =>
 #
@@ -701,10 +701,10 @@ DATA
 
 ### Pretty printing and XML declaration
 
-If you need formatted output you can pass `:pretty` parameter to `#to_json` and `#to_xml`
+If you need formatted output you can pass `pretty: true` parameter to `#to_json` and `#to_xml`
 
 ```ruby
-person.to_json(:pretty)
+person.to_json(pretty: true)
 
 # =>
 #
@@ -716,10 +716,10 @@ person.to_json(:pretty)
 # }
 ```
 
-You can also add an XML declaration by passing `:declaration` to `#to_xml`
+You can also add an XML declaration by passing `declaration: true` to `#to_xml`
 
 ```ruby
-person.to_xml(:pretty, :declaration)
+person.to_xml(pretty: true, declaration: true)
 
 # =>
 #
@@ -776,7 +776,7 @@ DATA
 #  @last_name="Doe",
 #  @address=#<Address:0x0000000113d7a140 @street="Oxford Street", @city="London">>
 
-PersonMapper.to_json(person, :pretty)
+PersonMapper.to_json(person, pretty: true)
 
 # =>
 #

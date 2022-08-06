@@ -222,13 +222,11 @@ module Shale
       def to_schemas(klass, base_name = nil, pretty: false, declaration: false)
         schemas = as_schemas(klass, base_name)
 
-        options = [
-          pretty ? :pretty : nil,
-          declaration ? :declaration : nil,
-        ]
-
         schemas.to_h do |schema|
-          [schema.name, Shale.xml_adapter.dump(schema.as_xml, *options)]
+          [
+            schema.name,
+            Shale.xml_adapter.dump(schema.as_xml, pretty: pretty, declaration: declaration),
+          ]
         end
       end
 

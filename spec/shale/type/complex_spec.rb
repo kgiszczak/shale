@@ -428,7 +428,7 @@ RSpec.describe Shale::Type::Complex do
           end
         end
 
-        context 'with :pretty param' do
+        context 'with pretty: true param' do
           it 'converts objects to json and formats it' do
             instance = ShaleComplexTesting::RootType.new(
               root_attr1: 'foo',
@@ -439,7 +439,7 @@ RSpec.describe Shale::Type::Complex do
               root_attr_using: 'using_foo'
             )
 
-            expect(instance.to_json(:pretty)).to eq(json.sub(/\n\z/, ''))
+            expect(instance.to_json(pretty: true)).to eq(json.sub(/\n\z/, ''))
           end
         end
       end
@@ -684,7 +684,7 @@ RSpec.describe Shale::Type::Complex do
           end
         end
 
-        context 'with :pretty param' do
+        context 'with pretty: true param' do
           it 'converts objects to xml and formats it' do
             instance = ShaleComplexTesting::RootType.new(
               root_attr1: 'foo',
@@ -700,11 +700,11 @@ RSpec.describe Shale::Type::Complex do
               </root_type>
             XML
 
-            expect(instance.to_xml(:pretty)).to eq(xml)
+            expect(instance.to_xml(pretty: true)).to eq(xml)
           end
         end
 
-        context 'with :declaration param' do
+        context 'with declaration: true param' do
           it 'converts objects to xml with declaration' do
             instance = ShaleComplexTesting::RootType.new(
               root_attr1: 'foo',
@@ -721,11 +721,11 @@ RSpec.describe Shale::Type::Complex do
               </root_type>
             XML
 
-            expect(instance.to_xml(:declaration)).to eq(xml)
+            expect(instance.to_xml(declaration: true)).to eq(xml)
           end
         end
 
-        context 'with :pretty and :declaration param' do
+        context 'with pretty: true and declaration: true param' do
           it 'converts objects to xml with declaration and formats it' do
             instance = ShaleComplexTesting::RootType.new(
               root_attr1: 'foo',
@@ -742,7 +742,7 @@ RSpec.describe Shale::Type::Complex do
               </root_type>
             XML
 
-            expect(instance.to_xml(:pretty, :declaration)).to eq(xml)
+            expect(instance.to_xml(pretty: true, declaration: true)).to eq(xml)
           end
         end
 
@@ -764,7 +764,7 @@ RSpec.describe Shale::Type::Complex do
               </cdata_parent>
             XML
 
-            expect(instance.to_xml(:pretty)).to eq(xml)
+            expect(instance.to_xml(pretty: true)).to eq(xml)
           end
         end
 
@@ -776,7 +776,7 @@ RSpec.describe Shale::Type::Complex do
               <content_using>foo,bar,baz</content_using>
             XML
 
-            expect(instance.to_xml(:pretty)).to eq(xml)
+            expect(instance.to_xml(pretty: true)).to eq(xml)
           end
         end
       end
@@ -1180,8 +1180,8 @@ RSpec.describe Shale::Type::Complex do
           attr_false: 'bar'
         )
 
-        expect(instance1.to_json(:pretty)).to eq(expected_nil)
-        expect(instance2.to_json(:pretty)).to eq(expected_set)
+        expect(instance1.to_json(pretty: true)).to eq(expected_nil)
+        expect(instance2.to_json(pretty: true)).to eq(expected_set)
       end
     end
 

@@ -118,13 +118,13 @@ module Shale
         # Convert Object to JSON
         #
         # @param [Shale::Mapper] instance Object to convert
-        # @param [Array<Symbol>] options
+        # @param [true, false] pretty
         #
         # @return [String]
         #
         # @api public
-        def to_json(instance, *options)
-          Shale.json_adapter.dump(as_json(instance), *options)
+        def to_json(instance, pretty: false)
+          Shale.json_adapter.dump(as_json(instance), pretty: pretty)
         end
 
         # Convert YAML to Object
@@ -363,16 +363,17 @@ module Shale
         # Convert Object to XML
         #
         # @param [Shale::Mapper] instance Object to convert
-        # @param [Array<Symbol>] options
+        # @param [true, false] pretty
+        # @param [true, false] declaration
         #
         # @raise [AdapterError]
         #
         # @return [String]
         #
         # @api public
-        def to_xml(instance, *options)
+        def to_xml(instance, pretty: false, declaration: false)
           validate_xml_adapter
-          Shale.xml_adapter.dump(as_xml(instance), *options)
+          Shale.xml_adapter.dump(as_xml(instance), pretty: pretty, declaration: declaration)
         end
 
         private
@@ -407,13 +408,13 @@ module Shale
 
       # Convert Object to JSON
       #
-      # @param [Array<Symbol>] options
+      # @param [true, false] pretty
       #
       # @return [String]
       #
       # @api public
-      def to_json(*options)
-        self.class.to_json(self, *options)
+      def to_json(pretty: false)
+        self.class.to_json(self, pretty: pretty)
       end
 
       # Convert Object to YAML
@@ -436,13 +437,14 @@ module Shale
 
       # Convert Object to XML
       #
-      # @param [Array<Symbol>] options
+      # @param [true, false] pretty
+      # @param [true, false] declaration
       #
       # @return [String]
       #
       # @api public
-      def to_xml(*options)
-        self.class.to_xml(self, *options)
+      def to_xml(pretty: false, declaration: false)
+        self.class.to_xml(self, pretty: pretty, declaration: declaration)
       end
     end
   end

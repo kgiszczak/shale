@@ -31,19 +31,20 @@ module Shale
       # Serialize REXML document into XML
       #
       # @param [::REXML::Document] doc REXML document
-      # @param [Array<Symbol>] options
+      # @param [true, false] pretty
+      # @param [true, false] declaration
       #
       # @return [String]
       #
       # @api private
-      def self.dump(doc, *options)
-        if options.include?(:declaration)
+      def self.dump(doc, pretty: false, declaration: false)
+        if declaration
           doc.add(::REXML::XMLDecl.new)
         end
 
         io = StringIO.new
 
-        if options.include?(:pretty)
+        if pretty
           formatter = ::REXML::Formatters::Pretty.new
           formatter.compact = true
         else

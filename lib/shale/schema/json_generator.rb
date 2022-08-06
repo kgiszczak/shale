@@ -124,9 +124,7 @@ module Shale
       # @api public
       def to_schema(klass, id: nil, title: nil, description: nil, pretty: false)
         schema = as_schema(klass, id: id, title: title, description: description)
-        options = pretty ? :pretty : nil
-
-        Shale.json_adapter.dump(schema, options)
+        Shale.json_adapter.dump(schema, pretty: pretty)
       end
 
       private

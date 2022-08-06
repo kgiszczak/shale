@@ -22,13 +22,13 @@ module Shale
       # Serialize Hash into JSON
       #
       # @param [Hash] obj Hash object
-      # @param [Array<Symbol>] options
+      # @param [true, false] pretty
       #
       # @return [String]
       #
       # @api private
-      def self.dump(obj, *options)
-        if options.include?(:pretty)
+      def self.dump(obj, pretty: false)
+        if pretty
           ::JSON.pretty_generate(obj)
         else
           ::JSON.generate(obj)
