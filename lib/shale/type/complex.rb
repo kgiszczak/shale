@@ -16,11 +16,13 @@ module Shale
             # Convert Hash to Object using Hash/JSON/YAML/TOML mapping
             #
             # @param [Hash] hash Hash to convert
+            # @param [Array<Symbol>] only
+            # @param [Array<Symbol>] except
             #
-            # @return [Shale::Mapper]
+            # @return [model instance]
             #
             # @api public
-            def of_#{format}(hash)
+            def of_#{format}(hash, only: nil, except: nil)
               instance = model.new
 
               attributes
@@ -29,6 +31,9 @@ module Shale
                 .each { |attr| instance.send(attr.setter, attr.default.call) }
 
               mapping_keys = #{format}_mapping.keys
+
+              only = to_partial_render_attributes(only)
+              except = to_partial_render_attributes(except)
 
               hash.each do |key, value|
                 mapping = mapping_keys[key]
@@ -40,15 +45,36 @@ module Shale
                   attribute = attributes[mapping.attribute]
                   next unless attribute
 
+                  if only
+                    attribute_only = only[attribute.name]
+                    next unless only.key?(attribute.name)
+                  end
+
+                  if except
+                    attribute_except = except[attribute.name]
+                    next if except.key?(attribute.name) && attribute_except.nil?
+                  end
+
                   if value.nil?
                     instance.send(attribute.setter, nil)
                   elsif attribute.collection?
                     [*value].each do |val|
-                      val = val ? attribute.type.of_#{format}(val) : val
+                      if val
+                        val = attribute.type.of_#{format}(
+                          val,
+                          only: attribute_only,
+                          except: attribute_except
+                        )
+                      end
+
                       instance.send(attribute.name) << attribute.type.cast(val)
                     end
                   else
-                    val = attribute.type.of_#{format}(value)
+                    val = attribute.type.of_#{format}(
+                      value,
+                      only: attribute_only,
+                      except: attribute_except
+                    )
                     instance.send(attribute.setter, attribute.type.cast(val))
                   end
                 end
@@ -60,19 +86,24 @@ module Shale
             # Convert Object to Hash using Hash/JSON/YAML/TOML mapping
             #
             # @param [any] instance Object to convert
+            # @param [Array<Symbol>] only
+            # @param [Array<Symbol>] except
             #
             # @raise [IncorrectModelError]
             #
             # @return [Hash]
             #
             # @api public
-            def as_#{format}(instance)
+            def as_#{format}(instance, only: nil, except: nil)
               unless instance.is_a?(model)
                 msg = "argument is a '\#{instance.class}' but should be a '\#{model}'"
                 raise IncorrectModelError, msg
               end
 
               hash = {}
+
+              only = to_partial_render_attributes(only)
+              except = to_partial_render_attributes(except)
 
               #{format}_mapping.keys.each_value do |mapping|
                 if mapping.method_to
@@ -81,16 +112,38 @@ module Shale
                   attribute = attributes[mapping.attribute]
                   next unless attribute
 
+                  if only
+                    attribute_only = only[attribute.name]
+                    next unless only.key?(attribute.name)
+                  end
+
+                  if except
+                    attribute_except = except[attribute.name]
+                    next if except.key?(attribute.name) && attribute_except.nil?
+                  end
+
                   value = instance.send(attribute.name)
 
                   if value.nil?
                     hash[mapping.name] = nil if mapping.render_nil?
                   elsif attribute.collection?
-                    hash[mapping.name] = [*value].map do |v|
-                      v ? attribute.type.as_#{format}(v) : v
+                    hash[mapping.name] = [*value].map do |val|
+                      if val
+                        attribute.type.as_#{format}(
+                          val,
+                          only: attribute_only,
+                          except: attribute_except,
+                        )
+                      else
+                        val
+                      end
                     end
                   else
-                    hash[mapping.name] = attribute.type.as_#{format}(value)
+                    hash[mapping.name] = attribute.type.as_#{format}(
+                      value,
+                      only: attribute_only,
+                      except: attribute_except,
+                    )
                   end
                 end
               end
@@ -107,86 +160,118 @@ module Shale
         # Convert JSON to Object
         #
         # @param [String] json JSON to convert
+        # @param [Array<Symbol>] only
+        # @param [Array<Symbol>] except
         #
-        # @return [Shale::Mapper]
+        # @return [model instance]
         #
         # @api public
-        def from_json(json)
-          of_json(Shale.json_adapter.load(json))
+        def from_json(json, only: nil, except: nil)
+          of_json(
+            Shale.json_adapter.load(json),
+            only: only,
+            except: except
+          )
         end
 
         # Convert Object to JSON
         #
-        # @param [Shale::Mapper] instance Object to convert
+        # @param [model instance] instance Object to convert
+        # @param [Array<Symbol>] only
+        # @param [Array<Symbol>] except
         # @param [true, false] pretty
         #
         # @return [String]
         #
         # @api public
-        def to_json(instance, pretty: false)
-          Shale.json_adapter.dump(as_json(instance), pretty: pretty)
+        def to_json(instance, only: nil, except: nil, pretty: false)
+          Shale.json_adapter.dump(
+            as_json(instance, only: only, except: except),
+            pretty: pretty
+          )
         end
 
         # Convert YAML to Object
         #
         # @param [String] yaml YAML to convert
+        # @param [Array<Symbol>] only
+        # @param [Array<Symbol>] except
         #
-        # @return [Shale::Mapper]
+        # @return [model instance]
         #
         # @api public
-        def from_yaml(yaml)
-          of_yaml(Shale.yaml_adapter.load(yaml))
+        def from_yaml(yaml, only: nil, except: nil)
+          of_yaml(
+            Shale.yaml_adapter.load(yaml),
+            only: only,
+            except: except
+          )
         end
 
         # Convert Object to YAML
         #
-        # @param [Shale::Mapper] instance Object to convert
+        # @param [model instance] instance Object to convert
+        # @param [Array<Symbol>] only
+        # @param [Array<Symbol>] except
         #
         # @return [String]
         #
         # @api public
-        def to_yaml(instance)
-          Shale.yaml_adapter.dump(as_yaml(instance))
+        def to_yaml(instance, only: nil, except: nil)
+          Shale.yaml_adapter.dump(as_yaml(instance, only: only, except: except))
         end
 
         # Convert TOML to Object
         #
         # @param [String] toml TOML to convert
+        # @param [Array<Symbol>] only
+        # @param [Array<Symbol>] except
         #
-        # @return [Shale::Mapper]
+        # @return [model instance]
         #
         # @api public
-        def from_toml(toml)
+        def from_toml(toml, only: nil, except: nil)
           validate_toml_adapter
-          of_toml(Shale.toml_adapter.load(toml))
+          of_toml(
+            Shale.toml_adapter.load(toml),
+            only: only,
+            except: except
+          )
         end
 
         # Convert Object to TOML
         #
-        # @param [Shale::Mapper] instance Object to convert
+        # @param [model instance] instance Object to convert
+        # @param [Array<Symbol>] only
+        # @param [Array<Symbol>] except
         #
         # @return [String]
         #
         # @api public
-        def to_toml(instance)
+        def to_toml(instance, only: nil, except: nil)
           validate_toml_adapter
-          Shale.toml_adapter.dump(as_toml(instance))
+          Shale.toml_adapter.dump(as_toml(instance, only: only, except: except))
         end
 
         # Convert XML document to Object
         #
-        # @param [Shale::Adapter::<XML adapter>::Node] xml XML to convert
+        # @param [Shale::Adapter::<XML adapter>::Node] element
+        # @param [Array<Symbol>] only
+        # @param [Array<Symbol>] except
         #
-        # @return [Shale::Mapper]
+        # @return [model instance]
         #
         # @api public
-        def of_xml(element)
+        def of_xml(element, only: nil, except: nil)
           instance = model.new
 
           attributes
             .values
             .select { |attr| attr.default }
             .each { |attr| instance.send(attr.setter, attr.default.call) }
+
+          only = to_partial_render_attributes(only)
+          except = to_partial_render_attributes(except)
 
           element.attributes.each do |key, value|
             mapping = xml_mapping.attributes[key.to_s]
@@ -197,6 +282,9 @@ module Shale
             else
               attribute = attributes[mapping.attribute]
               next unless attribute
+
+              next if only && !only.key?(attribute.name)
+              next if except&.key?(attribute.name)
 
               if attribute.collection?
                 instance.send(attribute.name) << attribute.type.cast(value)
@@ -215,8 +303,17 @@ module Shale
               attribute = attributes[content_mapping.attribute]
 
               if attribute
-                value = attribute.type.of_xml(element)
-                instance.send(attribute.setter, attribute.type.cast(value))
+                skip = false
+
+                # rubocop:disable Metrics/BlockNesting
+                skip = true if only && !only.key?(attribute.name)
+                skip = true if except&.key?(attribute.name)
+
+                unless skip
+                  value = attribute.type.of_xml(element)
+                  instance.send(attribute.setter, attribute.type.cast(value))
+                end
+                # rubocop:enable Metrics/BlockNesting
               end
             end
           end
@@ -231,7 +328,21 @@ module Shale
               attribute = attributes[mapping.attribute]
               next unless attribute
 
-              value = attribute.type.of_xml(node)
+              if only
+                attribute_only = only[attribute.name]
+                next unless only.key?(attribute.name)
+              end
+
+              if except
+                attribute_except = except[attribute.name]
+                next if except.key?(attribute.name) && attribute_except.nil?
+              end
+
+              value = attribute.type.of_xml(
+                node,
+                only: attribute_only,
+                except: attribute_except
+              )
 
               if attribute.collection?
                 instance.send(attribute.name) << attribute.type.cast(value)
@@ -247,15 +358,17 @@ module Shale
         # Convert XML to Object
         #
         # @param [String] xml XML to convert
+        # @param [Array<Symbol>] only
+        # @param [Array<Symbol>] except
         #
         # @raise [AdapterError]
         #
-        # @return [Shale::Mapper]
+        # @return [model instance]
         #
         # @api public
-        def from_xml(xml)
+        def from_xml(xml, only: nil, except: nil)
           validate_xml_adapter
-          of_xml(Shale.xml_adapter.load(xml))
+          of_xml(Shale.xml_adapter.load(xml), only: only, except: except)
         end
 
         # Convert Object to XML document
@@ -263,13 +376,15 @@ module Shale
         # @param [any] instance Object to convert
         # @param [String, nil] node_name XML node name
         # @param [Shale::Adapter::<xml adapter>::Document, nil] doc Object to convert
+        # @param [Array<Symbol>] only
+        # @param [Array<Symbol>] except
         #
         # @raise [IncorrectModelError]
         #
         # @return [::REXML::Document, ::Nokogiri::Document, ::Ox::Document]
         #
         # @api public
-        def as_xml(instance, node_name = nil, doc = nil, _cdata = nil)
+        def as_xml(instance, node_name = nil, doc = nil, _cdata = nil, only: nil, except: nil)
           unless instance.is_a?(model)
             msg = "argument is a '#{instance.class}' but should be a '#{model}'"
             raise IncorrectModelError, msg
@@ -277,7 +392,10 @@ module Shale
 
           unless doc
             doc = Shale.xml_adapter.create_document
-            doc.add_element(doc.doc, as_xml(instance, xml_mapping.prefixed_root, doc))
+            doc.add_element(
+              doc.doc,
+              as_xml(instance, xml_mapping.prefixed_root, doc, only: only, except: except)
+            )
             return doc.doc
           end
 
@@ -288,12 +406,18 @@ module Shale
             xml_mapping.default_namespace.name
           )
 
+          only = to_partial_render_attributes(only)
+          except = to_partial_render_attributes(except)
+
           xml_mapping.attributes.each_value do |mapping|
             if mapping.method_to
               new.send(mapping.method_to, instance, element, doc)
             else
               attribute = attributes[mapping.attribute]
               next unless attribute
+
+              next if only && !only.key?(attribute.name)
+              next if except&.key?(attribute.name)
 
               value = instance.send(attribute.name)
 
@@ -313,13 +437,20 @@ module Shale
               attribute = attributes[content_mapping.attribute]
 
               if attribute
-                value = instance.send(attribute.name)
+                skip = false
 
                 # rubocop:disable Metrics/BlockNesting
-                if content_mapping.cdata
-                  doc.create_cdata(value.to_s, element)
-                else
-                  doc.add_text(element, value.to_s)
+                skip = true if only && !only.key?(attribute.name)
+                skip = true if except&.key?(attribute.name)
+
+                unless skip
+                  value = instance.send(attribute.name)
+
+                  if content_mapping.cdata
+                    doc.create_cdata(value.to_s, element)
+                  else
+                    doc.add_text(element, value.to_s)
+                  end
                 end
                 # rubocop:enable Metrics/BlockNesting
               end
@@ -332,6 +463,16 @@ module Shale
             else
               attribute = attributes[mapping.attribute]
               next unless attribute
+
+              if only
+                attribute_only = only[attribute.name]
+                next unless only.key?(attribute.name)
+              end
+
+              if except
+                attribute_except = except[attribute.name]
+                next if except.key?(attribute.name) && attribute_except.nil?
+              end
 
               value = instance.send(attribute.name)
 
@@ -347,11 +488,25 @@ module Shale
               elsif attribute.collection?
                 [*value].each do |v|
                   next if v.nil?
-                  child = attribute.type.as_xml(v, mapping.prefixed_name, doc, mapping.cdata)
+                  child = attribute.type.as_xml(
+                    v,
+                    mapping.prefixed_name,
+                    doc,
+                    mapping.cdata,
+                    only: attribute_only,
+                    except: attribute_except
+                  )
                   doc.add_element(element, child)
                 end
               else
-                child = attribute.type.as_xml(value, mapping.prefixed_name, doc, mapping.cdata)
+                child = attribute.type.as_xml(
+                  value,
+                  mapping.prefixed_name,
+                  doc,
+                  mapping.cdata,
+                  only: attribute_only,
+                  except: attribute_except
+                )
                 doc.add_element(element, child)
               end
             end
@@ -362,7 +517,9 @@ module Shale
 
         # Convert Object to XML
         #
-        # @param [Shale::Mapper] instance Object to convert
+        # @param [model instance] instance Object to convert
+        # @param [Array<Symbol>] only
+        # @param [Array<Symbol>] except
         # @param [true, false] pretty
         # @param [true, false] declaration
         #
@@ -371,9 +528,13 @@ module Shale
         # @return [String]
         #
         # @api public
-        def to_xml(instance, pretty: false, declaration: false)
+        def to_xml(instance, only: nil, except: nil, pretty: false, declaration: false)
           validate_xml_adapter
-          Shale.xml_adapter.dump(as_xml(instance), pretty: pretty, declaration: declaration)
+          Shale.xml_adapter.dump(
+            as_xml(instance, only: only, except: except),
+            pretty: pretty,
+            declaration: declaration
+          )
         end
 
         private
@@ -395,56 +556,94 @@ module Shale
         def validate_xml_adapter
           raise AdapterError, XML_ADAPTER_NOT_SET_MESSAGE unless Shale.xml_adapter
         end
+
+        # Convert array with attributes to a hash
+        #
+        # @param [Array] ary
+        #
+        # @return [Hash, nil]
+        #
+        # @api private
+        def to_partial_render_attributes(ary)
+          return unless ary
+
+          ary.each_with_object([]) do |e, obj|
+            if e.is_a?(Hash)
+              obj.push(*e.to_a)
+            else
+              obj.push([e, nil])
+            end
+          end.to_h
+        end
       end
 
       # Convert Object to Hash
       #
+      # @param [Array<Symbol>] only
+      # @param [Array<Symbol>] except
+      #
       # @return [Hash]
       #
       # @api public
-      def to_hash
-        self.class.to_hash(self)
+      def to_hash(only: nil, except: nil)
+        self.class.to_hash(self, only: only, except: except)
       end
 
       # Convert Object to JSON
       #
+      # @param [Array<Symbol>] only
+      # @param [Array<Symbol>] except
       # @param [true, false] pretty
       #
       # @return [String]
       #
       # @api public
-      def to_json(pretty: false)
-        self.class.to_json(self, pretty: pretty)
+      def to_json(only: nil, except: nil, pretty: false)
+        self.class.to_json(self, only: only, except: except, pretty: pretty)
       end
 
       # Convert Object to YAML
       #
+      # @param [Array<Symbol>] only
+      # @param [Array<Symbol>] except
+      #
       # @return [String]
       #
       # @api public
-      def to_yaml
-        self.class.to_yaml(self)
+      def to_yaml(only: nil, except: nil)
+        self.class.to_yaml(self, only: only, except: except)
       end
 
       # Convert Object to TOML
       #
+      # @param [Array<Symbol>] only
+      # @param [Array<Symbol>] except
+      #
       # @return [String]
       #
       # @api public
-      def to_toml
-        self.class.to_toml(self)
+      def to_toml(only: nil, except: nil)
+        self.class.to_toml(self, only: only, except: except)
       end
 
       # Convert Object to XML
       #
+      # @param [Array<Symbol>] only
+      # @param [Array<Symbol>] except
       # @param [true, false] pretty
       # @param [true, false] declaration
       #
       # @return [String]
       #
       # @api public
-      def to_xml(pretty: false, declaration: false)
-        self.class.to_xml(self, pretty: pretty, declaration: declaration)
+      def to_xml(only: nil, except: nil, pretty: false, declaration: false)
+        self.class.to_xml(
+          self,
+          only: only,
+          except: except,
+          pretty: pretty,
+          declaration: declaration
+        )
       end
     end
   end

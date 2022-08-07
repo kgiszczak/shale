@@ -30,7 +30,7 @@ module Shale
         # @return [any]
         #
         # @api private
-        def of_hash(value)
+        def of_hash(value, **)
           value
         end
 
@@ -41,7 +41,7 @@ module Shale
         # @return [any]
         #
         # @api private
-        def as_hash(value)
+        def as_hash(value, **)
           value
         end
 
@@ -52,7 +52,7 @@ module Shale
         # @return [any]
         #
         # @api private
-        def of_json(value)
+        def of_json(value, **)
           value
         end
 
@@ -63,7 +63,7 @@ module Shale
         # @return [any]
         #
         # @api private
-        def as_json(value)
+        def as_json(value, **)
           value
         end
 
@@ -74,7 +74,7 @@ module Shale
         # @return [any]
         #
         # @api private
-        def of_yaml(value)
+        def of_yaml(value, **)
           value
         end
 
@@ -85,7 +85,7 @@ module Shale
         # @return [any]
         #
         # @api private
-        def as_yaml(value)
+        def as_yaml(value, **)
           value
         end
 
@@ -96,7 +96,7 @@ module Shale
         # @return [any]
         #
         # @api private
-        def of_toml(value)
+        def of_toml(value, **)
           value
         end
 
@@ -107,7 +107,7 @@ module Shale
         # @return [any]
         #
         # @api private
-        def as_toml(value)
+        def as_toml(value, **)
           value
         end
 
@@ -118,7 +118,7 @@ module Shale
         # @return [String]
         #
         # @api private
-        def of_xml(node)
+        def of_xml(node, **)
           node.text
         end
 
@@ -141,7 +141,7 @@ module Shale
         # @param [true, false] cdata
         #
         # @api private
-        def as_xml(value, name, doc, cdata = false)
+        def as_xml(value, name, doc, cdata = false, **)
           element = doc.create_element(name)
 
           if cdata

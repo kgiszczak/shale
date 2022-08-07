@@ -59,7 +59,7 @@ $ gem install shale
 * [Using XML namespaces](#using-xml-namespaces)
 * [Rendering nil values](#rendering-nil-values)
 * [Using methods to extract and generate data](#using-methods-to-extract-and-generate-data)
-* [Pretty printing and XML declaration](#pretty-printing-and-xml-declaration)
+* [Additional options](#additional-options)
 * [Using custom models](#using-custom-models)
 * [Supported types](#supported-types)
 * [Writing your own type](#writing-your-own-type)
@@ -699,7 +699,65 @@ DATA
 #  @city="London">
 ```
 
-### Pretty printing and XML declaration
+### Additional options
+
+You can control what attributes to render and parse by
+using `only: []` and `except: []` parameters.
+
+```ruby
+# e.g. if you have this model graph:
+person = Person.new(
+  first_name: 'John'
+  last_name: 'Doe',
+  address: Address.new(city: 'London', street: 'Oxford Street')
+)
+
+# if you want to render only `first_name` and `address.city` do:
+person.to_json(only: [:first_name, address: [:city]], pretty: true)
+
+# =>
+#
+# {
+#   "first_name": "John",
+#   "address": {
+#     "city": "London"
+#   }
+# }
+
+# and if you don't need an address you can do:
+person.to_json(except: [:address], pretty: true)
+
+# =>
+#
+# {
+#   "first_name": "John",
+#   "last_name": "Doe"
+# }
+```
+
+It works the same for parsing:
+
+```ruby
+# e.g. if you want to parse only `address.city` do:
+Person.from_json(doc, only: [address: [:city]])
+
+# =>
+#
+# #<Person:0x0000000113d7a488
+#  @first_name=nil,
+#  @last_name=nil,
+#  @address=#<Address:0x0000000113d7a140 @street=nil, @city="London">>
+
+# and if you don't need an `address`:
+Person.from_json(doc, except: [:address])
+
+# =>
+#
+# #<Person:0x0000000113d7a488
+#  @first_name="John",
+#  @last_name="Doe",
+#  @address=nil>
+```
 
 If you need formatted output you can pass `pretty: true` parameter to `#to_json` and `#to_xml`
 

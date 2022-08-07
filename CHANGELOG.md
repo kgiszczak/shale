@@ -1,6 +1,7 @@
 ## [0.7.0] - [unreleased]
 
 ### Added
+- `only: []` and `except: []` options that allow to controll what attributes are rendered/parsed
 - `render_nil: true` option that allows to render nil values
 
 ### Changed
