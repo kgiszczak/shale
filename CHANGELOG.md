@@ -5,6 +5,7 @@
 - `render_nil: true` option that allows to render nil values
 
 ### Changed
+- Pass whole document to methods for JSON/YAML/TOML so its behavior is consistent with XML mapping
 - Convert splat arguments to keyword arguments
 - RSpec: enable random spec execution and warnings
 

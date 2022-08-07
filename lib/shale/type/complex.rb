@@ -107,7 +107,7 @@ module Shale
 
               #{format}_mapping.keys.each_value do |mapping|
                 if mapping.method_to
-                  hash[mapping.name] = new.send(mapping.method_to, instance)
+                  new.send(mapping.method_to, instance, hash)
                 else
                   attribute = attributes[mapping.attribute]
                   next unless attribute

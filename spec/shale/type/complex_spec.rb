@@ -136,32 +136,32 @@ module ShaleComplexTesting
       model.root_attr_using = value
     end
 
-    def root_attr_using_to_hash(model)
-      model.root_attr_using
+    def root_attr_using_to_hash(model, doc)
+      doc['root_attr_using'] = model.root_attr_using
     end
 
     def root_attr_using_from_json(model, value)
       model.root_attr_using = value
     end
 
-    def root_attr_using_to_json(model)
-      model.root_attr_using
+    def root_attr_using_to_json(model, doc)
+      doc['root_attr_using'] = model.root_attr_using
     end
 
     def root_attr_using_from_yaml(model, value)
       model.root_attr_using = value
     end
 
-    def root_attr_using_to_yaml(model)
-      model.root_attr_using
+    def root_attr_using_to_yaml(model, doc)
+      doc['root_attr_using'] = model.root_attr_using
     end
 
     def root_attr_using_from_toml(model, value)
       model.root_attr_using = value
     end
 
-    def root_attr_using_to_toml(model)
-      model.root_attr_using
+    def root_attr_using_to_toml(model, doc)
+      doc['root_attr_using'] = model.root_attr_using
     end
 
     def root_attr_attribute_using_from_xml(model, value)
