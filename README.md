@@ -699,6 +699,36 @@ DATA
 #  @city="London">
 ```
 
+You can also pass a `context` object that will be available in extrator/generator methods:
+
+```ruby
+class Person < Shale::Mapper
+  attribute :password, Shale::Type::String
+
+  json do
+    map 'password', using: { from: :password_from_json, to: :password_to_json }
+  end
+
+  def password_from_json(model, value, context)
+    if context.admin?
+      model.password = value
+    else
+      model.password = '*****'
+    end
+  end
+
+  def password_to_json(model, doc, context)
+    if context.admin?
+      doc['password'] = model.password
+    else
+      doc['password'] = '*****'
+    end
+  end
+end
+
+Person.new(password: 'secret').to_json(context: current_user)
+```
+
 ### Additional options
 
 You can control which attributes to render and parse by

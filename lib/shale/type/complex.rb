@@ -18,11 +18,12 @@ module Shale
             # @param [Hash] hash Hash to convert
             # @param [Array<Symbol>] only
             # @param [Array<Symbol>] except
+            # @param [any] context
             #
             # @return [model instance]
             #
             # @api public
-            def of_#{format}(hash, only: nil, except: nil)
+            def of_#{format}(hash, only: nil, except: nil, context: nil)
               instance = model.new
 
               attributes
@@ -40,7 +41,13 @@ module Shale
                 next unless mapping
 
                 if mapping.method_from
-                  new.send(mapping.method_from, instance, value)
+                  mapper = new
+
+                  if mapper.method(mapping.method_from).parameters.length == 3
+                    mapper.send(mapping.method_from, instance, value, context)
+                  else
+                    mapper.send(mapping.method_from, instance, value)
+                  end
                 else
                   attribute = attributes[mapping.attribute]
                   next unless attribute
@@ -63,7 +70,8 @@ module Shale
                         val = attribute.type.of_#{format}(
                           val,
                           only: attribute_only,
-                          except: attribute_except
+                          except: attribute_except,
+                          context: context
                         )
                       end
 
@@ -73,7 +81,8 @@ module Shale
                     val = attribute.type.of_#{format}(
                       value,
                       only: attribute_only,
-                      except: attribute_except
+                      except: attribute_except,
+                      context: context
                     )
                     instance.send(attribute.setter, attribute.type.cast(val))
                   end
@@ -88,13 +97,14 @@ module Shale
             # @param [any] instance Object to convert
             # @param [Array<Symbol>] only
             # @param [Array<Symbol>] except
+            # @param [any] context
             #
             # @raise [IncorrectModelError]
             #
             # @return [Hash]
             #
             # @api public
-            def as_#{format}(instance, only: nil, except: nil)
+            def as_#{format}(instance, only: nil, except: nil, context: nil)
               unless instance.is_a?(model)
                 msg = "argument is a '\#{instance.class}' but should be a '\#{model}'"
                 raise IncorrectModelError, msg
@@ -107,7 +117,13 @@ module Shale
 
               #{format}_mapping.keys.each_value do |mapping|
                 if mapping.method_to
-                  new.send(mapping.method_to, instance, hash)
+                  mapper = new
+
+                  if mapper.method(mapping.method_to).parameters.length == 3
+                    mapper.send(mapping.method_to, instance, hash, context)
+                  else
+                    mapper.send(mapping.method_to, instance, hash)
+                  end
                 else
                   attribute = attributes[mapping.attribute]
                   next unless attribute
@@ -133,6 +149,7 @@ module Shale
                           val,
                           only: attribute_only,
                           except: attribute_except,
+                          context: context
                         )
                       else
                         val
@@ -143,6 +160,7 @@ module Shale
                       value,
                       only: attribute_only,
                       except: attribute_except,
+                      context: context
                     )
                   end
                 end
@@ -162,15 +180,17 @@ module Shale
         # @param [String] json JSON to convert
         # @param [Array<Symbol>] only
         # @param [Array<Symbol>] except
+        # @param [any] context
         #
         # @return [model instance]
         #
         # @api public
-        def from_json(json, only: nil, except: nil)
+        def from_json(json, only: nil, except: nil, context: nil)
           of_json(
             Shale.json_adapter.load(json),
             only: only,
-            except: except
+            except: except,
+            context: context
           )
         end
 
@@ -179,14 +199,15 @@ module Shale
         # @param [model instance] instance Object to convert
         # @param [Array<Symbol>] only
         # @param [Array<Symbol>] except
+        # @param [any] context
         # @param [true, false] pretty
         #
         # @return [String]
         #
         # @api public
-        def to_json(instance, only: nil, except: nil, pretty: false)
+        def to_json(instance, only: nil, except: nil, context: nil, pretty: false)
           Shale.json_adapter.dump(
-            as_json(instance, only: only, except: except),
+            as_json(instance, only: only, except: except, context: context),
             pretty: pretty
           )
         end
@@ -196,15 +217,17 @@ module Shale
         # @param [String] yaml YAML to convert
         # @param [Array<Symbol>] only
         # @param [Array<Symbol>] except
+        # @param [any] context
         #
         # @return [model instance]
         #
         # @api public
-        def from_yaml(yaml, only: nil, except: nil)
+        def from_yaml(yaml, only: nil, except: nil, context: nil)
           of_yaml(
             Shale.yaml_adapter.load(yaml),
             only: only,
-            except: except
+            except: except,
+            context: context
           )
         end
 
@@ -213,12 +236,15 @@ module Shale
         # @param [model instance] instance Object to convert
         # @param [Array<Symbol>] only
         # @param [Array<Symbol>] except
+        # @param [any] context
         #
         # @return [String]
         #
         # @api public
-        def to_yaml(instance, only: nil, except: nil)
-          Shale.yaml_adapter.dump(as_yaml(instance, only: only, except: except))
+        def to_yaml(instance, only: nil, except: nil, context: nil)
+          Shale.yaml_adapter.dump(
+            as_yaml(instance, only: only, except: except, context: context)
+          )
         end
 
         # Convert TOML to Object
@@ -226,16 +252,18 @@ module Shale
         # @param [String] toml TOML to convert
         # @param [Array<Symbol>] only
         # @param [Array<Symbol>] except
+        # @param [any] context
         #
         # @return [model instance]
         #
         # @api public
-        def from_toml(toml, only: nil, except: nil)
+        def from_toml(toml, only: nil, except: nil, context: nil)
           validate_toml_adapter
           of_toml(
             Shale.toml_adapter.load(toml),
             only: only,
-            except: except
+            except: except,
+            context: context
           )
         end
 
@@ -244,13 +272,16 @@ module Shale
         # @param [model instance] instance Object to convert
         # @param [Array<Symbol>] only
         # @param [Array<Symbol>] except
+        # @param [any] context
         #
         # @return [String]
         #
         # @api public
-        def to_toml(instance, only: nil, except: nil)
+        def to_toml(instance, only: nil, except: nil, context: nil)
           validate_toml_adapter
-          Shale.toml_adapter.dump(as_toml(instance, only: only, except: except))
+          Shale.toml_adapter.dump(
+            as_toml(instance, only: only, except: except, context: context)
+          )
         end
 
         # Convert XML document to Object
@@ -258,11 +289,12 @@ module Shale
         # @param [Shale::Adapter::<XML adapter>::Node] element
         # @param [Array<Symbol>] only
         # @param [Array<Symbol>] except
+        # @param [any] context
         #
         # @return [model instance]
         #
         # @api public
-        def of_xml(element, only: nil, except: nil)
+        def of_xml(element, only: nil, except: nil, context: nil)
           instance = model.new
 
           attributes
@@ -278,7 +310,13 @@ module Shale
             next unless mapping
 
             if mapping.method_from
-              new.send(mapping.method_from, instance, value)
+              mapper = new
+
+              if mapper.method(mapping.method_from).parameters.length == 3
+                mapper.send(mapping.method_from, instance, value, context)
+              else
+                mapper.send(mapping.method_from, instance, value)
+              end
             else
               attribute = attributes[mapping.attribute]
               next unless attribute
@@ -298,7 +336,13 @@ module Shale
 
           if content_mapping
             if content_mapping.method_from
-              new.send(content_mapping.method_from, instance, element)
+              mapper = new
+
+              if mapper.method(content_mapping.method_from).parameters.length == 3
+                mapper.send(content_mapping.method_from, instance, element, context)
+              else
+                mapper.send(content_mapping.method_from, instance, element)
+              end
             else
               attribute = attributes[content_mapping.attribute]
 
@@ -323,7 +367,13 @@ module Shale
             next unless mapping
 
             if mapping.method_from
-              new.send(mapping.method_from, instance, node)
+              mapper = new
+
+              if mapper.method(mapping.method_from).parameters.length == 3
+                mapper.send(mapping.method_from, instance, node, context)
+              else
+                mapper.send(mapping.method_from, instance, node)
+              end
             else
               attribute = attributes[mapping.attribute]
               next unless attribute
@@ -341,7 +391,8 @@ module Shale
               value = attribute.type.of_xml(
                 node,
                 only: attribute_only,
-                except: attribute_except
+                except: attribute_except,
+                context: context
               )
 
               if attribute.collection?
@@ -360,15 +411,21 @@ module Shale
         # @param [String] xml XML to convert
         # @param [Array<Symbol>] only
         # @param [Array<Symbol>] except
+        # @param [any] context
         #
         # @raise [AdapterError]
         #
         # @return [model instance]
         #
         # @api public
-        def from_xml(xml, only: nil, except: nil)
+        def from_xml(xml, only: nil, except: nil, context: nil)
           validate_xml_adapter
-          of_xml(Shale.xml_adapter.load(xml), only: only, except: except)
+          of_xml(
+            Shale.xml_adapter.load(xml),
+            only: only,
+            except: except,
+            context: context
+          )
         end
 
         # Convert Object to XML document
@@ -378,13 +435,22 @@ module Shale
         # @param [Shale::Adapter::<xml adapter>::Document, nil] doc Object to convert
         # @param [Array<Symbol>] only
         # @param [Array<Symbol>] except
+        # @param [any] context
         #
         # @raise [IncorrectModelError]
         #
         # @return [::REXML::Document, ::Nokogiri::Document, ::Ox::Document]
         #
         # @api public
-        def as_xml(instance, node_name = nil, doc = nil, _cdata = nil, only: nil, except: nil)
+        def as_xml(
+          instance,
+          node_name = nil,
+          doc = nil,
+          _cdata = nil,
+          only: nil,
+          except: nil,
+          context: nil
+        )
           unless instance.is_a?(model)
             msg = "argument is a '#{instance.class}' but should be a '#{model}'"
             raise IncorrectModelError, msg
@@ -392,10 +458,17 @@ module Shale
 
           unless doc
             doc = Shale.xml_adapter.create_document
-            doc.add_element(
-              doc.doc,
-              as_xml(instance, xml_mapping.prefixed_root, doc, only: only, except: except)
+
+            element = as_xml(
+              instance,
+              xml_mapping.prefixed_root,
+              doc,
+              only: only,
+              except: except,
+              context: context
             )
+            doc.add_element(doc.doc, element)
+
             return doc.doc
           end
 
@@ -411,7 +484,13 @@ module Shale
 
           xml_mapping.attributes.each_value do |mapping|
             if mapping.method_to
-              new.send(mapping.method_to, instance, element, doc)
+              mapper = new
+
+              if mapper.method(mapping.method_to).parameters.length == 4
+                mapper.send(mapping.method_to, instance, element, doc, context)
+              else
+                mapper.send(mapping.method_to, instance, element, doc)
+              end
             else
               attribute = attributes[mapping.attribute]
               next unless attribute
@@ -432,7 +511,13 @@ module Shale
 
           if content_mapping
             if content_mapping.method_to
-              new.send(content_mapping.method_to, instance, element, doc)
+              mapper = new
+
+              if mapper.method(content_mapping.method_to).parameters.length == 4
+                mapper.send(content_mapping.method_to, instance, element, doc, context)
+              else
+                mapper.send(content_mapping.method_to, instance, element, doc)
+              end
             else
               attribute = attributes[content_mapping.attribute]
 
@@ -459,7 +544,13 @@ module Shale
 
           xml_mapping.elements.each_value do |mapping|
             if mapping.method_to
-              new.send(mapping.method_to, instance, element, doc)
+              mapper = new
+
+              if mapper.method(mapping.method_to).parameters.length == 4
+                mapper.send(mapping.method_to, instance, element, doc, context)
+              else
+                mapper.send(mapping.method_to, instance, element, doc)
+              end
             else
               attribute = attributes[mapping.attribute]
               next unless attribute
@@ -494,7 +585,8 @@ module Shale
                     doc,
                     mapping.cdata,
                     only: attribute_only,
-                    except: attribute_except
+                    except: attribute_except,
+                    context: context
                   )
                   doc.add_element(element, child)
                 end
@@ -505,7 +597,8 @@ module Shale
                   doc,
                   mapping.cdata,
                   only: attribute_only,
-                  except: attribute_except
+                  except: attribute_except,
+                  context: context
                 )
                 doc.add_element(element, child)
               end
@@ -520,6 +613,7 @@ module Shale
         # @param [model instance] instance Object to convert
         # @param [Array<Symbol>] only
         # @param [Array<Symbol>] except
+        # @param [any] context
         # @param [true, false] pretty
         # @param [true, false] declaration
         #
@@ -528,10 +622,17 @@ module Shale
         # @return [String]
         #
         # @api public
-        def to_xml(instance, only: nil, except: nil, pretty: false, declaration: false)
+        def to_xml(
+          instance,
+          only: nil,
+          except: nil,
+          context: nil,
+          pretty: false,
+          declaration: false
+        )
           validate_xml_adapter
           Shale.xml_adapter.dump(
-            as_xml(instance, only: only, except: except),
+            as_xml(instance, only: only, except: except, context: context),
             pretty: pretty,
             declaration: declaration
           )
@@ -581,66 +682,78 @@ module Shale
       #
       # @param [Array<Symbol>] only
       # @param [Array<Symbol>] except
+      # @param [any] context
       #
       # @return [Hash]
       #
       # @api public
-      def to_hash(only: nil, except: nil)
-        self.class.to_hash(self, only: only, except: except)
+      def to_hash(only: nil, except: nil, context: nil)
+        self.class.to_hash(self, only: only, except: except, context: context)
       end
 
       # Convert Object to JSON
       #
       # @param [Array<Symbol>] only
       # @param [Array<Symbol>] except
+      # @param [any] context
       # @param [true, false] pretty
       #
       # @return [String]
       #
       # @api public
-      def to_json(only: nil, except: nil, pretty: false)
-        self.class.to_json(self, only: only, except: except, pretty: pretty)
+      def to_json(only: nil, except: nil, context: nil, pretty: false)
+        self.class.to_json(
+          self,
+          only: only,
+          except: except,
+          context: context,
+          pretty: pretty
+        )
       end
 
       # Convert Object to YAML
       #
       # @param [Array<Symbol>] only
       # @param [Array<Symbol>] except
+      # @param [any] context
       #
       # @return [String]
       #
       # @api public
-      def to_yaml(only: nil, except: nil)
-        self.class.to_yaml(self, only: only, except: except)
+      def to_yaml(only: nil, except: nil, context: nil)
+        self.class.to_yaml(self, only: only, except: except, context: context)
       end
 
       # Convert Object to TOML
       #
       # @param [Array<Symbol>] only
       # @param [Array<Symbol>] except
+      # @param [any] context
       #
       # @return [String]
       #
       # @api public
-      def to_toml(only: nil, except: nil)
-        self.class.to_toml(self, only: only, except: except)
+      def to_toml(only: nil, except: nil, context: nil)
+        self.class.to_toml(self, only: only, except: except, context: context)
       end
 
       # Convert Object to XML
       #
       # @param [Array<Symbol>] only
       # @param [Array<Symbol>] except
+      # @param [any] context
       # @param [true, false] pretty
       # @param [true, false] declaration
       #
       # @return [String]
       #
       # @api public
-      def to_xml(only: nil, except: nil, pretty: false, declaration: false)
+      def to_xml(only: nil, except: nil, context: nil, pretty: false, declaration: false)
         self.class.to_xml(
           self,
           only: only,
           except: except,
+          context: context,
           pretty: pretty,
           declaration: declaration
         )

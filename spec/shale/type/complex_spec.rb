@@ -381,6 +381,142 @@ module ShaleComplexTesting
       end
     end
   end
+
+  module ContextOption
+    class Address < Shale::Mapper
+      attribute :city, Shale::Type::String
+      attribute :street, Shale::Type::String
+      attribute :number, Shale::Type::String
+
+      hsh do
+        map 'city', using: { from: :city_from, to: :city_to }
+      end
+
+      json do
+        map 'city', using: { from: :city_from, to: :city_to }
+      end
+
+      yaml do
+        map 'city', using: { from: :city_from, to: :city_to }
+      end
+
+      toml do
+        map 'city', using: { from: :city_from, to: :city_to }
+      end
+
+      xml do
+        root 'address'
+
+        map_content using: { from: :city_from_xml, to: :city_to_xml }
+        map_element 'street', using: { from: :street_from_xml, to: :street_to_xml }
+        map_attribute 'number', using: { from: :number_from_xml, to: :number_to_xml }
+      end
+
+      def city_from(model, value, context)
+        model.city = "#{value}:#{context}"
+      end
+
+      def city_to(model, doc, context)
+        doc['city'] = "#{model.city}:#{context}"
+      end
+
+      def city_from_xml(model, node, context)
+        model.city = "#{node.text}:#{context}"
+      end
+
+      def city_to_xml(model, parent, doc, context)
+        doc.add_text(parent, "#{model.city}:#{context}")
+      end
+
+      def street_from_xml(model, node, context)
+        model.street = "#{node.text}:#{context}"
+      end
+
+      def street_to_xml(model, parent, doc, context)
+        el = doc.create_element('street')
+        doc.add_text(el, "#{model.street}:#{context}")
+        doc.add_element(parent, el)
+      end
+
+      def number_from_xml(model, value, context)
+        model.number = "#{value}:#{context}"
+      end
+
+      def number_to_xml(model, parent, doc, context)
+        doc.add_attribute(parent, 'number', "#{model.number}:#{context}")
+      end
+    end
+
+    class Person < Shale::Mapper
+      attribute :first_name, Shale::Type::String
+      attribute :last_name, Shale::Type::String
+      attribute :age, Shale::Type::String
+      attribute :address, Address
+
+      hsh do
+        map 'first_name', using: { from: :first_name_from, to: :first_name_to }
+        map 'address', to: :address
+      end
+
+      json do
+        map 'first_name', using: { from: :first_name_from, to: :first_name_to }
+        map 'address', to: :address
+      end
+
+      yaml do
+        map 'first_name', using: { from: :first_name_from, to: :first_name_to }
+        map 'address', to: :address
+      end
+
+      toml do
+        map 'first_name', using: { from: :first_name_from, to: :first_name_to }
+        map 'address', to: :address
+      end
+
+      xml do
+        root 'person'
+
+        map_content using: { from: :first_name_from_xml, to: :first_name_to_xml }
+        map_element 'last_name', using: { from: :last_name_from_xml, to: :last_name_to_xml }
+        map_attribute 'age', using: { from: :age_from_xml, to: :age_to_xml }
+        map_element 'address', to: :address
+      end
+
+      def first_name_from(model, value, context)
+        model.first_name = "#{value}:#{context}"
+      end
+
+      def first_name_to(model, doc, context)
+        doc['first_name'] = "#{model.first_name}:#{context}"
+      end
+
+      def first_name_from_xml(model, node, context)
+        model.first_name = "#{node.text}:#{context}"
+      end
+
+      def first_name_to_xml(model, parent, doc, context)
+        doc.add_text(parent, "#{model.first_name}:#{context}")
+      end
+
+      def last_name_from_xml(model, node, context)
+        model.last_name = "#{node.text}:#{context}"
+      end
+
+      def last_name_to_xml(model, parent, doc, context)
+        el = doc.create_element('last_name')
+        doc.add_text(el, "#{model.last_name}:#{context}")
+        doc.add_element(parent, el)
+      end
+
+      def age_from_xml(model, value, context)
+        model.age = "#{value}:#{context}"
+      end
+
+      def age_to_xml(model, parent, doc, context)
+        doc.add_attribute(parent, 'age', "#{model.age}:#{context}")
+      end
+    end
+  end
 end
 
 RSpec.describe Shale::Type::Complex do
@@ -2031,6 +2167,203 @@ RSpec.describe Shale::Type::Complex do
               <Car engine="1.4">Honda</Car>
               <Car engine="2.0">Toyota</Car>
             </Person>
+          DOC
+        end
+      end
+    end
+  end
+
+  context 'with context option' do
+    subject(:mapper) { ShaleComplexTesting::ContextOption::Person }
+    subject(:address_class) { ShaleComplexTesting::ContextOption::Address }
+
+    context 'with hash mapping' do
+      let(:hash) do
+        {
+          'first_name' => 'John',
+          'address' => {
+            'city' => 'London',
+          },
+        }
+      end
+
+      describe '.from_hash' do
+        it 'maps hash to object' do
+          instance = mapper.from_hash(hash, context: 'foo')
+
+          expect(instance.first_name).to eq('John:foo')
+          expect(instance.address.city).to eq('London:foo')
+        end
+      end
+
+      describe '.to_hash' do
+        it 'converts objects to hash' do
+          instance = mapper.new(first_name: 'John', address: address_class.new(city: 'London'))
+
+          result = instance.to_hash(context: 'bar')
+          expect(result).to eq({
+            'first_name' => 'John:bar',
+            'address' => {
+              'city' => 'London:bar',
+            },
+          })
+        end
+      end
+    end
+
+    context 'with JSON mapping' do
+      let(:json) do
+        <<~DOC
+          {
+            "first_name": "John",
+            "address": {
+              "city": "London"
+            }
+          }
+        DOC
+      end
+
+      describe '.from_json' do
+        it 'maps JSON to object' do
+          instance = mapper.from_json(json, context: 'foo')
+
+          expect(instance.first_name).to eq('John:foo')
+          expect(instance.address.city).to eq('London:foo')
+        end
+      end
+
+      describe '.to_json' do
+        it 'converts objects to JSON' do
+          instance = mapper.new(first_name: 'John', address: address_class.new(city: 'London'))
+
+          result = instance.to_json(context: 'bar', pretty: true)
+          expect(result).to eq(<<~DOC.gsub(/\n\z/, ''))
+            {
+              "first_name": "John:bar",
+              "address": {
+                "city": "London:bar"
+              }
+            }
+          DOC
+        end
+      end
+    end
+
+    context 'with YAML mapping' do
+      let(:yaml) do
+        <<~DOC
+          ---
+          first_name: John
+          address:
+            city: London
+        DOC
+      end
+
+      describe '.from_yaml' do
+        it 'maps YAML to object' do
+          instance = mapper.from_yaml(yaml, context: 'foo')
+
+          expect(instance.first_name).to eq('John:foo')
+          expect(instance.address.city).to eq('London:foo')
+        end
+      end
+
+      describe '.to_yaml' do
+        it 'converts objects to YAML' do
+          instance = mapper.new(first_name: 'John', address: address_class.new(city: 'London'))
+
+          result = instance.to_yaml(context: 'bar')
+          expect(result).to eq(<<~DOC)
+            ---
+            first_name: John:bar
+            address:
+              city: London:bar
+          DOC
+        end
+      end
+    end
+
+    context 'with TOML mapping' do
+      let(:toml) do
+        <<~DOC
+          first_name = "John"
+
+          [address]
+          city = "London"
+        DOC
+      end
+
+      describe '.from_toml' do
+        it 'maps TOML to object' do
+          instance = mapper.from_toml(toml, context: 'foo')
+
+          expect(instance.first_name).to eq('John:foo')
+          expect(instance.address.city).to eq('London:foo')
+        end
+      end
+
+      describe '.to_toml' do
+        it 'converts objects to TOML' do
+          instance = mapper.new(first_name: 'John', address: address_class.new(city: 'London'))
+
+          result = instance.to_toml(context: 'bar')
+          expect(result).to eq(<<~DOC)
+            first_name = "John:bar"
+
+            [address]
+            city = "London:bar"
+          DOC
+        end
+      end
+    end
+
+    context 'with XML mapping' do
+      let(:xml) do
+        <<~DOC
+          <person age="44">
+            John
+            <last_name>Doe</last_name>
+            <address number="12">
+              London
+              <street>Oxford Street</street>
+            </address>
+          </person>
+        DOC
+      end
+
+      describe '.from_xml' do
+        it 'maps XML to object' do
+          instance = mapper.from_xml(xml, context: 'foo')
+
+          expect(instance.first_name).to eq("\n  John\n  :foo")
+          expect(instance.last_name).to eq('Doe:foo')
+          expect(instance.age).to eq('44:foo')
+          expect(instance.address.city).to eq("\n    London\n    :foo")
+          expect(instance.address.street).to eq('Oxford Street:foo')
+          expect(instance.address.number).to eq('12:foo')
+        end
+      end
+
+      describe '.to_xml' do
+        it 'converts objects to XML' do
+          instance = mapper.new(
+            first_name: 'John',
+            last_name: 'Doe',
+            age: '44',
+            address: address_class.new(city: 'London', street: 'Oxford Street', number: '12')
+          )
+
+          result = instance.to_xml(context: 'bar', pretty: true)
+
+          expect(result).to eq(<<~DOC.gsub(/\n\z/, ''))
+            <person age="44:bar">
+              John:bar
+              <last_name>Doe:bar</last_name>
+              <address number="12:bar">
+                London:bar
+                <street>Oxford Street:bar</street>
+              </address>
+            </person>
           DOC
         end
       end
