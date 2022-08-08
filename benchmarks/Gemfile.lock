@@ -1,0 +1,35 @@
+PATH
+  remote: ..
+  specs:
+    shale (0.6.0)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    benchmark-ips (2.10.0)
+    declarative (0.0.20)
+    multi_json (1.15.0)
+    nokogiri (1.13.8-x86_64-darwin)
+      racc (~> 1.4)
+    ox (2.14.11)
+    racc (1.6.0)
+    representable (3.2.0)
+      declarative (< 0.1.0)
+      trailblazer-option (>= 0.1.1, < 0.2.0)
+      uber (< 0.2.0)
+    trailblazer-option (0.1.2)
+    uber (0.1.0)
+
+PLATFORMS
+  x86_64-darwin-20
+
+DEPENDENCIES
+  benchmark-ips
+  multi_json
+  nokogiri
+  ox
+  representable
+  shale!
+
+BUNDLED WITH
+   2.3.10

@@ -104,7 +104,7 @@ module BuildNokogiriXpath
 
     def build_report(xml)
       Report.new(
-        people: xml.xpath('people/person').map { |e| build_person(e) }
+        people: xml.xpath('report/person').map { |e| build_person(e) }
       )
     end
   end

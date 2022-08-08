@@ -104,7 +104,7 @@ module BuildNokogiriCss
 
     def build_report(xml)
       Report.new(
-        people: xml.css('people person').map { |e| build_person(e) }
+        people: xml.css('report person').map { |e| build_person(e) }
       )
     end
   end

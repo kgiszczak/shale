@@ -1,5 +1,4 @@
-
-<people>
+<report>
   <person>
     <first_name>John</first_name>
     <last_name>Doe</last_name>
@@ -18120,4 +18119,4 @@
       </pet>
     </child>
   </person>
-</people>
+</report>
