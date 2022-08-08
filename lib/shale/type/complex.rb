@@ -43,7 +43,7 @@ module Shale
                 if mapping.method_from
                   mapper = new
 
-                  if mapper.method(mapping.method_from).parameters.length == 3
+                  if mapper.method(mapping.method_from).arity == 3
                     mapper.send(mapping.method_from, instance, value, context)
                   else
                     mapper.send(mapping.method_from, instance, value)
@@ -119,7 +119,7 @@ module Shale
                 if mapping.method_to
                   mapper = new
 
-                  if mapper.method(mapping.method_to).parameters.length == 3
+                  if mapper.method(mapping.method_to).arity == 3
                     mapper.send(mapping.method_to, instance, hash, context)
                   else
                     mapper.send(mapping.method_to, instance, hash)
@@ -312,7 +312,7 @@ module Shale
             if mapping.method_from
               mapper = new
 
-              if mapper.method(mapping.method_from).parameters.length == 3
+              if mapper.method(mapping.method_from).arity == 3
                 mapper.send(mapping.method_from, instance, value, context)
               else
                 mapper.send(mapping.method_from, instance, value)
@@ -338,7 +338,7 @@ module Shale
             if content_mapping.method_from
               mapper = new
 
-              if mapper.method(content_mapping.method_from).parameters.length == 3
+              if mapper.method(content_mapping.method_from).arity == 3
                 mapper.send(content_mapping.method_from, instance, element, context)
               else
                 mapper.send(content_mapping.method_from, instance, element)
@@ -369,7 +369,7 @@ module Shale
             if mapping.method_from
               mapper = new
 
-              if mapper.method(mapping.method_from).parameters.length == 3
+              if mapper.method(mapping.method_from).arity == 3
                 mapper.send(mapping.method_from, instance, node, context)
               else
                 mapper.send(mapping.method_from, instance, node)
@@ -486,7 +486,7 @@ module Shale
             if mapping.method_to
               mapper = new
 
-              if mapper.method(mapping.method_to).parameters.length == 4
+              if mapper.method(mapping.method_to).arity == 4
                 mapper.send(mapping.method_to, instance, element, doc, context)
               else
                 mapper.send(mapping.method_to, instance, element, doc)
@@ -513,7 +513,7 @@ module Shale
             if content_mapping.method_to
               mapper = new
 
-              if mapper.method(content_mapping.method_to).parameters.length == 4
+              if mapper.method(content_mapping.method_to).arity == 4
                 mapper.send(content_mapping.method_to, instance, element, doc, context)
               else
                 mapper.send(content_mapping.method_to, instance, element, doc)
@@ -546,7 +546,7 @@ module Shale
             if mapping.method_to
               mapper = new
 
-              if mapper.method(mapping.method_to).parameters.length == 4
+              if mapper.method(mapping.method_to).arity == 4
                 mapper.send(mapping.method_to, instance, element, doc, context)
               else
                 mapper.send(mapping.method_to, instance, element, doc)
