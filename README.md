@@ -699,7 +699,7 @@ DATA
 #  @city="London">
 ```
 
-You can also pass a `context` object that will be available in extrator/generator methods:
+You can also pass a `context` object that will be available in extractor/generator methods:
 
 ```ruby
 class Person < Shale::Mapper
