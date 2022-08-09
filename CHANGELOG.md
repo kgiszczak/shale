@@ -1,4 +1,4 @@
-## [0.7.0] - [unreleased]
+## [0.7.0] - [2022-08-09]
 
 ### Added
 - `only: []` and `except: []` options that allow to controll what attributes are rendered/parsed
