@@ -13,15 +13,14 @@ require_relative 'lib/representers'
 
 json = File.read('./data/report.json')
 xml = File.read('./data/report.xml')
-
-json_hash = JSON.parse(json)
+hash = JSON.parse(json)
 
 Validator.validate!(
-  FromHash.build_report(json_hash),
-  ReportMapper.of_json(json_hash)
+  FromHash.build_report(hash),
+  ReportMapper.of_json(hash)
 )
 Validator.validate!(
-  FromHash.build_report(json_hash),
+  FromHash.build_report(hash),
   ReportRepresenterJSON.new(Report.new).from_json(json)
 )
 
@@ -45,7 +44,7 @@ end
 
 puts "\n\nto_json\n\n"
 
-report = ReportMapper.of_json(json_hash)
+report = ReportMapper.of_json(hash)
 
 Benchmark.ips do |x|
   x.report('By hand') do
@@ -63,27 +62,27 @@ Benchmark.ips do |x|
   x.compare!
 end
 
-puts "\n\nof_json\n\n"
+puts "\n\nfrom_hash\n\n"
 
 Benchmark.ips do |x|
   x.report('By hand') do
-    FromHash.build_report(json_hash)
+    FromHash.build_report(hash)
   end
 
   x.report('Shale') do
-    ReportMapper.of_json(json_hash)
+    ReportMapper.from_hash(hash)
   end
 
   x.report('Representable') do
-    ReportRepresenterJSON.new(Report.new).from_hash(json_hash)
+    ReportRepresenterJSON.new(Report.new).from_hash(hash)
   end
 
   x.compare!
 end
 
-puts "\n\nas_json\n\n"
+puts "\n\nto_hash\n\n"
 
-report = ReportMapper.of_json(json_hash)
+report = ReportMapper.from_hash(hash)
 
 Benchmark.ips do |x|
   x.report('By hand') do
@@ -91,7 +90,7 @@ Benchmark.ips do |x|
   end
 
   x.report('Shale') do
-    ReportMapper.as_json(report)
+    ReportMapper.to_hash(report)
   end
 
   x.report('Representable') do

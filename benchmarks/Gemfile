@@ -4,9 +4,10 @@ source 'https://rubygems.org'
 
 gem 'benchmark-ips'
 
-gem 'representable'
 gem 'multi_json'
 gem 'nokogiri'
 gem 'ox'
+gem 'representable'
+gem 'rexml'
 
 gem 'shale', path: '../'

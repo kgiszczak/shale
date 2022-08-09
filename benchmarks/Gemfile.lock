@@ -17,6 +17,7 @@ GEM
       declarative (< 0.1.0)
       trailblazer-option (>= 0.1.1, < 0.2.0)
       uber (< 0.2.0)
+    rexml (3.2.5)
     trailblazer-option (0.1.2)
     uber (0.1.0)
 
@@ -29,6 +30,7 @@ DEPENDENCIES
   nokogiri
   ox
   representable
+  rexml
   shale!
 
 BUNDLED WITH
