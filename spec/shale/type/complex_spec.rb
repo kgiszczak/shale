@@ -517,6 +517,29 @@ module ShaleComplexTesting
       end
     end
   end
+
+  module Types
+    class Child < Shale::Mapper
+      attribute :type_boolean, Shale::Type::Boolean
+      attribute :type_date, Shale::Type::Date
+      attribute :type_float, Shale::Type::Float
+      attribute :type_integer, Shale::Type::Integer
+      attribute :type_string, Shale::Type::String
+      attribute :type_time, Shale::Type::Time
+      attribute :type_value, Shale::Type::Value
+    end
+
+    class Root < Shale::Mapper
+      attribute :type_boolean, Shale::Type::Boolean
+      attribute :type_date, Shale::Type::Date
+      attribute :type_float, Shale::Type::Float
+      attribute :type_integer, Shale::Type::Integer
+      attribute :type_string, Shale::Type::String
+      attribute :type_time, Shale::Type::Time
+      attribute :type_value, Shale::Type::Value
+      attribute :child, Child
+    end
+  end
 end
 
 RSpec.describe Shale::Type::Complex do
@@ -2365,6 +2388,284 @@ RSpec.describe Shale::Type::Complex do
               </address>
             </person>
           DOC
+        end
+      end
+    end
+  end
+
+  context 'with different types' do
+    subject(:mapper) { ShaleComplexTesting::Types::Root }
+
+    context 'with hash mapping' do
+      let(:hash) do
+        {
+          'type_boolean' => true,
+          'type_date' => Date.new(2022, 1, 1),
+          'type_float' => 1.1,
+          'type_integer' => 1,
+          'type_string' => 'foo',
+          'type_time' => Time.new(2021, 1, 1, 10, 10, 10, '+01:00'),
+          'type_value' => 'foo',
+          'child' => {
+            'type_boolean' => true,
+            'type_date' => Date.new(2022, 1, 1),
+            'type_float' => 1.1,
+            'type_integer' => 1,
+            'type_string' => 'foo',
+            'type_time' => Time.new(2021, 1, 1, 10, 10, 10, '+01:00'),
+            'type_value' => 'foo',
+          },
+        }
+      end
+
+      describe '.from_hash' do
+        it 'maps hash to object' do
+          instance = mapper.from_hash(hash)
+
+          expect(instance.type_boolean).to eq(true)
+          expect(instance.type_date).to eq(Date.new(2022, 1, 1))
+          expect(instance.type_float).to eq(1.1)
+          expect(instance.type_integer).to eq(1)
+          expect(instance.type_string).to eq('foo')
+          expect(instance.type_time).to eq(Time.new(2021, 1, 1, 10, 10, 10, '+01:00'))
+          expect(instance.type_value).to eq('foo')
+
+          expect(instance.child.type_boolean).to eq(true)
+          expect(instance.child.type_date).to eq(Date.new(2022, 1, 1))
+          expect(instance.child.type_float).to eq(1.1)
+          expect(instance.child.type_integer).to eq(1)
+          expect(instance.child.type_string).to eq('foo')
+          expect(instance.child.type_time).to eq(Time.new(2021, 1, 1, 10, 10, 10, '+01:00'))
+          expect(instance.child.type_value).to eq('foo')
+        end
+      end
+
+      describe '.to_hash' do
+        it 'converts objects to hash' do
+          instance = mapper.from_hash(hash)
+
+          result = instance.to_hash
+          expect(result).to eq(hash)
+        end
+      end
+    end
+
+    context 'with JSON mapping' do
+      let(:json) do
+        <<~DOC
+          {
+            "type_boolean": true,
+            "type_date": "2022-01-01",
+            "type_float": 1.1,
+            "type_integer": 1,
+            "type_string": "foo",
+            "type_time": "2021-01-01T10:10:10+01:00",
+            "type_value": "foo",
+            "child": {
+              "type_boolean": true,
+              "type_date": "2022-01-01",
+              "type_float": 1.1,
+              "type_integer": 1,
+              "type_string": "foo",
+              "type_time": "2021-01-01T10:10:10+01:00",
+              "type_value": "foo"
+            }
+          }
+        DOC
+      end
+
+      describe '.from_json' do
+        it 'maps JSON to object' do
+          instance = mapper.from_json(json)
+
+          expect(instance.type_boolean).to eq(true)
+          expect(instance.type_date).to eq(Date.new(2022, 1, 1))
+          expect(instance.type_float).to eq(1.1)
+          expect(instance.type_integer).to eq(1)
+          expect(instance.type_string).to eq('foo')
+          expect(instance.type_time).to eq(Time.new(2021, 1, 1, 10, 10, 10, '+01:00'))
+          expect(instance.type_value).to eq('foo')
+
+          expect(instance.child.type_boolean).to eq(true)
+          expect(instance.child.type_date).to eq(Date.new(2022, 1, 1))
+          expect(instance.child.type_float).to eq(1.1)
+          expect(instance.child.type_integer).to eq(1)
+          expect(instance.child.type_string).to eq('foo')
+          expect(instance.child.type_time).to eq(Time.new(2021, 1, 1, 10, 10, 10, '+01:00'))
+          expect(instance.child.type_value).to eq('foo')
+        end
+      end
+
+      describe '.to_json' do
+        it 'converts objects to JSON' do
+          instance = mapper.from_json(json)
+
+          result = instance.to_json(pretty: true)
+          expect(result).to eq(json.gsub(/\n\z/, ''))
+        end
+      end
+    end
+
+    context 'with YAML mapping' do
+      let(:yaml) do
+        <<~DOC
+          ---
+          type_boolean: true
+          type_date: '2022-01-01'
+          type_float: 1.1
+          type_integer: 1
+          type_string: foo
+          type_time: '2021-01-01T10:10:10+01:00'
+          type_value: foo
+          child:
+            type_boolean: true
+            type_date: '2022-01-01'
+            type_float: 1.1
+            type_integer: 1
+            type_string: foo
+            type_time: '2021-01-01T10:10:10+01:00'
+            type_value: foo
+        DOC
+      end
+
+      describe '.from_yaml' do
+        it 'maps YAML to object' do
+          instance = mapper.from_yaml(yaml)
+
+          expect(instance.type_boolean).to eq(true)
+          expect(instance.type_date).to eq(Date.new(2022, 1, 1))
+          expect(instance.type_float).to eq(1.1)
+          expect(instance.type_integer).to eq(1)
+          expect(instance.type_string).to eq('foo')
+          expect(instance.type_time).to eq(Time.new(2021, 1, 1, 10, 10, 10, '+01:00'))
+          expect(instance.type_value).to eq('foo')
+
+          expect(instance.child.type_boolean).to eq(true)
+          expect(instance.child.type_date).to eq(Date.new(2022, 1, 1))
+          expect(instance.child.type_float).to eq(1.1)
+          expect(instance.child.type_integer).to eq(1)
+          expect(instance.child.type_string).to eq('foo')
+          expect(instance.child.type_time).to eq(Time.new(2021, 1, 1, 10, 10, 10, '+01:00'))
+          expect(instance.child.type_value).to eq('foo')
+        end
+      end
+
+      describe '.to_yaml' do
+        it 'converts objects to YAML' do
+          instance = mapper.from_yaml(yaml)
+
+          result = instance.to_yaml
+          expect(result).to eq(yaml)
+        end
+      end
+    end
+
+    context 'with TOML mapping' do
+      let(:toml) do
+        <<~DOC
+          type_boolean = true
+          type_date = 2022-01-01
+          type_float = 1.1
+          type_integer = 1
+          type_string = "foo"
+          type_time = 2021-01-01T10:10:10.000+01:00
+          type_value = "foo"
+
+          [child]
+          type_boolean = true
+          type_date = 2022-01-01
+          type_float = 1.1
+          type_integer = 1
+          type_string = "foo"
+          type_time = 2021-01-01T10:10:10.000+01:00
+          type_value = "foo"
+        DOC
+      end
+
+      describe '.from_toml' do
+        it 'maps TOML to object' do
+          instance = mapper.from_toml(toml)
+
+          expect(instance.type_boolean).to eq(true)
+          expect(instance.type_date).to eq(Date.new(2022, 1, 1))
+          expect(instance.type_float).to eq(1.1)
+          expect(instance.type_integer).to eq(1)
+          expect(instance.type_string).to eq('foo')
+          expect(instance.type_time).to eq(Time.new(2021, 1, 1, 10, 10, 10, '+01:00'))
+          expect(instance.type_value).to eq('foo')
+
+          expect(instance.child.type_boolean).to eq(true)
+          expect(instance.child.type_date).to eq(Date.new(2022, 1, 1))
+          expect(instance.child.type_float).to eq(1.1)
+          expect(instance.child.type_integer).to eq(1)
+          expect(instance.child.type_string).to eq('foo')
+          expect(instance.child.type_time).to eq(Time.new(2021, 1, 1, 10, 10, 10, '+01:00'))
+          expect(instance.child.type_value).to eq('foo')
+        end
+      end
+
+      describe '.to_toml' do
+        it 'converts objects to TOML' do
+          instance = mapper.from_toml(toml)
+
+          result = instance.to_toml
+          expect(result).to eq(toml)
+        end
+      end
+    end
+
+    context 'with XML mapping' do
+      let(:xml) do
+        <<~DOC
+          <root>
+            <type_boolean>true</type_boolean>
+            <type_date>2022-01-01</type_date>
+            <type_float>1.1</type_float>
+            <type_integer>1</type_integer>
+            <type_string>foo</type_string>
+            <type_time>2021-01-01T10:10:10+01:00</type_time>
+            <type_value>foo</type_value>
+            <child>
+              <type_boolean>true</type_boolean>
+              <type_date>2022-01-01</type_date>
+              <type_float>1.1</type_float>
+              <type_integer>1</type_integer>
+              <type_string>foo</type_string>
+              <type_time>2021-01-01T10:10:10+01:00</type_time>
+              <type_value>foo</type_value>
+            </child>
+          </root>
+        DOC
+      end
+
+      describe '.from_xml' do
+        it 'maps XML to object' do
+          instance = mapper.from_xml(xml)
+
+          expect(instance.type_boolean).to eq(true)
+          expect(instance.type_date).to eq(Date.new(2022, 1, 1))
+          expect(instance.type_float).to eq(1.1)
+          expect(instance.type_integer).to eq(1)
+          expect(instance.type_string).to eq('foo')
+          expect(instance.type_time).to eq(Time.new(2021, 1, 1, 10, 10, 10, '+01:00'))
+          expect(instance.type_value).to eq('foo')
+
+          expect(instance.child.type_boolean).to eq(true)
+          expect(instance.child.type_date).to eq(Date.new(2022, 1, 1))
+          expect(instance.child.type_float).to eq(1.1)
+          expect(instance.child.type_integer).to eq(1)
+          expect(instance.child.type_string).to eq('foo')
+          expect(instance.child.type_time).to eq(Time.new(2021, 1, 1, 10, 10, 10, '+01:00'))
+          expect(instance.child.type_value).to eq('foo')
+        end
+      end
+
+      describe '.to_xml' do
+        it 'converts objects to XML' do
+          instance = mapper.from_xml(xml)
+
+          result = instance.to_xml(pretty: true)
+          expect(result).to eq(xml.gsub(/\n\z/, ''))
         end
       end
     end

@@ -52,6 +52,13 @@ RSpec.describe Shale::Type::Time do
         expect(described_class.as_json(time)).to eq('2021-01-01T10:10:10+01:00')
       end
     end
+
+    context 'with extra params' do
+      it 'returns ISO formatted time' do
+        time = Time.new(2021, 1, 1, 10, 10, 10, '+01:00')
+        expect(described_class.as_json(time, context: nil)).to eq('2021-01-01T10:10:10+01:00')
+      end
+    end
   end
 
   describe '.as_yaml' do
@@ -65,6 +72,13 @@ RSpec.describe Shale::Type::Time do
       it 'returns ISO formatted time' do
         time = Time.new(2021, 1, 1, 10, 10, 10, '+01:00')
         expect(described_class.as_yaml(time)).to eq('2021-01-01T10:10:10+01:00')
+      end
+    end
+
+    context 'with extra params' do
+      it 'returns ISO formatted time' do
+        time = Time.new(2021, 1, 1, 10, 10, 10, '+01:00')
+        expect(described_class.as_yaml(time, context: nil)).to eq('2021-01-01T10:10:10+01:00')
       end
     end
   end

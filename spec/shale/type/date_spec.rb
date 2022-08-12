@@ -50,6 +50,13 @@ RSpec.describe Shale::Type::Date do
         expect(described_class.as_json(date)).to eq('2021-01-01')
       end
     end
+
+    context 'with extra params' do
+      it 'returns ISO formatted date' do
+        date = Date.new(2021, 1, 1)
+        expect(described_class.as_json(date, context: nil)).to eq('2021-01-01')
+      end
+    end
   end
 
   describe '.as_yaml' do
@@ -63,6 +70,13 @@ RSpec.describe Shale::Type::Date do
       it 'returns ISO formatted date' do
         date = Date.new(2021, 1, 1)
         expect(described_class.as_yaml(date)).to eq('2021-01-01')
+      end
+    end
+
+    context 'with extra params' do
+      it 'returns ISO formatted date' do
+        date = Date.new(2021, 1, 1)
+        expect(described_class.as_yaml(date, context: nil)).to eq('2021-01-01')
       end
     end
   end

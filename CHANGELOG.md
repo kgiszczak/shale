@@ -1,3 +1,8 @@
+## [0.7.1] - [unreleased]
+
+### Fixed
+- Fix broken handling of Date and Time types
+
 ## [0.7.0] - [2022-08-09]
 
 ### Added

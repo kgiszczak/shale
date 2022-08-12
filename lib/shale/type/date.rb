@@ -32,7 +32,7 @@ module Shale
       # @return [String]
       #
       # @api private
-      def self.as_json(value)
+      def self.as_json(value, **)
         value&.iso8601
       end
 
@@ -43,7 +43,7 @@ module Shale
       # @return [String]
       #
       # @api private
-      def self.as_yaml(value)
+      def self.as_yaml(value, **)
         value&.iso8601
       end
 
