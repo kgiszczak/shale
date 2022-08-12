@@ -1,4 +1,4 @@
-## [0.7.1] - [unreleased]
+## [0.7.1] - [2022-08-12]
 
 ### Fixed
 - Fix broken handling of Date and Time types
