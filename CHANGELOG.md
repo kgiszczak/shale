@@ -1,3 +1,9 @@
+## [0.8.0] - [unreleased]
+
+### Changed
+- Use anonymous module for attributes definition.
+  It allows to override accessors and `super` works as expected.
+
 ## [0.7.1] - [2022-08-12]
 
 ### Fixed

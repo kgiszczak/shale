@@ -171,6 +171,38 @@ module ShaleMapperTesting
   class FinalizedChild2 < FinalizedParent2
     attribute :two, Shale::Type::String
   end
+
+  class AttributesModuleParent < Shale::Mapper
+    attribute :parent, Shale::Type::String
+
+    def parent
+      "#{super}!"
+    end
+
+    def parent=(val)
+      super("!#{val}")
+    end
+  end
+
+  class AttributesModuleChild < AttributesModuleParent
+    attribute :child, Shale::Type::String
+
+    def parent
+      "#{super}?"
+    end
+
+    def parent=(val)
+      super("?#{val}")
+    end
+
+    def child
+      "#{super}?"
+    end
+
+    def child=(val)
+      super("?#{val}")
+    end
+  end
 end
 
 RSpec.describe Shale::Mapper do
@@ -405,6 +437,23 @@ RSpec.describe Shale::Mapper do
         subject = ShaleMapperTesting::Parent.new
         subject.foo_int = '123'
         expect(subject.foo_int).to eq(123)
+      end
+
+      it 'sets accessor on anonymous module' do
+        parent = ShaleMapperTesting::AttributesModuleParent.new
+        child = ShaleMapperTesting::AttributesModuleChild.new
+
+        parent.parent = 'foo'
+
+        child.parent = 'bar'
+        child.child = 'baz'
+
+        expect(parent.class.ancestors[1].instance_methods).to contain_exactly(:parent, :parent=)
+        expect(child.class.ancestors[1].instance_methods).to contain_exactly(:child, :child=)
+
+        expect(parent.parent).to eq('!foo!')
+        expect(child.parent).to eq('!?bar!?')
+        expect(child.child).to eq('?baz?')
       end
 
       it 'sets attributes' do

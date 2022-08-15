@@ -98,6 +98,10 @@ module Shale
       def inherited(subclass)
         super
 
+        attributes_module = Module.new
+        subclass.instance_variable_set('@attributes_module', attributes_module)
+        subclass.include(attributes_module)
+
         subclass.instance_variable_set('@model', subclass)
         subclass.instance_variable_set('@attributes', @attributes.dup)
 
@@ -171,7 +175,7 @@ module Shale
         @toml_mapping.map(name.to_s, to: name) unless @toml_mapping.finalized?
         @xml_mapping.map_element(name.to_s, to: name) unless @xml_mapping.finalized?
 
-        class_eval(<<-RUBY, __FILE__, __LINE__ + 1)
+        @attributes_module.class_eval(<<-RUBY, __FILE__, __LINE__ + 1)
           attr_reader :#{name}
 
           def #{name}=(val)
