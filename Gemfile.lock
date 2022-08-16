@@ -58,11 +58,11 @@ GEM
     simplecov_json_formatter (0.1.4)
     toml-rb (2.1.2)
       citrus (~> 3.0, > 3.0)
-    tomlib (0.4.0)
+    tomlib (0.5.0)
     unicode-display_width (2.2.0)
 
 PLATFORMS
-  ruby
+  x86_64-darwin-20
   x86_64-linux
 
 DEPENDENCIES
@@ -78,4 +78,4 @@ DEPENDENCIES
   tomlib
 
 BUNDLED WITH
-   2.3.16
+   2.3.20

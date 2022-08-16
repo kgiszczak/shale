@@ -1,15 +1,18 @@
 ## [0.8.0] - [unreleased]
 
+### Added
+- Bring back Ruby 2.6 support
+
 ### Changed
 - Use anonymous module for attributes definition.
   It allows to override accessors and `super` works as expected.
 
-## [0.7.1] - [2022-08-12]
+## [0.7.1] - 2022-08-12
 
 ### Fixed
 - Fix broken handling of Date and Time types
 
-## [0.7.0] - [2022-08-09]
+## [0.7.0] - 2022-08-09
 
 ### Added
 - `only: []` and `except: []` options that allow to controll what attributes are rendered/parsed
