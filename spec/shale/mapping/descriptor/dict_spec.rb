@@ -9,6 +9,7 @@ RSpec.describe Shale::Mapping::Descriptor::Dict do
         name: 'foo',
         attribute: :bar,
         methods: nil,
+        group: nil,
         render_nil: false
       )
       expect(obj.name).to eq('foo')
@@ -22,6 +23,7 @@ RSpec.describe Shale::Mapping::Descriptor::Dict do
           name: 'foo',
           attribute: :bar,
           methods: nil,
+          group: nil,
           render_nil: false
         )
         expect(obj.attribute).to eq(:bar)
@@ -34,6 +36,7 @@ RSpec.describe Shale::Mapping::Descriptor::Dict do
           name: 'foo',
           attribute: nil,
           methods: nil,
+          group: nil,
           render_nil: false
         )
         expect(obj.attribute).to eq(nil)
@@ -48,6 +51,7 @@ RSpec.describe Shale::Mapping::Descriptor::Dict do
           name: 'foo',
           attribute: :bar,
           methods: { from: :met_from, to: :met_to },
+          group: nil,
           render_nil: false
         )
         expect(obj.method_from).to eq(:met_from)
@@ -60,6 +64,7 @@ RSpec.describe Shale::Mapping::Descriptor::Dict do
           name: 'foo',
           attribute: :bar,
           methods: nil,
+          group: nil,
           render_nil: false
         )
         expect(obj.method_from).to eq(nil)
@@ -74,6 +79,7 @@ RSpec.describe Shale::Mapping::Descriptor::Dict do
           name: 'foo',
           attribute: :bar,
           methods: { from: :met_from, to: :met_to },
+          group: nil,
           render_nil: false
         )
         expect(obj.method_to).to eq(:met_to)
@@ -86,9 +92,38 @@ RSpec.describe Shale::Mapping::Descriptor::Dict do
           name: 'foo',
           attribute: :bar,
           methods: nil,
+          group: nil,
           render_nil: false
         )
         expect(obj.method_to).to eq(nil)
+      end
+    end
+  end
+
+  describe '#group' do
+    context 'when group is set' do
+      it 'returns group' do
+        obj = described_class.new(
+          name: 'foo',
+          attribute: nil,
+          methods: nil,
+          group: 'foobar',
+          render_nil: false
+        )
+        expect(obj.group).to eq('foobar')
+      end
+    end
+
+    context 'when group is not set' do
+      it 'returns nil' do
+        obj = described_class.new(
+          name: 'foo',
+          attribute: nil,
+          methods: nil,
+          group: nil,
+          render_nil: false
+        )
+        expect(obj.group).to eq(nil)
       end
     end
   end
@@ -100,6 +135,7 @@ RSpec.describe Shale::Mapping::Descriptor::Dict do
           name: 'foo',
           attribute: :bar,
           methods: nil,
+          group: nil,
           render_nil: true
         )
         expect(obj.render_nil?).to eq(true)
@@ -112,6 +148,7 @@ RSpec.describe Shale::Mapping::Descriptor::Dict do
           name: 'foo',
           attribute: :bar,
           methods: nil,
+          group: nil,
           render_nil: false
         )
         expect(obj.render_nil?).to eq(false)
@@ -124,6 +161,7 @@ RSpec.describe Shale::Mapping::Descriptor::Dict do
           name: 'foo',
           attribute: :bar,
           methods: nil,
+          group: nil,
           render_nil: nil
         )
         expect(obj.render_nil?).to eq(false)
@@ -136,6 +174,7 @@ RSpec.describe Shale::Mapping::Descriptor::Dict do
           name: 'foo',
           attribute: :bar,
           methods: nil,
+          group: nil,
           render_nil: 'foobar'
         )
         expect(obj.render_nil?).to eq(false)

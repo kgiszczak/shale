@@ -69,6 +69,10 @@ module ShaleMapperTesting
 
     hsh do
       map 'bar', to: :foo
+      using from: :method_from, to: :method_to do
+        map 'baz'
+        map 'qux'
+      end
     end
   end
 
@@ -77,6 +81,10 @@ module ShaleMapperTesting
 
     json do
       map 'bar', to: :foo
+      using from: :method_from, to: :method_to do
+        map 'baz'
+        map 'qux'
+      end
     end
   end
 
@@ -85,6 +93,10 @@ module ShaleMapperTesting
 
     yaml do
       map 'bar', to: :foo
+      using from: :method_from, to: :method_to do
+        map 'baz'
+        map 'qux'
+      end
     end
   end
 
@@ -93,6 +105,10 @@ module ShaleMapperTesting
 
     toml do
       map 'bar', to: :foo
+      using from: :method_from, to: :method_to do
+        map 'baz'
+        map 'qux'
+      end
     end
   end
 
@@ -109,6 +125,10 @@ module ShaleMapperTesting
       map_element 'ns2_bar', to: :ns2_element, namespace: 'http://ns2.com', prefix: 'ns2'
       map_attribute 'bar', to: :foo_attribute
       map_content to: :foo_content
+      using from: :method_from, to: :method_to do
+        map_attribute 'baz'
+        map_element 'qux'
+      end
     end
   end
 
@@ -536,29 +556,89 @@ RSpec.describe Shale::Mapper do
 
   describe '.hsh' do
     it 'declares custom Hash mapping' do
-      expect(ShaleMapperTesting::HashMapping.hash_mapping.keys.keys).to eq(['bar'])
-      expect(ShaleMapperTesting::HashMapping.hash_mapping.keys['bar'].attribute).to eq(:foo)
+      mapping = ShaleMapperTesting::HashMapping.hash_mapping.keys
+
+      expect(mapping.keys).to eq(%w[bar baz qux])
+      expect(mapping['bar'].attribute).to eq(:foo)
+      expect(mapping['bar'].method_from).to eq(nil)
+      expect(mapping['bar'].method_to).to eq(nil)
+      expect(mapping['bar'].group).to eq(nil)
+
+      expect(mapping['baz'].attribute).to eq(nil)
+      expect(mapping['baz'].method_from).to eq(:method_from)
+      expect(mapping['baz'].method_to).to eq(:method_to)
+      expect(mapping['baz'].group).to match('group_')
+
+      expect(mapping['qux'].attribute).to eq(nil)
+      expect(mapping['qux'].method_from).to eq(:method_from)
+      expect(mapping['qux'].method_to).to eq(:method_to)
+      expect(mapping['qux'].group).to match('group_')
     end
   end
 
   describe '.json' do
     it 'declares custom JSON mapping' do
-      expect(ShaleMapperTesting::JsonMapping.json_mapping.keys.keys).to eq(['bar'])
-      expect(ShaleMapperTesting::JsonMapping.json_mapping.keys['bar'].attribute).to eq(:foo)
+      mapping = ShaleMapperTesting::JsonMapping.json_mapping.keys
+
+      expect(mapping.keys).to eq(%w[bar baz qux])
+      expect(mapping['bar'].attribute).to eq(:foo)
+      expect(mapping['bar'].method_from).to eq(nil)
+      expect(mapping['bar'].method_to).to eq(nil)
+      expect(mapping['bar'].group).to eq(nil)
+
+      expect(mapping['baz'].attribute).to eq(nil)
+      expect(mapping['baz'].method_from).to eq(:method_from)
+      expect(mapping['baz'].method_to).to eq(:method_to)
+      expect(mapping['baz'].group).to match('group_')
+
+      expect(mapping['qux'].attribute).to eq(nil)
+      expect(mapping['qux'].method_from).to eq(:method_from)
+      expect(mapping['qux'].method_to).to eq(:method_to)
+      expect(mapping['qux'].group).to match('group_')
     end
   end
 
   describe '.yaml' do
     it 'declares custom YAML mapping' do
-      expect(ShaleMapperTesting::YamlMapping.yaml_mapping.keys.keys).to eq(['bar'])
-      expect(ShaleMapperTesting::YamlMapping.yaml_mapping.keys['bar'].attribute).to eq(:foo)
+      mapping = ShaleMapperTesting::YamlMapping.yaml_mapping.keys
+
+      expect(mapping.keys).to eq(%w[bar baz qux])
+      expect(mapping['bar'].attribute).to eq(:foo)
+      expect(mapping['bar'].method_from).to eq(nil)
+      expect(mapping['bar'].method_to).to eq(nil)
+      expect(mapping['bar'].group).to eq(nil)
+
+      expect(mapping['baz'].attribute).to eq(nil)
+      expect(mapping['baz'].method_from).to eq(:method_from)
+      expect(mapping['baz'].method_to).to eq(:method_to)
+      expect(mapping['baz'].group).to match('group_')
+
+      expect(mapping['qux'].attribute).to eq(nil)
+      expect(mapping['qux'].method_from).to eq(:method_from)
+      expect(mapping['qux'].method_to).to eq(:method_to)
+      expect(mapping['qux'].group).to match('group_')
     end
   end
 
   describe '.toml' do
     it 'declares custom TOML mapping' do
-      expect(ShaleMapperTesting::TomlMapping.toml_mapping.keys.keys).to eq(['bar'])
-      expect(ShaleMapperTesting::TomlMapping.toml_mapping.keys['bar'].attribute).to eq(:foo)
+      mapping = ShaleMapperTesting::TomlMapping.toml_mapping.keys
+
+      expect(mapping.keys).to eq(%w[bar baz qux])
+      expect(mapping['bar'].attribute).to eq(:foo)
+      expect(mapping['bar'].method_from).to eq(nil)
+      expect(mapping['bar'].method_to).to eq(nil)
+      expect(mapping['bar'].group).to eq(nil)
+
+      expect(mapping['baz'].attribute).to eq(nil)
+      expect(mapping['baz'].method_from).to eq(:method_from)
+      expect(mapping['baz'].method_to).to eq(:method_to)
+      expect(mapping['baz'].group).to match('group_')
+
+      expect(mapping['qux'].attribute).to eq(nil)
+      expect(mapping['qux'].method_from).to eq(:method_from)
+      expect(mapping['qux'].method_to).to eq(:method_to)
+      expect(mapping['qux'].group).to match('group_')
     end
   end
 
@@ -568,13 +648,24 @@ RSpec.describe Shale::Mapper do
       attributes = ShaleMapperTesting::XmlMapping.xml_mapping.attributes
       namespace = ShaleMapperTesting::XmlMapping.xml_mapping.default_namespace
 
-      expect(elements.keys).to eq(%w[http://ns1.com:bar http://ns2.com:ns2_bar])
+      expect(elements.keys).to eq(%w[http://ns1.com:bar http://ns2.com:ns2_bar http://ns1.com:qux])
       expect(elements['http://ns1.com:bar'].attribute).to eq(:foo_element)
+      expect(elements['http://ns1.com:bar'].group).to eq(nil)
       expect(elements['http://ns2.com:ns2_bar'].attribute).to eq(:ns2_element)
-      expect(attributes.keys).to eq(['bar'])
+      expect(elements['http://ns2.com:ns2_bar'].group).to eq(nil)
+      expect(elements['http://ns1.com:qux'].attribute).to eq(nil)
+      expect(elements['http://ns1.com:qux'].method_from).to eq(:method_from)
+      expect(elements['http://ns1.com:qux'].method_to).to eq(:method_to)
+      expect(elements['http://ns1.com:qux'].group).to match('group_')
+
+      expect(attributes.keys).to eq(%w[bar baz])
       expect(attributes['bar'].attribute).to eq(:foo_attribute)
+      expect(attributes['baz'].attribute).to eq(nil)
+      expect(attributes['baz'].group).to match('group_')
+
       expect(ShaleMapperTesting::XmlMapping.xml_mapping.content.attribute).to eq(:foo_content)
       expect(ShaleMapperTesting::XmlMapping.xml_mapping.prefixed_root).to eq('ns1:foobar')
+
       expect(namespace.name).to eq('http://ns1.com')
       expect(namespace.prefix).to eq('ns1')
     end

@@ -35,17 +35,26 @@ module Shale
         # @api private
         attr_reader :method_to
 
+        # Return group name
+        #
+        # @return [String]
+        #
+        # @api private
+        attr_reader :group
+
         # Initialize instance
         #
         # @param [String] name
         # @param [Symbol, nil] attribute
         # @param [Hash, nil] methods
+        # @param [String, nil] group
         # @param [true, false] render_nil
         #
         # @api private
-        def initialize(name:, attribute:, methods:, render_nil:)
+        def initialize(name:, attribute:, methods:, group:, render_nil:)
           @name = name
           @attribute = attribute
+          @group = group
           @render_nil = render_nil
 
           if methods

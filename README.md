@@ -729,6 +729,55 @@ end
 Person.new(password: 'secret').to_json(context: current_user)
 ```
 
+If you want to work on multiple elements at a time you can group them with `using` block:
+
+```ruby
+class Person < Shale::Mapper
+  attribute :name, Shale::Type::String
+
+  json do
+    using from: :name_from_json, to: :name_to_json do
+      map 'first_name'
+      map 'last_name'
+    end
+  end
+
+  xml do
+    using from: :name_from_xml, to: :name_to_xml do
+      map_content
+      map_element 'first_name'
+      map_attribute 'last_name'
+    end
+  end
+
+  def name_from_json(model, value)
+    model.name = "#{value['first_name']} #{value['last_name']}"
+  end
+
+  def name_to_json(model, doc)
+    doc['first_name'] = model.name.split(' ')[0]
+    doc['last_name'] = model.name.split(' ')[1]
+  end
+
+  def name_from_xml(model, value)
+    # value => { content: ..., attributes: {}, elements: {} }
+  end
+
+  def name_to_xml(model, element, doc)
+    # ...
+  end
+end
+
+Person.from_json(<<~DATA)
+{
+  "first_name": "John",
+  "last_name": "Doe"
+}
+DATA
+
+# => #<Person:0x00007f9bc3086d60 @name="John Doe">
+```
+
 ### Additional options
 
 You can control which attributes to render and parse by

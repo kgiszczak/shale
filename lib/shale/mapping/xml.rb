@@ -1,80 +1,23 @@
 # frozen_string_literal: true
 
-require_relative 'descriptor/xml'
-require_relative 'descriptor/xml_namespace'
-require_relative 'validator'
+require_relative 'xml_base'
+require_relative 'xml_group'
 
 module Shale
   module Mapping
-    class Xml
-      # Return elements mapping hash
-      #
-      # @return [Hash]
-      #
-      # @api private
-      attr_reader :elements
-
-      # Return attributes mapping hash
-      #
-      # @return [Hash]
-      #
-      # @api private
-      attr_reader :attributes
-
-      # Return content mapping
-      #
-      # @return [Symbol]
-      #
-      # @api private
-      attr_reader :content
-
-      # Return default namespace
-      #
-      # @return [Shale::Mapping::Descriptor::XmlNamespace]
-      #
-      # @api private
-      attr_reader :default_namespace
-
-      # Return unprefixed root
-      #
-      # @return [String]
-      #
-      # @api private
-      def unprefixed_root
-        @root
-      end
-
-      # Return prefixed root
-      #
-      # @return [String]
-      #
-      # @api private
-      def prefixed_root
-        [default_namespace.prefix, @root].compact.join(':')
-      end
-
-      # Initialize instance
-      #
-      # @api private
-      def initialize
-        super
-        @elements = {}
-        @attributes = {}
-        @content = nil
-        @root = ''
-        @default_namespace = Descriptor::XmlNamespace.new
-        @finalized = false
-      end
-
+    # Mapping for XML serialization format
+    #
+    # @api private
+    class Xml < XmlBase
       # Map element to attribute
       #
-      # @param [String] element Document's element
-      # @param [Symbol, nil] to Object's attribute
+      # @param [String] element
+      # @param [Symbol, nil] to
       # @param [Hash, nil] using
       # @param [String, nil] namespace
       # @param [String, nil] prefix
-      #
-      # @raise [IncorrectMappingArgumentsError] when arguments are incorrect
+      # @param [true, false] cdata
+      # @param [true, false] render_nil
       #
       # @api private
       def map_element(
@@ -86,24 +29,12 @@ module Shale
         cdata: false,
         render_nil: false
       )
-        Validator.validate_arguments(element, to, using)
-        Validator.validate_namespace(element, namespace, prefix)
-
-        if namespace == :undefined && prefix == :undefined
-          nsp = default_namespace.name
-          pfx = default_namespace.prefix
-        else
-          nsp = namespace
-          pfx = prefix
-        end
-
-        namespaced_element = [nsp, element].compact.join(':')
-
-        @elements[namespaced_element] = Descriptor::Xml.new(
-          name: element,
-          attribute: to,
-          methods: using,
-          namespace: Descriptor::XmlNamespace.new(nsp, pfx),
+        super(
+          element,
+          to: to,
+          using: using,
+          namespace: namespace,
+          prefix: prefix,
           cdata: cdata,
           render_nil: render_nil
         )
@@ -111,13 +42,12 @@ module Shale
 
       # Map document's attribute to object's attribute
       #
-      # @param [String] attribute Document's attribute
-      # @param [Symbol, nil] to Object's attribute
+      # @param [String] attribute
+      # @param [Symbol, nil] to
       # @param [Hash, nil] using
       # @param [String, nil] namespace
       # @param [String, nil] prefix
-      #
-      # @raise [IncorrectMappingArgumentsError] when arguments are incorrect
+      # @param [true, false] render_nil
       #
       # @api private
       def map_attribute(
@@ -128,85 +58,43 @@ module Shale
         prefix: nil,
         render_nil: false
       )
-        Validator.validate_arguments(attribute, to, using)
-        Validator.validate_namespace(attribute, namespace, prefix)
-
-        namespaced_attribute = [namespace, attribute].compact.join(':')
-
-        @attributes[namespaced_attribute] = Descriptor::Xml.new(
-          name: attribute,
-          attribute: to,
-          methods: using,
-          namespace: Descriptor::XmlNamespace.new(namespace, prefix),
-          cdata: false,
+        super(
+          attribute,
+          to: to,
+          using: using,
+          namespace: namespace,
+          prefix: prefix,
           render_nil: render_nil
         )
       end
 
       # Map document's content to object's attribute
       #
-      # @param [Symbol] to Object's attribute
+      # @param [Symbol] to
+      # @param [Hash, nil] using
+      # @param [true, false] cdata
       #
       # @api private
       def map_content(to: nil, using: nil, cdata: false)
-        Validator.validate_arguments('content', to, using)
-
-        @content = Descriptor::Xml.new(
-          name: nil,
-          attribute: to,
-          methods: using,
-          namespace: nil,
-          cdata: cdata,
-          render_nil: false
-        )
+        super(to: to, using: using, cdata: cdata)
       end
 
-      # Set the name for root element
+      # Map group of nodes to mapping methods
       #
-      # @param [String] value root's name
-      #
-      # @api private
-      def root(value)
-        @root = value
-      end
-
-      # Set default namespace for root element
-      #
-      # @param [String] name
-      # @param [String] prefix
+      # @param [Symbol] from
+      # @param [Symbol] to
+      # @param [Proc] block
       #
       # @api private
-      def namespace(name, prefix)
-        @default_namespace.name = name
-        @default_namespace.prefix = prefix
-      end
+      def using(from:, to:, &block)
+        group = XmlGroup.new(from, to)
 
-      # Set the "finalized" instance variable to true
-      #
-      # @api private
-      def finalize!
-        @finalized = true
-      end
+        group.namespace(default_namespace.name, default_namespace.prefix)
+        group.instance_eval(&block)
 
-      # Query the "finalized" instance variable
-      #
-      # @return [truem false]
-      #
-      # @api private
-      def finalized?
-        @finalized
-      end
-
-      # @api private
-      def initialize_dup(other)
-        @elements = other.instance_variable_get('@elements').dup
-        @attributes = other.instance_variable_get('@attributes').dup
-        @content = other.instance_variable_get('@content').dup
-        @root = other.instance_variable_get('@root').dup
-        @default_namespace = other.instance_variable_get('@default_namespace').dup
-        @finalized = false
-
-        super
+        @elements.merge!(group.elements)
+        @attributes.merge!(group.attributes)
+        @content = group.content if group.content
       end
     end
   end

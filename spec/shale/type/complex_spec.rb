@@ -540,6 +540,142 @@ module ShaleComplexTesting
       attribute :child, Child
     end
   end
+
+  class UsingGroupWithoutContext < Shale::Mapper
+    attribute :one, Shale::Type::String
+    attribute :two, Shale::Type::String
+    attribute :three, Shale::Type::String
+
+    hsh do
+      using from: :attrs_from_dict, to: :attrs_to_dict do
+        map 'one'
+        map 'two'
+      end
+    end
+
+    json do
+      using from: :attrs_from_dict, to: :attrs_to_dict do
+        map 'one'
+        map 'two'
+      end
+    end
+
+    yaml do
+      using from: :attrs_from_dict, to: :attrs_to_dict do
+        map 'one'
+        map 'two'
+      end
+    end
+
+    toml do
+      using from: :attrs_from_dict, to: :attrs_to_dict do
+        map 'one'
+        map 'two'
+      end
+    end
+
+    xml do
+      root 'el'
+      using from: :attrs_from_xml, to: :attrs_to_xml do
+        map_element 'one'
+        map_attribute 'two'
+        map_content
+      end
+    end
+
+    def attrs_from_dict(model, value)
+      model.one = value['one']
+      model.two = value['two']
+    end
+
+    def attrs_to_dict(model, doc)
+      doc['one'] = model.one
+      doc['two'] = model.two
+    end
+
+    def attrs_from_xml(model, value)
+      model.one = value[:elements]['one'].text
+      model.two = value[:attributes]['two']
+      model.three = value[:content].text
+    end
+
+    def attrs_to_xml(model, element, doc)
+      doc.add_attribute(element, 'two', model.two)
+      doc.add_text(element, model.three)
+
+      one = doc.create_element('one')
+      doc.add_text(one, model.one)
+      doc.add_element(element, one)
+    end
+  end
+
+  class UsingGroupWithContext < Shale::Mapper
+    attribute :one, Shale::Type::String
+    attribute :two, Shale::Type::String
+    attribute :three, Shale::Type::String
+
+    hsh do
+      using from: :attrs_from_dict, to: :attrs_to_dict do
+        map 'one'
+        map 'two'
+      end
+    end
+
+    json do
+      using from: :attrs_from_dict, to: :attrs_to_dict do
+        map 'one'
+        map 'two'
+      end
+    end
+
+    yaml do
+      using from: :attrs_from_dict, to: :attrs_to_dict do
+        map 'one'
+        map 'two'
+      end
+    end
+
+    toml do
+      using from: :attrs_from_dict, to: :attrs_to_dict do
+        map 'one'
+        map 'two'
+      end
+    end
+
+    xml do
+      root 'el'
+      using from: :attrs_from_xml, to: :attrs_to_xml do
+        map_element 'one'
+        map_attribute 'two'
+        map_content
+      end
+    end
+
+    def attrs_from_dict(model, value, context)
+      model.one = value['one'] + context
+      model.two = value['two'] + context
+    end
+
+    def attrs_to_dict(model, doc, context)
+      doc['one'] = model.one + context
+      doc['two'] = model.two + context
+    end
+
+    def attrs_from_xml(model, value, context)
+      model.one = value[:elements]['one'].text + context
+      model.two = value[:attributes]['two'] + context
+      model.three = value[:content].text + context
+    end
+
+    def attrs_to_xml(model, element, doc, context)
+      doc.add_attribute(element, 'two', model.two + context)
+      doc.add_text(element, model.three + context)
+
+      one = doc.create_element('one')
+      doc.add_text(one, model.one + context)
+      doc.add_element(element, one)
+    end
+  end
 end
 
 RSpec.describe Shale::Type::Complex do
@@ -2666,6 +2802,324 @@ RSpec.describe Shale::Type::Complex do
 
           result = instance.to_xml(pretty: true)
           expect(result).to eq(xml.gsub(/\n\z/, ''))
+        end
+      end
+    end
+  end
+
+  context 'with using' do
+    context 'without context' do
+      subject(:mapper) { ShaleComplexTesting::UsingGroupWithoutContext }
+
+      context 'with hash mapping' do
+        let(:hash) do
+          {
+            'one' => 'one',
+            'two' => 'two',
+          }
+        end
+
+        describe '.from_hash' do
+          it 'maps hash to object' do
+            instance = mapper.from_hash(hash)
+
+            expect(instance.one).to eq('one')
+            expect(instance.two).to eq('two')
+          end
+        end
+
+        describe '.to_hash' do
+          it 'converts objects to hash' do
+            instance = mapper.new(one: 'one', two: 'two')
+
+            result = instance.to_hash
+            expect(result).to eq({
+              'one' => 'one',
+              'two' => 'two',
+            })
+          end
+        end
+      end
+
+      context 'with JSON mapping' do
+        let(:json) do
+          <<~DOC
+            {
+              "one": "one",
+              "two": "two"
+            }
+          DOC
+        end
+
+        describe '.from_json' do
+          it 'maps JSON to object' do
+            instance = mapper.from_json(json)
+
+            expect(instance.one).to eq('one')
+            expect(instance.two).to eq('two')
+          end
+        end
+
+        describe '.to_json' do
+          it 'converts objects to JSON' do
+            instance = mapper.new(one: 'one', two: 'two')
+
+            result = instance.to_json(pretty: true)
+            expect(result).to eq(<<~DOC.gsub(/\n\z/, ''))
+              {
+                "one": "one",
+                "two": "two"
+              }
+            DOC
+          end
+        end
+      end
+
+      context 'with YAML mapping' do
+        let(:yaml) do
+          <<~DOC
+            ---
+            one: one
+            two: two
+          DOC
+        end
+
+        describe '.from_yaml' do
+          it 'maps YAML to object' do
+            instance = mapper.from_yaml(yaml)
+
+            expect(instance.one).to eq('one')
+            expect(instance.two).to eq('two')
+          end
+        end
+
+        describe '.to_yaml' do
+          it 'converts objects to YAML' do
+            instance = mapper.new(one: 'one', two: 'two')
+
+            result = instance.to_yaml
+            expect(result).to eq(<<~DOC)
+              ---
+              one: one
+              two: two
+            DOC
+          end
+        end
+      end
+
+      context 'with TOML mapping' do
+        let(:toml) do
+          <<~DOC
+            one = "one"
+            two = "two"
+          DOC
+        end
+
+        describe '.from_toml' do
+          it 'maps TOML to object' do
+            instance = mapper.from_toml(toml)
+
+            expect(instance.one).to eq('one')
+            expect(instance.two).to eq('two')
+          end
+        end
+
+        describe '.to_toml' do
+          it 'converts objects to TOML' do
+            instance = mapper.new(one: 'one', two: 'two')
+
+            result = instance.to_toml
+            expect(result).to eq(<<~DOC)
+              one = "one"
+              two = "two"
+            DOC
+          end
+        end
+      end
+
+      context 'with XML mapping' do
+        let(:xml) do
+          <<~DOC
+            <el two="two">three<one>one</one></el>
+          DOC
+        end
+
+        describe '.from_xml' do
+          it 'maps XML to object' do
+            instance = mapper.from_xml(xml)
+
+            expect(instance.one).to eq('one')
+            expect(instance.two).to eq('two')
+            expect(instance.three).to eq('three')
+          end
+        end
+
+        describe '.to_xml' do
+          it 'converts objects to XML' do
+            instance = mapper.new(one: 'one', two: 'two', three: 'three')
+
+            result = instance.to_xml
+
+            expect(result).to eq('<el two="two">three<one>one</one></el>')
+          end
+        end
+      end
+    end
+
+    context 'with context' do
+      subject(:mapper) { ShaleComplexTesting::UsingGroupWithContext }
+
+      context 'with hash mapping' do
+        let(:hash) do
+          {
+            'one' => 'one',
+            'two' => 'two',
+          }
+        end
+
+        describe '.from_hash' do
+          it 'maps hash to object' do
+            instance = mapper.from_hash(hash, context: 'foo')
+
+            expect(instance.one).to eq('onefoo')
+            expect(instance.two).to eq('twofoo')
+          end
+        end
+
+        describe '.to_hash' do
+          it 'converts objects to hash' do
+            instance = mapper.new(one: 'one', two: 'two')
+
+            result = instance.to_hash(context: 'foo')
+            expect(result).to eq({
+              'one' => 'onefoo',
+              'two' => 'twofoo',
+            })
+          end
+        end
+      end
+
+      context 'with JSON mapping' do
+        let(:json) do
+          <<~DOC
+            {
+              "one": "one",
+              "two": "two"
+            }
+          DOC
+        end
+
+        describe '.from_json' do
+          it 'maps JSON to object' do
+            instance = mapper.from_json(json, context: 'foo')
+
+            expect(instance.one).to eq('onefoo')
+            expect(instance.two).to eq('twofoo')
+          end
+        end
+
+        describe '.to_json' do
+          it 'converts objects to JSON' do
+            instance = mapper.new(one: 'one', two: 'two')
+
+            result = instance.to_json(pretty: true, context: 'foo')
+            expect(result).to eq(<<~DOC.gsub(/\n\z/, ''))
+              {
+                "one": "onefoo",
+                "two": "twofoo"
+              }
+            DOC
+          end
+        end
+      end
+
+      context 'with YAML mapping' do
+        let(:yaml) do
+          <<~DOC
+            ---
+            one: one
+            two: two
+          DOC
+        end
+
+        describe '.from_yaml' do
+          it 'maps YAML to object' do
+            instance = mapper.from_yaml(yaml, context: 'foo')
+
+            expect(instance.one).to eq('onefoo')
+            expect(instance.two).to eq('twofoo')
+          end
+        end
+
+        describe '.to_yaml' do
+          it 'converts objects to YAML' do
+            instance = mapper.new(one: 'one', two: 'two')
+
+            result = instance.to_yaml(context: 'foo')
+            expect(result).to eq(<<~DOC)
+              ---
+              one: onefoo
+              two: twofoo
+            DOC
+          end
+        end
+      end
+
+      context 'with TOML mapping' do
+        let(:toml) do
+          <<~DOC
+            one = "one"
+            two = "two"
+          DOC
+        end
+
+        describe '.from_toml' do
+          it 'maps TOML to object' do
+            instance = mapper.from_toml(toml, context: 'foo')
+
+            expect(instance.one).to eq('onefoo')
+            expect(instance.two).to eq('twofoo')
+          end
+        end
+
+        describe '.to_toml' do
+          it 'converts objects to TOML' do
+            instance = mapper.new(one: 'one', two: 'two')
+
+            result = instance.to_toml(context: 'foo')
+            expect(result).to eq(<<~DOC)
+              one = "onefoo"
+              two = "twofoo"
+            DOC
+          end
+        end
+      end
+
+      context 'with XML mapping' do
+        let(:xml) do
+          <<~DOC
+            <el two="two">three<one>one</one></el>
+          DOC
+        end
+
+        describe '.from_xml' do
+          it 'maps XML to object' do
+            instance = mapper.from_xml(xml, context: 'foo')
+
+            expect(instance.one).to eq('onefoo')
+            expect(instance.two).to eq('twofoo')
+            expect(instance.three).to eq('threefoo')
+          end
+        end
+
+        describe '.to_xml' do
+          it 'converts objects to XML' do
+            instance = mapper.new(one: 'one', two: 'two', three: 'three')
+
+            result = instance.to_xml(context: 'foo')
+
+            expect(result).to eq('<el two="twofoo">threefoo<one>onefoo</one></el>')
+          end
         end
       end
     end

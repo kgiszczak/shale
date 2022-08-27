@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 require_relative '../error'
+require_relative '../mapping/group/dict_grouping'
+require_relative '../mapping/group/xml_grouping'
 require_relative 'value'
 
 module Shale
@@ -32,6 +34,7 @@ module Shale
                 .each { |attr| instance.send(attr.setter, attr.default.call) }
 
               mapping_keys = #{format}_mapping.keys
+              grouping = Mapping::Group::DictGrouping.new
 
               only = to_partial_render_attributes(only)
               except = to_partial_render_attributes(except)
@@ -40,7 +43,9 @@ module Shale
                 mapping = mapping_keys[key]
                 next unless mapping
 
-                if mapping.method_from
+                if mapping.group
+                  grouping.add(mapping, value)
+                elsif mapping.method_from
                   mapper = new
 
                   if mapper.method(mapping.method_from).arity == 3
@@ -89,6 +94,16 @@ module Shale
                 end
               end
 
+              grouping.each do |group|
+                mapper = new
+
+                if mapper.method(group.method_from).arity == 3
+                  mapper.send(group.method_from, instance, group.dict, context)
+                else
+                  mapper.send(group.method_from, instance, group.dict)
+                end
+              end
+
               instance
             end
 
@@ -111,12 +126,15 @@ module Shale
               end
 
               hash = {}
+              grouping = Mapping::Group::DictGrouping.new
 
               only = to_partial_render_attributes(only)
               except = to_partial_render_attributes(except)
 
               #{format}_mapping.keys.each_value do |mapping|
-                if mapping.method_to
+                if mapping.group
+                  grouping.add(mapping, nil)
+                elsif mapping.method_to
                   mapper = new
 
                   if mapper.method(mapping.method_to).arity == 3
@@ -163,6 +181,16 @@ module Shale
                       context: context
                     )
                   end
+                end
+              end
+
+              grouping.each do |group|
+                mapper = new
+
+                if mapper.method(group.method_to).arity == 3
+                  mapper.send(group.method_to, instance, hash, context)
+                else
+                  mapper.send(group.method_to, instance, hash)
                 end
               end
 
@@ -302,6 +330,8 @@ module Shale
             .select { |attr| attr.default }
             .each { |attr| instance.send(attr.setter, attr.default.call) }
 
+          grouping = Mapping::Group::XmlGrouping.new
+
           only = to_partial_render_attributes(only)
           except = to_partial_render_attributes(except)
 
@@ -309,7 +339,9 @@ module Shale
             mapping = xml_mapping.attributes[key.to_s]
             next unless mapping
 
-            if mapping.method_from
+            if mapping.group
+              grouping.add(mapping, :attribute, value)
+            elsif mapping.method_from
               mapper = new
 
               if mapper.method(mapping.method_from).arity == 3
@@ -335,7 +367,9 @@ module Shale
           content_mapping = xml_mapping.content
 
           if content_mapping
-            if content_mapping.method_from
+            if content_mapping.group
+              grouping.add(content_mapping, :content, element)
+            elsif content_mapping.method_from
               mapper = new
 
               if mapper.method(content_mapping.method_from).arity == 3
@@ -366,7 +400,9 @@ module Shale
             mapping = xml_mapping.elements[node.name]
             next unless mapping
 
-            if mapping.method_from
+            if mapping.group
+              grouping.add(mapping, :element, node)
+            elsif mapping.method_from
               mapper = new
 
               if mapper.method(mapping.method_from).arity == 3
@@ -400,6 +436,16 @@ module Shale
               else
                 instance.send(attribute.setter, attribute.type.cast(value))
               end
+            end
+          end
+
+          grouping.each do |group|
+            mapper = new
+
+            if mapper.method(group.method_from).arity == 3
+              mapper.send(group.method_from, instance, group.dict, context)
+            else
+              mapper.send(group.method_from, instance, group.dict)
             end
           end
 
@@ -479,11 +525,15 @@ module Shale
             xml_mapping.default_namespace.name
           )
 
+          grouping = Mapping::Group::XmlGrouping.new
+
           only = to_partial_render_attributes(only)
           except = to_partial_render_attributes(except)
 
           xml_mapping.attributes.each_value do |mapping|
-            if mapping.method_to
+            if mapping.group
+              grouping.add(mapping, :attribute, nil)
+            elsif mapping.method_to
               mapper = new
 
               if mapper.method(mapping.method_to).arity == 4
@@ -510,7 +560,9 @@ module Shale
           content_mapping = xml_mapping.content
 
           if content_mapping
-            if content_mapping.method_to
+            if content_mapping.group
+              grouping.add(content_mapping, :content, nil)
+            elsif content_mapping.method_to
               mapper = new
 
               if mapper.method(content_mapping.method_to).arity == 4
@@ -543,7 +595,9 @@ module Shale
           end
 
           xml_mapping.elements.each_value do |mapping|
-            if mapping.method_to
+            if mapping.group
+              grouping.add(mapping, :element, nil)
+            elsif mapping.method_to
               mapper = new
 
               if mapper.method(mapping.method_to).arity == 4
@@ -602,6 +656,16 @@ module Shale
                 )
                 doc.add_element(element, child)
               end
+            end
+          end
+
+          grouping.each do |group|
+            mapper = new
+
+            if mapper.method(group.method_to).arity == 4
+              mapper.send(group.method_to, instance, element, doc, context)
+            else
+              mapper.send(group.method_to, instance, element, doc)
             end
           end
 

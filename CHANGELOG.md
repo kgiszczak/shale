@@ -1,6 +1,7 @@
 ## [0.8.0] - [unreleased]
 
 ### Added
+- Allow to group mappings with `using` block
 - Bring back Ruby 2.6 support
 
 ### Changed

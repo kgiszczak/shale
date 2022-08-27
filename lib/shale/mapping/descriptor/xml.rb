@@ -28,13 +28,21 @@ module Shale
         # @param [String] name
         # @param [Symbol, String] attribute
         # @param [Hash, nil] methods
+        # @param [String, nil] group
         # @param [Shale::Mapping::XmlNamespace] namespace
         # @param [true, false] cdata
         # @param [true, false] render_nil
         #
         # @api private
-        def initialize(name:, attribute:, methods:, namespace:, cdata:, render_nil:)
-          super(name: name, attribute: attribute, methods: methods, render_nil: render_nil)
+        def initialize(name:, attribute:, methods:, group:, namespace:, cdata:, render_nil:)
+          super(
+            name: name,
+            attribute: attribute,
+            methods: methods,
+            group: group,
+            render_nil: render_nil
+          )
+
           @namespace = namespace
           @cdata = cdata
         end
@@ -46,6 +54,15 @@ module Shale
         # @api private
         def prefixed_name
           [namespace.prefix, name].compact.join(':')
+        end
+
+        # Return name with XML namespace
+        #
+        # @return [String]
+        #
+        # @api private
+        def namespaced_name
+          [namespace.name, name].compact.join(':')
         end
       end
     end

@@ -1,8 +1,15 @@
 # frozen_string_literal: true
 
-require 'shale/mapping/dict'
+require 'shale/mapping/dict_base'
 
-RSpec.describe Shale::Mapping::Dict do
+RSpec.describe Shale::Mapping::DictBase do
+  describe '#keys' do
+    it 'returns keys hash' do
+      obj = described_class.new
+      expect(obj.keys).to eq({})
+    end
+  end
+
   describe '#map' do
     context 'when :to and :using is nil' do
       it 'raises an error' do
@@ -56,6 +63,14 @@ RSpec.describe Shale::Mapping::Dict do
         end
       end
 
+      context 'when :group is set' do
+        it 'adds mapping to keys hash' do
+          obj = described_class.new
+          obj.map('foo', to: :foo, group: 'foo')
+          expect(obj.keys['foo'].group).to eq('foo')
+        end
+      end
+
       context 'when :render_nil is set' do
         it 'adds mapping to keys hash' do
           obj = described_class.new
@@ -66,31 +81,38 @@ RSpec.describe Shale::Mapping::Dict do
     end
   end
 
-  describe '#using' do
-    it 'creates methods mappings' do
+  describe '#finalize!' do
+    it 'sets the "finalized" to true' do
       obj = described_class.new
+      obj.finalize!
+      expect(obj.finalized?).to eq(true)
+    end
+  end
 
-      obj.map('foo', to: :foo)
-      obj.using(from: :foo, to: :bar) do
-        map('bar')
-        map('baz')
-      end
+  describe '#finalized?' do
+    it 'returns value of "finalized" variable' do
+      obj = described_class.new
+      expect(obj.finalized?).to eq(false)
+    end
+  end
 
-      expect(obj.keys.keys).to eq(%w[foo bar baz])
-      expect(obj.keys['foo'].attribute).to eq(:foo)
-      expect(obj.keys['foo'].method_from).to eq(nil)
-      expect(obj.keys['foo'].method_to).to eq(nil)
-      expect(obj.keys['foo'].group).to eq(nil)
+  describe '#initialize_dup' do
+    it 'duplicates keys instance variable' do
+      original = described_class.new
+      original.finalize!
+      original.map('foo', to: :bar)
 
-      expect(obj.keys['bar'].attribute).to eq(nil)
-      expect(obj.keys['bar'].method_from).to eq(:foo)
-      expect(obj.keys['bar'].method_to).to eq(:bar)
-      expect(obj.keys['bar'].group).to match('group_')
+      duplicate = original.dup
+      duplicate.map('baz', to: :qux)
 
-      expect(obj.keys['baz'].attribute).to eq(nil)
-      expect(obj.keys['baz'].method_from).to eq(:foo)
-      expect(obj.keys['baz'].method_to).to eq(:bar)
-      expect(obj.keys['baz'].group).to match('group_')
+      expect(original.keys.keys).to eq(['foo'])
+      expect(original.keys['foo'].attribute).to eq(:bar)
+      expect(original.finalized?).to eq(true)
+
+      expect(duplicate.keys.keys).to eq(%w[foo baz])
+      expect(duplicate.keys['foo'].attribute).to eq(:bar)
+      expect(duplicate.keys['baz'].attribute).to eq(:qux)
+      expect(duplicate.finalized?).to eq(false)
     end
   end
 end

@@ -10,6 +10,7 @@ RSpec.describe Shale::Mapping::Descriptor::Xml do
         name: 'foo',
         attribute: :foo,
         methods: { from: :method_from, to: :method_to },
+        group: nil,
         namespace: nil,
         cdata: false,
         render_nil: true
@@ -31,6 +32,7 @@ RSpec.describe Shale::Mapping::Descriptor::Xml do
         name: 'foo',
         attribute: :foo,
         methods: nil,
+        group: nil,
         namespace: nsp,
         cdata: false,
         render_nil: false
@@ -46,6 +48,7 @@ RSpec.describe Shale::Mapping::Descriptor::Xml do
         name: 'foo',
         attribute: :foo,
         methods: nil,
+        group: nil,
         namespace: nil,
         cdata: true,
         render_nil: false
@@ -62,6 +65,7 @@ RSpec.describe Shale::Mapping::Descriptor::Xml do
           name: 'foo',
           attribute: :foo,
           methods: nil,
+          group: nil,
           namespace: Shale::Mapping::Descriptor::XmlNamespace.new('http://bar.com', 'bar'),
           cdata: false,
           render_nil: false
@@ -77,12 +81,47 @@ RSpec.describe Shale::Mapping::Descriptor::Xml do
           name: 'foo',
           attribute: :foo,
           methods: nil,
+          group: nil,
           namespace: Shale::Mapping::Descriptor::XmlNamespace.new,
           cdata: false,
           render_nil: false
         )
 
         expect(obj.prefixed_name).to eq('foo')
+      end
+    end
+  end
+
+  describe '#namespaced_name' do
+    context 'when namespace is present' do
+      it 'returns name prefixed by namespace' do
+        obj = described_class.new(
+          name: 'foo',
+          attribute: :foo,
+          methods: nil,
+          group: nil,
+          namespace: Shale::Mapping::Descriptor::XmlNamespace.new('http://bar.com', 'bar'),
+          cdata: false,
+          render_nil: false
+        )
+
+        expect(obj.namespaced_name).to eq('http://bar.com:foo')
+      end
+    end
+
+    context 'when namespace is not present' do
+      it 'returns name' do
+        obj = described_class.new(
+          name: 'foo',
+          attribute: :foo,
+          methods: nil,
+          group: nil,
+          namespace: Shale::Mapping::Descriptor::XmlNamespace.new,
+          cdata: false,
+          render_nil: false
+        )
+
+        expect(obj.namespaced_name).to eq('foo')
       end
     end
   end
