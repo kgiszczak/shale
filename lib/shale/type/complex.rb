@@ -34,7 +34,7 @@ module Shale
                 .each { |attr| instance.send(attr.setter, attr.default.call) }
 
               mapping_keys = #{format}_mapping.keys
-              grouping = Mapping::Group::DictGrouping.new
+              grouping = Shale::Mapping::Group::DictGrouping.new
 
               only = to_partial_render_attributes(only)
               except = to_partial_render_attributes(except)
@@ -126,7 +126,7 @@ module Shale
               end
 
               hash = {}
-              grouping = Mapping::Group::DictGrouping.new
+              grouping = Shale::Mapping::Group::DictGrouping.new
 
               only = to_partial_render_attributes(only)
               except = to_partial_render_attributes(except)
@@ -330,7 +330,7 @@ module Shale
             .select { |attr| attr.default }
             .each { |attr| instance.send(attr.setter, attr.default.call) }
 
-          grouping = Mapping::Group::XmlGrouping.new
+          grouping = Shale::Mapping::Group::XmlGrouping.new
 
           only = to_partial_render_attributes(only)
           except = to_partial_render_attributes(except)
@@ -525,7 +525,7 @@ module Shale
             xml_mapping.default_namespace.name
           )
 
-          grouping = Mapping::Group::XmlGrouping.new
+          grouping = Shale::Mapping::Group::XmlGrouping.new
 
           only = to_partial_render_attributes(only)
           except = to_partial_render_attributes(except)
