@@ -66,12 +66,12 @@ RSpec.describe Shale::Mapping::Dict do
     end
   end
 
-  describe '#using' do
+  describe '#group' do
     it 'creates methods mappings' do
       obj = described_class.new
 
       obj.map('foo', to: :foo)
-      obj.using(from: :foo, to: :bar) do
+      obj.group(from: :foo, to: :bar) do
         map('bar')
         map('baz')
       end

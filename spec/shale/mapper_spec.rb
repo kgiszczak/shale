@@ -69,7 +69,7 @@ module ShaleMapperTesting
 
     hsh do
       map 'bar', to: :foo
-      using from: :method_from, to: :method_to do
+      group from: :method_from, to: :method_to do
         map 'baz'
         map 'qux'
       end
@@ -81,7 +81,7 @@ module ShaleMapperTesting
 
     json do
       map 'bar', to: :foo
-      using from: :method_from, to: :method_to do
+      group from: :method_from, to: :method_to do
         map 'baz'
         map 'qux'
       end
@@ -93,7 +93,7 @@ module ShaleMapperTesting
 
     yaml do
       map 'bar', to: :foo
-      using from: :method_from, to: :method_to do
+      group from: :method_from, to: :method_to do
         map 'baz'
         map 'qux'
       end
@@ -105,7 +105,7 @@ module ShaleMapperTesting
 
     toml do
       map 'bar', to: :foo
-      using from: :method_from, to: :method_to do
+      group from: :method_from, to: :method_to do
         map 'baz'
         map 'qux'
       end
@@ -125,7 +125,7 @@ module ShaleMapperTesting
       map_element 'ns2_bar', to: :ns2_element, namespace: 'http://ns2.com', prefix: 'ns2'
       map_attribute 'bar', to: :foo_attribute
       map_content to: :foo_content
-      using from: :method_from, to: :method_to do
+      group from: :method_from, to: :method_to do
         map_attribute 'baz'
         map_element 'qux'
       end

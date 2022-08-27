@@ -729,21 +729,21 @@ end
 Person.new(password: 'secret').to_json(context: current_user)
 ```
 
-If you want to work on multiple elements at a time you can group them with `using` block:
+If you want to work on multiple elements at a time you can group them using `group` block:
 
 ```ruby
 class Person < Shale::Mapper
   attribute :name, Shale::Type::String
 
   json do
-    using from: :name_from_json, to: :name_to_json do
+    group from: :name_from_json, to: :name_to_json do
       map 'first_name'
       map 'last_name'
     end
   end
 
   xml do
-    using from: :name_from_xml, to: :name_to_xml do
+    group from: :name_from_xml, to: :name_to_xml do
       map_content
       map_element 'first_name'
       map_attribute 'last_name'

@@ -86,7 +86,7 @@ module Shale
       # @param [Proc] block
       #
       # @api private
-      def using(from:, to:, &block)
+      def group(from:, to:, &block)
         group = XmlGroup.new(from, to)
 
         group.namespace(default_namespace.name, default_namespace.prefix)

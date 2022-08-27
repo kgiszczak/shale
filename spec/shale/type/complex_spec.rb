@@ -547,28 +547,28 @@ module ShaleComplexTesting
     attribute :three, Shale::Type::String
 
     hsh do
-      using from: :attrs_from_dict, to: :attrs_to_dict do
+      group from: :attrs_from_dict, to: :attrs_to_dict do
         map 'one'
         map 'two'
       end
     end
 
     json do
-      using from: :attrs_from_dict, to: :attrs_to_dict do
+      group from: :attrs_from_dict, to: :attrs_to_dict do
         map 'one'
         map 'two'
       end
     end
 
     yaml do
-      using from: :attrs_from_dict, to: :attrs_to_dict do
+      group from: :attrs_from_dict, to: :attrs_to_dict do
         map 'one'
         map 'two'
       end
     end
 
     toml do
-      using from: :attrs_from_dict, to: :attrs_to_dict do
+      group from: :attrs_from_dict, to: :attrs_to_dict do
         map 'one'
         map 'two'
       end
@@ -576,7 +576,7 @@ module ShaleComplexTesting
 
     xml do
       root 'el'
-      using from: :attrs_from_xml, to: :attrs_to_xml do
+      group from: :attrs_from_xml, to: :attrs_to_xml do
         map_element 'one'
         map_attribute 'two'
         map_content
@@ -615,28 +615,28 @@ module ShaleComplexTesting
     attribute :three, Shale::Type::String
 
     hsh do
-      using from: :attrs_from_dict, to: :attrs_to_dict do
+      group from: :attrs_from_dict, to: :attrs_to_dict do
         map 'one'
         map 'two'
       end
     end
 
     json do
-      using from: :attrs_from_dict, to: :attrs_to_dict do
+      group from: :attrs_from_dict, to: :attrs_to_dict do
         map 'one'
         map 'two'
       end
     end
 
     yaml do
-      using from: :attrs_from_dict, to: :attrs_to_dict do
+      group from: :attrs_from_dict, to: :attrs_to_dict do
         map 'one'
         map 'two'
       end
     end
 
     toml do
-      using from: :attrs_from_dict, to: :attrs_to_dict do
+      group from: :attrs_from_dict, to: :attrs_to_dict do
         map 'one'
         map 'two'
       end
@@ -644,7 +644,7 @@ module ShaleComplexTesting
 
     xml do
       root 'el'
-      using from: :attrs_from_xml, to: :attrs_to_xml do
+      group from: :attrs_from_xml, to: :attrs_to_xml do
         map_element 'one'
         map_attribute 'two'
         map_content

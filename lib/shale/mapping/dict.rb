@@ -30,7 +30,7 @@ module Shale
       # @param [Proc] block
       #
       # @api private
-      def using(from:, to:, &block)
+      def group(from:, to:, &block)
         group = DictGroup.new(from, to)
         group.instance_eval(&block)
         @keys.merge!(group.keys)

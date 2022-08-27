@@ -299,12 +299,12 @@ RSpec.describe Shale::Mapping::Xml do
     end
   end
 
-  describe '#using' do
+  describe '#group' do
     context 'without namespaces' do
       it 'creates methods mappings' do
         obj = described_class.new
 
-        obj.using(from: :foo, to: :bar) do
+        obj.group(from: :foo, to: :bar) do
           map_content
           map_element('bar')
           map_attribute('baz')
@@ -339,7 +339,7 @@ RSpec.describe Shale::Mapping::Xml do
       it 'creates methods mappings' do
         obj = described_class.new
 
-        obj.using(from: :foo, to: :bar) do
+        obj.group(from: :foo, to: :bar) do
           map_content
           map_element('bar', namespace: 'http://foo.com', prefix: 'foo')
           map_attribute('baz', namespace: 'http://foo.com', prefix: 'foo')
@@ -375,7 +375,7 @@ RSpec.describe Shale::Mapping::Xml do
         obj = described_class.new
 
         obj.namespace('http://foo.com', 'foo')
-        obj.using(from: :foo, to: :bar) do
+        obj.group(from: :foo, to: :bar) do
           map_content
           map_element('bar')
           map_attribute('baz')
@@ -411,7 +411,7 @@ RSpec.describe Shale::Mapping::Xml do
         obj = described_class.new
 
         obj.namespace('http://foo.com', 'foo')
-        obj.using(from: :foo, to: :bar) do
+        obj.group(from: :foo, to: :bar) do
           map_content
           map_element('bar', namespace: 'http://bar.com', prefix: 'bar')
           map_attribute('baz', namespace: 'http://bar.com', prefix: 'bar')
