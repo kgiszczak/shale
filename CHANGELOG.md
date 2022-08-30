@@ -1,4 +1,4 @@
-## [0.8.0] - [unreleased]
+## [0.8.0] - 2022-08-30
 
 ### Added
 - Allow to group mappings using `group` block
