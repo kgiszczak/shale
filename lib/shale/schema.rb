@@ -71,6 +71,7 @@ module Shale
     # Generate Shale model from XML Schema
     #
     # @param [Array<String>] schemas
+    # @param [<String>] ruby_namespace
     #
     # @return [Array<String>]
     #
@@ -79,8 +80,8 @@ module Shale
     #   # => [model1, model2, model3]
     #
     # @api public
-    def self.from_xml(schemas)
-      XMLCompiler.new.to_models(schemas)
+    def self.from_xml(schemas, ruby_namespace: nil)
+      XMLCompiler.new.to_models(schemas, ruby_namespace: ruby_namespace)
     end
   end
 end

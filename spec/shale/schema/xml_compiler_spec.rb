@@ -1515,13 +1515,22 @@ RSpec.describe Shale::Schema::XMLCompiler do
     end
   end
 
+  require 'debug'
   describe '#to_models' do
     let(:schema) do
       <<~DATA
         <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
           <xs:element name="root" type="root" />
+          <xs:element name="node" type="node" />
 
           <xs:complexType name="root">
+            <xs:sequence>
+              <xs:element name="name" type="xs:string" />
+              <xs:element name="node" type="node" />
+            </xs:sequence>
+          </xs:complexType>
+
+          <xs:complexType name="node">
             <xs:sequence>
               <xs:element name="name" type="xs:string" />
             </xs:sequence>
@@ -1534,11 +1543,31 @@ RSpec.describe Shale::Schema::XMLCompiler do
       <<~DATA
         require 'shale'
 
+        require_relative 'node'
+
         class Root < Shale::Mapper
           attribute :name, Shale::Type::String
+          attribute :node, Node
 
           xml do
             root 'root'
+
+            map_element 'name', to: :name
+            map_element 'node', to: :node
+          end
+        end
+      DATA
+    end
+
+    let(:result_node) do
+      <<~DATA
+        require 'shale'
+
+        class Node < Shale::Mapper
+          attribute :name, Shale::Type::String
+
+          xml do
+            root 'node'
 
             map_element 'name', to: :name
           end
@@ -1546,10 +1575,58 @@ RSpec.describe Shale::Schema::XMLCompiler do
       DATA
     end
 
-    it 'genrates output' do
-      models = described_class.new.to_models([schema])
+    let(:result_ns) do
+      <<~DATA
+        require 'shale'
 
-      expect(models).to eq({ 'root' => result })
+        require_relative 'node'
+
+        class Foo::Bar::Root < Shale::Mapper
+          attribute :name, Shale::Type::String
+          attribute :node, Foo::Bar::Node
+
+          xml do
+            root 'root'
+
+            map_element 'name', to: :name
+            map_element 'node', to: :node
+          end
+        end
+      DATA
+    end
+
+    let(:result_node_ns) do
+      <<~DATA
+        require 'shale'
+
+        class Foo::Bar::Node < Shale::Mapper
+          attribute :name, Shale::Type::String
+
+          xml do
+            root 'node'
+
+            map_element 'name', to: :name
+          end
+        end
+      DATA
+    end
+
+    it 'generates output' do
+      models = Shale::Schema.from_xml [schema]
+      # models = described_class.new.to_models([schema])
+
+      expect(models).to eq({ 'node' => result_node, 'root' => result })
+    end
+
+    it 'generates output with a namespace' do
+      models = Shale::Schema.from_xml [schema], ruby_namespace: 'Foo::Bar'
+
+      expect(models).to eq({ 'node' => result_node_ns, 'root' => result_ns })
+    end
+
+    it 'passes a smoke test' do
+      Shale::Schema.from_xml [schema_complex_content], ruby_namespace: 'Foo::Bar'
+      Shale::Schema.from_xml [schema_simple_types], ruby_namespace: 'Foo::Bar'
     end
   end
 end

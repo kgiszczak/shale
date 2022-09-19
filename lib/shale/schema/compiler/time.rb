@@ -15,6 +15,8 @@ module Shale
         def name
           'Shale::Type::Time'
         end
+
+        alias ruby_class_name name
       end
     end
   end

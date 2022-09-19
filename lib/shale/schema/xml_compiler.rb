@@ -143,19 +143,19 @@ module Shale
         <%- end -%>
         <%- end -%>
 
-        class <%= type.name %> < Shale::Mapper
+        class <%= type.ruby_class_name %> < Shale::Mapper
           <%- type.properties.select(&:content?).each do |property| -%>
-          attribute :<%= property.attribute_name %>, <%= property.type.name -%>
+          attribute :<%= property.attribute_name %>, <%= property.type.ruby_class_name -%>
           <%- if property.collection? %>, collection: true<% end -%>
           <%- unless property.default.nil? %>, default: -> { <%= property.default %> }<% end %>
           <%- end -%>
           <%- type.properties.select(&:attribute?).each do |property| -%>
-          attribute :<%= property.attribute_name %>, <%= property.type.name -%>
+          attribute :<%= property.attribute_name %>, <%= property.type.ruby_class_name -%>
           <%- if property.collection? %>, collection: true<% end -%>
           <%- unless property.default.nil? %>, default: -> { <%= property.default %> }<% end %>
           <%- end -%>
           <%- type.properties.select(&:element?).each do |property| -%>
-          attribute :<%= property.attribute_name %>, <%= property.type.name -%>
+          attribute :<%= property.attribute_name %>, <%= property.type.ruby_class_name -%>
           <%- if property.collection? %>, collection: true<% end -%>
           <%- unless property.default.nil? %>, default: -> { <%= property.default %> }<% end %>
           <%- end -%>
@@ -256,6 +256,7 @@ module Shale
       # Generate Shale models from XML Schema
       #
       # @param [Array<String>] schemas
+      # @param [<String>] namespace
       #
       # @raise [SchemaError] when XML Schema has errors
       #
@@ -265,7 +266,9 @@ module Shale
       #   Shale::Schema::XMLCompiler.new.to_models([schema1, schema2])
       #
       # @api public
-      def to_models(schemas)
+      def to_models(schemas, ruby_namespace: nil)
+        @ruby_namespace = ruby_namespace
+
         types = as_models(schemas)
 
         types.to_h do |type|
@@ -535,7 +538,7 @@ module Shale
             name = node.attributes['name'] || node.parent.attributes['name']
             prefix, namespace = resolve_complex_type_namespace(node)
 
-            @complex_types[id] = Compiler::XMLComplex.new(id, name, prefix, namespace)
+            @complex_types[id] = Compiler::XMLComplex.new(id, name, prefix, namespace, @ruby_namespace)
           end
         end
       end

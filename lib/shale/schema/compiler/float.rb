@@ -15,6 +15,8 @@ module Shale
         def name
           'Shale::Type::Float'
         end
+
+        alias ruby_namespace name
       end
     end
   end

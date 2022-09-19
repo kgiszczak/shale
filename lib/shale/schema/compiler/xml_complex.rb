@@ -38,11 +38,16 @@ module Shale
         # @param [String] namespace
         #
         # @api private
-        def initialize(id, name, prefix, namespace)
+        def initialize(id, name, prefix, namespace, ruby_namespace = nil)
           super(id, name)
           @root = name
           @prefix = prefix
           @namespace = namespace
+          @ruby_namespace = ruby_namespace
+        end
+
+        def ruby_class_name
+          [@ruby_namespace, name].compact.join('::')
         end
       end
     end

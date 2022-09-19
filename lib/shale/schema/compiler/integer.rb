@@ -15,6 +15,8 @@ module Shale
         def name
           'Shale::Type::Integer'
         end
+
+        alias ruby_class_name name
       end
     end
   end
