@@ -436,24 +436,6 @@ schema_circular_references = <<~SCHEMA
   </xs:schema>
 SCHEMA
 
-schema_circular_references = <<~SCHEMA
-  <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
-    <xs:element name="Type1" type="Type1" />
-
-    <xs:complexType name="Type1">
-      <xs:sequence>
-        <xs:element name="Type2" type="Type2" />
-      </xs:sequence>
-    </xs:complexType>
-
-    <xs:complexType name="Type2">
-      <xs:sequence>
-        <xs:element name="Type1" type="Type1" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:schema>
-SCHEMA
-
 schema_collections = <<~SCHEMA
   <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
     <xs:element name="complex1" type="complex1" />
