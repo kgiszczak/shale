@@ -1,3 +1,8 @@
+## [0.9.0] - [unreleased]
+
+### Added
+- Allow to specify version and add encoding to XML declaration
+
 ## [0.8.0] - 2022-08-30
 
 ### Added

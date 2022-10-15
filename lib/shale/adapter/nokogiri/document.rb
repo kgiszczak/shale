@@ -9,9 +9,14 @@ module Shale
       class Document
         # Initialize object
         #
+        # @param [String, nil] version
+        #
         # @api private
-        def initialize
-          @doc = ::Nokogiri::XML::Document.new
+        def initialize(version = nil)
+          ver = nil
+          ver = version if version.is_a?(String)
+
+          @doc = ::Nokogiri::XML::Document.new(ver)
           @namespaces = {}
         end
 

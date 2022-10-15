@@ -6,6 +6,13 @@ require 'shale/adapter/nokogiri/document'
 RSpec.describe Shale::Adapter::Nokogiri::Document do
   subject(:doc) { described_class.new }
 
+  describe '#intialize' do
+    it 'accepts version parameter' do
+      instance = described_class.new('foobar')
+      expect(instance.doc.version).to eq('foobar')
+    end
+  end
+
   describe '#doc' do
     context 'without namespaces' do
       it 'returns Nokogiri::XML::Document instance' do

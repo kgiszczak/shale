@@ -72,11 +72,58 @@ RSpec.describe Shale::Adapter::REXML do
         expect(xml).to eq(expected)
       end
     end
+
+    context 'when declaration is nil' do
+      it 'generates XML document without declaration' do
+        xml = described_class.dump(doc, declaration: nil)
+        expect(xml).to eq('<foo><bar>Hello</bar></foo>')
+      end
+    end
+
+    context 'when declaration is string' do
+      it 'generates XML document with declaration' do
+        xml = described_class.dump(doc, declaration: 'foo')
+        expect(xml).to eq('<?xml version="foo"?><foo><bar>Hello</bar></foo>')
+      end
+    end
+
+    context 'when encoding is false' do
+      it 'generates XML document without encoding' do
+        xml = described_class.dump(doc, declaration: true, encoding: false)
+        expect(xml).to eq('<?xml version="1.0"?><foo><bar>Hello</bar></foo>')
+      end
+    end
+
+    context 'when encoding is nil' do
+      it 'generates XML document without encoding' do
+        xml = described_class.dump(doc, declaration: true, encoding: nil)
+        expect(xml).to eq('<?xml version="1.0"?><foo><bar>Hello</bar></foo>')
+      end
+    end
+
+    context 'when encoding is true' do
+      it 'generates XML document with encoding' do
+        xml = described_class.dump(doc, declaration: true, encoding: true)
+        expect(xml).to eq('<?xml version="1.0" encoding="UTF-8"?><foo><bar>Hello</bar></foo>')
+      end
+    end
+
+    context 'when encoding is string' do
+      it 'generates XML document with encoding' do
+        xml = described_class.dump(doc, declaration: true, encoding: 'ASCII')
+        expect(xml).to eq('<?xml version="1.0" encoding="ASCII"?><foo><bar>Hello</bar></foo>')
+      end
+    end
   end
 
   describe '.create_document' do
     it 'returns instance of Shale::Adapter::REXML::Document' do
       doc = described_class.create_document
+      expect(doc.class).to eq(Shale::Adapter::REXML::Document)
+    end
+
+    it 'accepts one parameter and returns instance' do
+      doc = described_class.create_document('foobar')
       expect(doc.class).to eq(Shale::Adapter::REXML::Document)
     end
   end

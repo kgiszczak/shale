@@ -853,14 +853,15 @@ person.to_json(pretty: true)
 # }
 ```
 
-You can also add an XML declaration by passing `declaration: true` to `#to_xml`
+You can also add an XML declaration by passing `declaration: true` and `encoding: true`
+or if you want to spcify version: `declaration: '1.1'` and `encoding: 'ASCII'` to `#to_xml`
 
 ```ruby
-person.to_xml(pretty: true, declaration: true)
+person.to_xml(pretty: true, declaration: true, encoding: true)
 
 # =>
 #
-# <?xml version="1.0"?>
+# <?xml version="1.0" encoding="UTF-8"?>
 # <Person>
 #   <Address city="London"/>
 # </Person>

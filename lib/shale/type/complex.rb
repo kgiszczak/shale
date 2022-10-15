@@ -495,7 +495,8 @@ module Shale
           _cdata = nil,
           only: nil,
           except: nil,
-          context: nil
+          context: nil,
+          version: nil
         )
           unless instance.is_a?(model)
             msg = "argument is a '#{instance.class}' but should be a '#{model}'"
@@ -503,7 +504,7 @@ module Shale
           end
 
           unless doc
-            doc = Shale.xml_adapter.create_document
+            doc = Shale.xml_adapter.create_document(version)
 
             element = as_xml(
               instance,
@@ -680,6 +681,7 @@ module Shale
         # @param [any] context
         # @param [true, false] pretty
         # @param [true, false] declaration
+        # @param [true, false, String] encoding
         #
         # @raise [AdapterError]
         #
@@ -692,13 +694,15 @@ module Shale
           except: nil,
           context: nil,
           pretty: false,
-          declaration: false
+          declaration: false,
+          encoding: false
         )
           validate_xml_adapter
           Shale.xml_adapter.dump(
-            as_xml(instance, only: only, except: except, context: context),
+            as_xml(instance, only: only, except: except, context: context, version: declaration),
             pretty: pretty,
-            declaration: declaration
+            declaration: declaration,
+            encoding: encoding
           )
         end
 
@@ -808,18 +812,27 @@ module Shale
       # @param [any] context
       # @param [true, false] pretty
       # @param [true, false] declaration
+      # @param [true, false, String] encoding
       #
       # @return [String]
       #
       # @api public
-      def to_xml(only: nil, except: nil, context: nil, pretty: false, declaration: false)
+      def to_xml(
+        only: nil,
+        except: nil,
+        context: nil,
+        pretty: false,
+        declaration: false,
+        encoding: false
+      )
         self.class.to_xml(
           self,
           only: only,
           except: except,
           context: context,
           pretty: pretty,
-          declaration: declaration
+          declaration: declaration,
+          encoding: encoding
         )
       end
     end

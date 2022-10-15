@@ -1082,6 +1082,48 @@ RSpec.describe Shale::Type::Complex do
           end
         end
 
+        context 'with declaration: true and encoding: true param' do
+          it 'converts objects to xml with declaration' do
+            instance = ShaleComplexTesting::RootType.new(
+              root_attr1: 'foo',
+              root_bool: false,
+              root_attr_using: 'foo_element_using',
+              root_attr_attribute_using: 'foo'
+            )
+
+            xml = <<~XML.gsub(/>\s+/, '>').gsub(/'\s+/, "' ")
+              <?xml version="1.0" encoding="UTF-8"?>
+              <root_type attr1="foo" attribute_using="foo" collection="[]">
+                <element_bool>false</element_bool>
+                <element_using>foo_element_using</element_using>
+              </root_type>
+            XML
+
+            expect(instance.to_xml(declaration: true, encoding: true)).to eq(xml)
+          end
+        end
+
+        context 'with declaration: "1.1" and encoding: "ASCII" param' do
+          it 'converts objects to xml with declaration' do
+            instance = ShaleComplexTesting::RootType.new(
+              root_attr1: 'foo',
+              root_bool: false,
+              root_attr_using: 'foo_element_using',
+              root_attr_attribute_using: 'foo'
+            )
+
+            xml = <<~XML.gsub(/>\s+/, '>').gsub(/'\s+/, "' ")
+              <?xml version="1.1" encoding="ASCII"?>
+              <root_type attr1="foo" attribute_using="foo" collection="[]">
+                <element_bool>false</element_bool>
+                <element_using>foo_element_using</element_using>
+              </root_type>
+            XML
+
+            expect(instance.to_xml(declaration: '1.1', encoding: 'ASCII')).to eq(xml)
+          end
+        end
+
         context 'with pretty: true and declaration: true param' do
           it 'converts objects to xml with declaration and formats it' do
             instance = ShaleComplexTesting::RootType.new(

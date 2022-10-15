@@ -32,14 +32,28 @@ module Shale
       #
       # @param [::REXML::Document] doc REXML document
       # @param [true, false] pretty
-      # @param [true, false] declaration
+      # @param [true, false, String] declaration
+      # @param [true, false, String] encoding
       #
       # @return [String]
       #
       # @api private
-      def self.dump(doc, pretty: false, declaration: false)
+      def self.dump(doc, pretty: false, declaration: false, encoding: false)
         if declaration
-          doc.add(::REXML::XMLDecl.new)
+          ver = nil
+          enc = nil
+
+          if declaration.is_a?(String)
+            ver = declaration
+          end
+
+          if encoding == true
+            enc = 'UTF-8'
+          else
+            enc = encoding || nil
+          end
+
+          doc.add(::REXML::XMLDecl.new(ver, enc))
         end
 
         io = StringIO.new
@@ -58,7 +72,7 @@ module Shale
       # Create Shale::Adapter::REXML::Document instance
       #
       # @api private
-      def self.create_document
+      def self.create_document(_version = nil)
         Document.new
       end
     end

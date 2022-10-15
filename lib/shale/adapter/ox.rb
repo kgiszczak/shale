@@ -31,12 +31,13 @@ module Shale
       #
       # @param [::Ox::Document, ::Ox::Element] doc Ox document
       # @param [true, false] pretty
-      # @param [true, false] declaration
+      # @param [true, false, String] declaration
+      # @param [true, false, String] encoding
       #
       # @return [String]
       #
       # @api private
-      def self.dump(doc, pretty: false, declaration: false)
+      def self.dump(doc, pretty: false, declaration: false, encoding: false)
         opts = { indent: -1, with_xml: false }
 
         if pretty
@@ -44,7 +45,12 @@ module Shale
         end
 
         if declaration
-          doc[:version] = '1.0'
+          doc[:version] = declaration == true ? '1.0' : declaration
+
+          if encoding
+            doc[:encoding] = encoding == true ? 'UTF-8' : encoding
+          end
+
           opts[:with_xml] = true
         end
 
@@ -54,7 +60,7 @@ module Shale
       # Create Shale::Adapter::Ox::Document instance
       #
       # @api private
-      def self.create_document
+      def self.create_document(_version = nil)
         Document.new
       end
     end

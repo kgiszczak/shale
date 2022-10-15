@@ -37,12 +37,13 @@ module Shale
       #
       # @param [::Nokogiri::XML::Document] doc Nokogiri document
       # @param [true, false] pretty
-      # @param [true, false] declaration
+      # @param [true, false, String] declaration
+      # @param [true, false, String] encoding
       #
       # @return [String]
       #
       # @api private
-      def self.dump(doc, pretty: false, declaration: false)
+      def self.dump(doc, pretty: false, declaration: false, encoding: false)
         save_with = ::Nokogiri::XML::Node::SaveOptions::AS_XML
 
         if pretty
@@ -51,6 +52,10 @@ module Shale
 
         unless declaration
           save_with |= ::Nokogiri::XML::Node::SaveOptions::NO_DECLARATION
+        end
+
+        if encoding
+          doc.encoding = encoding == true ? 'UTF-8' : encoding
         end
 
         result = doc.to_xml(save_with: save_with)
@@ -64,9 +69,11 @@ module Shale
 
       # Create Shale::Adapter::Nokogiri::Document instance
       #
+      # @param [true, false, String, nil] declaration
+      #
       # @api private
-      def self.create_document
-        Document.new
+      def self.create_document(version = nil)
+        Document.new(version)
       end
     end
   end
