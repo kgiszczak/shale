@@ -51,6 +51,7 @@ $ gem install shale
 * [Converting object to Hash](#converting-object-to-hash)
 * [Converting XML to object](#converting-xml-to-object)
 * [Converting object to XML](#converting-object-to-xml)
+* [Converting collections](#converting-collections)
 * [Mapping JSON keys to object attributes](#mapping-json-keys-to-object-attributes)
 * [Mapping YAML keys to object attributes](#mapping-yaml-keys-to-object-attributes)
 * [Mapping TOML keys to object attributes](#mapping-toml-keys-to-object-attributes)
@@ -344,6 +345,43 @@ person.to_xml
 #     <zip>E1 6AN</zip>
 #   </address>
 # </person>
+```
+
+### Converting collections
+
+Shale allows converting collections for formats that support it (JSON and YAML).
+To convert Ruby array to JSON:
+
+```ruby
+person1 = Person.new(name: 'John Doe')
+person2 = Person.new(name: 'Joe Sixpack')
+
+Person.to_json([person1, person2], pretty: true) # or Person.to_yaml([person1, person2])
+
+# =>
+#
+# [
+#   { "name": "John Doe" },
+#   { "name": "Joe Sixpack" }
+# ]
+```
+
+To convert JSON array to Ruby:
+
+```ruby
+Person.from_json(<<~JSON)
+[
+  { "name": "John Doe" },
+  { "name": "Joe Sixpack" }
+]
+JSON
+
+# =>
+#
+# [
+#   #<Person:0x00000001033dbce8 @name="John Doe">,
+#   #<Person:0x00000001033db4c8 @name="Joe Sixpack">
+# ]
 ```
 
 ### Mapping JSON keys to object attributes

@@ -717,6 +717,24 @@ RSpec.describe Shale::Type::Complex do
           expect(instance.root_attr_complex.complex_attr1).to eq('bar')
           expect(instance.root_attr_using).to eq('using_foo')
         end
+
+        it 'maps collection to array' do
+          instance = ShaleComplexTesting::RootType.from_hash([hash, hash])
+
+          expect(instance.class).to eq(Array)
+          expect(instance.length).to eq(2)
+
+          2.times do |i|
+            expect(instance[i].class).to eq(ShaleComplexTesting::RootType)
+            expect(instance[i].root_attr1).to eq('foo')
+            expect(instance[i].root_attr2).to eq(%w[one two three])
+            expect(instance[i].root_attr3).to eq(nil)
+            expect(instance[i].root_bool).to eq(false)
+            expect(instance[i].root_attr_complex.class).to eq(ShaleComplexTesting::ComplexType)
+            expect(instance[i].root_attr_complex.complex_attr1).to eq('bar')
+            expect(instance[i].root_attr_using).to eq('using_foo')
+          end
+        end
       end
 
       describe '.to_hash' do
@@ -731,6 +749,20 @@ RSpec.describe Shale::Type::Complex do
           )
 
           expect(instance.to_hash).to eq(hash)
+        end
+
+        it 'converts array to collection' do
+          instance = ShaleComplexTesting::RootType.new(
+            root_attr1: 'foo',
+            root_attr2: %w[one two three],
+            root_attr3: nil,
+            root_bool: false,
+            root_attr_complex: ShaleComplexTesting::ComplexType.new(complex_attr1: 'bar'),
+            root_attr_using: 'using_foo'
+          )
+
+          array = ShaleComplexTesting::RootType.to_hash([instance, instance])
+          expect(array).to eq([hash, hash])
         end
       end
     end
@@ -767,6 +799,24 @@ RSpec.describe Shale::Type::Complex do
           expect(instance.root_attr_complex.complex_attr1).to eq('bar')
           expect(instance.root_attr_using).to eq('using_foo')
         end
+
+        it 'maps collection to array' do
+          instance = ShaleComplexTesting::RootType.from_json("[#{json},#{json}]")
+
+          expect(instance.class).to eq(Array)
+          expect(instance.length).to eq(2)
+
+          2.times do |i|
+            expect(instance[i].class).to eq(ShaleComplexTesting::RootType)
+            expect(instance[i].root_attr1).to eq('foo')
+            expect(instance[i].root_attr2).to eq(%w[one two three])
+            expect(instance[i].root_attr3).to eq(nil)
+            expect(instance[i].root_bool).to eq(false)
+            expect(instance[i].root_attr_complex.class).to eq(ShaleComplexTesting::ComplexType)
+            expect(instance[i].root_attr_complex.complex_attr1).to eq('bar')
+            expect(instance[i].root_attr_using).to eq('using_foo')
+          end
+        end
       end
 
       describe '.to_json' do
@@ -783,6 +833,20 @@ RSpec.describe Shale::Type::Complex do
 
             expect(instance.to_json).to eq(json.gsub(/\s+/, ''))
           end
+
+          it 'converts array to json' do
+            instance = ShaleComplexTesting::RootType.new(
+              root_attr1: 'foo',
+              root_attr2: %w[one two three],
+              root_attr3: nil,
+              root_bool: false,
+              root_attr_complex: ShaleComplexTesting::ComplexType.new(complex_attr1: 'bar'),
+              root_attr_using: 'using_foo'
+            )
+
+            array = ShaleComplexTesting::RootType.to_json([instance, instance])
+            expect(array).to eq("[#{json},#{json}]".gsub(/\s+/, ''))
+          end
         end
 
         context 'with pretty: true param' do
@@ -797,6 +861,22 @@ RSpec.describe Shale::Type::Complex do
             )
 
             expect(instance.to_json(pretty: true)).to eq(json.sub(/\n\z/, ''))
+          end
+
+          it 'converts array to json and formats it' do
+            instance = ShaleComplexTesting::RootType.new(
+              root_attr1: 'foo',
+              root_attr2: %w[one two three],
+              root_attr3: nil,
+              root_bool: false,
+              root_attr_complex: ShaleComplexTesting::ComplexType.new(complex_attr1: 'bar'),
+              root_attr_using: 'using_foo'
+            )
+
+            array = ShaleComplexTesting::RootType.to_json([instance, instance], pretty: true)
+
+            json_indent = json.sub(/\n\z/, '').gsub(/\n/, "\n  ")
+            expect(array).to eq("[\n  #{json_indent},\n  #{json_indent}\n]")
           end
         end
       end
@@ -818,6 +898,30 @@ RSpec.describe Shale::Type::Complex do
         YAML
       end
 
+      let(:yaml_collection) do
+        <<~YAML
+          ---
+          - root_attr1: foo
+            root_attr2:
+            - one
+            - two
+            - three
+            root_bool: false
+            root_attr_complex:
+              complex_attr1: bar
+            root_attr_using: using_foo
+          - root_attr1: foo
+            root_attr2:
+            - one
+            - two
+            - three
+            root_bool: false
+            root_attr_complex:
+              complex_attr1: bar
+            root_attr_using: using_foo
+        YAML
+      end
+
       describe '.from_yaml' do
         it 'maps yaml to object' do
           instance = ShaleComplexTesting::RootType.from_yaml(yaml)
@@ -830,6 +934,23 @@ RSpec.describe Shale::Type::Complex do
           expect(instance.root_attr_complex.class).to eq(ShaleComplexTesting::ComplexType)
           expect(instance.root_attr_complex.complex_attr1).to eq('bar')
           expect(instance.root_attr_using).to eq('using_foo')
+        end
+
+        it 'maps yaml to array' do
+          instance = ShaleComplexTesting::RootType.from_yaml(yaml_collection)
+
+          expect(instance.class).to eq(Array)
+          expect(instance.length).to eq(2)
+          2.times do |i|
+            expect(instance[i].class).to eq(ShaleComplexTesting::RootType)
+            expect(instance[i].root_attr1).to eq('foo')
+            expect(instance[i].root_attr2).to eq(%w[one two three])
+            expect(instance[i].root_attr3).to eq(nil)
+            expect(instance[i].root_bool).to eq(false)
+            expect(instance[i].root_attr_complex.class).to eq(ShaleComplexTesting::ComplexType)
+            expect(instance[i].root_attr_complex.complex_attr1).to eq('bar')
+            expect(instance[i].root_attr_using).to eq('using_foo')
+          end
         end
       end
 
@@ -845,6 +966,20 @@ RSpec.describe Shale::Type::Complex do
           )
 
           expect(instance.to_yaml.gsub(/ +$/, '')).to eq(yaml)
+        end
+
+        it 'converts array to yaml' do
+          instance = ShaleComplexTesting::RootType.new(
+            root_attr1: 'foo',
+            root_attr2: %w[one two three],
+            root_attr3: nil,
+            root_bool: false,
+            root_attr_complex: ShaleComplexTesting::ComplexType.new(complex_attr1: 'bar'),
+            root_attr_using: 'using_foo'
+          )
+
+          array = ShaleComplexTesting::RootType.to_yaml([instance, instance])
+          expect(array).to eq(yaml_collection)
         end
       end
     end
@@ -900,6 +1035,14 @@ RSpec.describe Shale::Type::Complex do
           )
 
           expect(instance.to_toml).to eq(to_toml)
+        end
+
+        it 'raises an error when converting array' do
+          msg = "argument is a 'Array' but should be a 'ShaleComplexTesting::RootType'"
+
+          expect do
+            ShaleComplexTesting::RootType.to_toml([])
+          end.to raise_error(Shale::IncorrectModelError, msg)
         end
       end
     end
@@ -1213,6 +1356,23 @@ RSpec.describe Shale::Type::Complex do
           expect(instance.root_attr_complex.complex_attr1).to eq('bar')
           expect(instance.root_attr_using).to eq('using_foo')
         end
+
+        it 'maps collection to array' do
+          instance = ShaleComplexTesting::RootType.from_hash([hash, hash])
+
+          expect(instance.class).to eq(Array)
+          expect(instance.length).to eq(2)
+          2.times do |i|
+            expect(instance[i].class).to eq(ShaleComplexTesting::RootTypeModel)
+            expect(instance[i].root_attr1).to eq('foo')
+            expect(instance[i].root_attr2).to eq(%w[one two three])
+            expect(instance[i].root_attr3).to eq(nil)
+            expect(instance[i].root_bool).to eq(false)
+            expect(instance[i].root_attr_complex.class).to eq(ShaleComplexTesting::ComplexTypeModel)
+            expect(instance[i].root_attr_complex.complex_attr1).to eq('bar')
+            expect(instance[i].root_attr_using).to eq('using_foo')
+          end
+        end
       end
 
       describe '.to_hash' do
@@ -1239,6 +1399,20 @@ RSpec.describe Shale::Type::Complex do
 
             expect(ShaleComplexTesting::RootType.to_hash(instance)).to eq(hash)
           end
+
+          it 'converts objects to array' do
+            instance = ShaleComplexTesting::RootTypeModel.new(
+              root_attr1: 'foo',
+              root_attr2: %w[one two three],
+              root_attr3: nil,
+              root_bool: false,
+              root_attr_complex: ShaleComplexTesting::ComplexTypeModel.new(complex_attr1: 'bar'),
+              root_attr_using: 'using_foo'
+            )
+
+            result = ShaleComplexTesting::RootType.to_hash([instance, instance])
+            expect(result).to eq([hash, hash])
+          end
         end
       end
     end
@@ -1262,6 +1436,39 @@ RSpec.describe Shale::Type::Complex do
         JSON
       end
 
+      let(:json_collection) do
+        <<~JSON
+          [
+            {
+              "root_attr1": "foo",
+              "root_attr2": [
+                "one",
+                "two",
+                "three"
+              ],
+              "root_bool": false,
+              "root_attr_complex": {
+                "complex_attr1": "bar"
+              },
+              "root_attr_using": "using_foo"
+            },
+            {
+              "root_attr1": "foo",
+              "root_attr2": [
+                "one",
+                "two",
+                "three"
+              ],
+              "root_bool": false,
+              "root_attr_complex": {
+                "complex_attr1": "bar"
+              },
+              "root_attr_using": "using_foo"
+            }
+          ]
+        JSON
+      end
+
       describe '.from_json' do
         it 'maps json to object' do
           instance = ShaleComplexTesting::RootType.from_json(json)
@@ -1274,6 +1481,23 @@ RSpec.describe Shale::Type::Complex do
           expect(instance.root_attr_complex.class).to eq(ShaleComplexTesting::ComplexTypeModel)
           expect(instance.root_attr_complex.complex_attr1).to eq('bar')
           expect(instance.root_attr_using).to eq('using_foo')
+        end
+
+        it 'maps json to array' do
+          instance = ShaleComplexTesting::RootType.from_json(json_collection)
+
+          expect(instance.class).to eq(Array)
+          expect(instance.length).to eq(2)
+          2.times do |i|
+            expect(instance[i].class).to eq(ShaleComplexTesting::RootTypeModel)
+            expect(instance[i].root_attr1).to eq('foo')
+            expect(instance[i].root_attr2).to eq(%w[one two three])
+            expect(instance[i].root_attr3).to eq(nil)
+            expect(instance[i].root_bool).to eq(false)
+            expect(instance[i].root_attr_complex.class).to eq(ShaleComplexTesting::ComplexTypeModel)
+            expect(instance[i].root_attr_complex.complex_attr1).to eq('bar')
+            expect(instance[i].root_attr_using).to eq('using_foo')
+          end
         end
       end
 
@@ -1302,6 +1526,20 @@ RSpec.describe Shale::Type::Complex do
             result = ShaleComplexTesting::RootType.to_json(instance)
             expect(result).to eq(json.gsub(/\s+/, ''))
           end
+
+          it 'converts array to json' do
+            instance = ShaleComplexTesting::RootTypeModel.new(
+              root_attr1: 'foo',
+              root_attr2: %w[one two three],
+              root_attr3: nil,
+              root_bool: false,
+              root_attr_complex: ShaleComplexTesting::ComplexTypeModel.new(complex_attr1: 'bar'),
+              root_attr_using: 'using_foo'
+            )
+
+            result = ShaleComplexTesting::RootType.to_json([instance, instance])
+            expect(result).to eq(json_collection.gsub(/\s+/, ''))
+          end
         end
       end
     end
@@ -1321,6 +1559,29 @@ RSpec.describe Shale::Type::Complex do
           root_attr_using: using_foo
         YAML
       end
+      let(:yaml_collection) do
+        <<~YAML
+          ---
+          - root_attr1: foo
+            root_attr2:
+            - one
+            - two
+            - three
+            root_bool: false
+            root_attr_complex:
+              complex_attr1: bar
+            root_attr_using: using_foo
+          - root_attr1: foo
+            root_attr2:
+            - one
+            - two
+            - three
+            root_bool: false
+            root_attr_complex:
+              complex_attr1: bar
+            root_attr_using: using_foo
+        YAML
+      end
 
       describe '.from_yaml' do
         it 'maps yaml to object' do
@@ -1334,6 +1595,23 @@ RSpec.describe Shale::Type::Complex do
           expect(instance.root_attr_complex.class).to eq(ShaleComplexTesting::ComplexTypeModel)
           expect(instance.root_attr_complex.complex_attr1).to eq('bar')
           expect(instance.root_attr_using).to eq('using_foo')
+        end
+
+        it 'maps yaml to array' do
+          instance = ShaleComplexTesting::RootType.from_yaml(yaml_collection)
+
+          expect(instance.class).to eq(Array)
+          expect(instance.length).to eq(2)
+          2.times do |i|
+            expect(instance[i].class).to eq(ShaleComplexTesting::RootTypeModel)
+            expect(instance[i].root_attr1).to eq('foo')
+            expect(instance[i].root_attr2).to eq(%w[one two three])
+            expect(instance[i].root_attr3).to eq(nil)
+            expect(instance[i].root_bool).to eq(false)
+            expect(instance[i].root_attr_complex.class).to eq(ShaleComplexTesting::ComplexTypeModel)
+            expect(instance[i].root_attr_complex.complex_attr1).to eq('bar')
+            expect(instance[i].root_attr_using).to eq('using_foo')
+          end
         end
       end
 
@@ -1361,6 +1639,20 @@ RSpec.describe Shale::Type::Complex do
 
             result = ShaleComplexTesting::RootType.to_yaml(instance)
             expect(result.gsub(/ +$/, '')).to eq(yaml)
+          end
+
+          it 'converts array to yaml' do
+            instance = ShaleComplexTesting::RootTypeModel.new(
+              root_attr1: 'foo',
+              root_attr2: %w[one two three],
+              root_attr3: nil,
+              root_bool: false,
+              root_attr_complex: ShaleComplexTesting::ComplexTypeModel.new(complex_attr1: 'bar'),
+              root_attr_using: 'using_foo'
+            )
+
+            result = ShaleComplexTesting::RootType.to_yaml([instance, instance])
+            expect(result.gsub(/ +$/, '')).to eq(yaml_collection)
           end
         end
       end
@@ -1412,6 +1704,16 @@ RSpec.describe Shale::Type::Complex do
 
             expect do
               ShaleComplexTesting::RootType.to_toml('')
+            end.to raise_error(Shale::IncorrectModelError, msg)
+          end
+        end
+
+        context 'with array' do
+          it 'raises an exception' do
+            msg = /argument is a 'Array' but should be a 'ShaleComplexTesting::RootTypeModel/
+
+            expect do
+              ShaleComplexTesting::RootType.to_toml([])
             end.to raise_error(Shale::IncorrectModelError, msg)
           end
         end
@@ -1728,6 +2030,43 @@ RSpec.describe Shale::Type::Complex do
         }
       end
 
+      let(:hash_collection) do
+        [
+          {
+            'first_name' => 'John',
+            'last_name' => 'Doe',
+            'age' => 44,
+            'address' => {
+              'city' => 'London',
+              'zip' => '1N ASD123',
+              'street' => {
+                'name' => 'Oxford Street', 'house_no' => '1', 'flat_no' => '2'
+              },
+            },
+            'car' => [
+              { 'brand' => 'Honda', 'model' => 'Accord', 'engine' => '1.4' },
+              { 'brand' => 'Toyota', 'model' => 'Corolla', 'engine' => '2.0' },
+            ],
+          },
+          {
+            'first_name' => 'John',
+            'last_name' => 'Doe',
+            'age' => 44,
+            'address' => {
+              'city' => 'London',
+              'zip' => '1N ASD123',
+              'street' => {
+                'name' => 'Oxford Street', 'house_no' => '1', 'flat_no' => '2'
+              },
+            },
+            'car' => [
+              { 'brand' => 'Honda', 'model' => 'Accord', 'engine' => '1.4' },
+              { 'brand' => 'Toyota', 'model' => 'Corolla', 'engine' => '2.0' },
+            ],
+          },
+        ]
+      end
+
       describe '.from_hash' do
         it 'maps hash to partial object' do
           instance = mapper.from_hash(
@@ -1776,6 +2115,58 @@ RSpec.describe Shale::Type::Complex do
           expect(instance.car[1].model).to eq(nil)
           expect(instance.car[1].engine).to eq('2.0')
         end
+
+        it 'maps collection to partial object' do
+          instance = mapper.from_hash(
+            hash_collection,
+            only: [
+              :first_name,
+              { address: [:zip, { street: [:flat_no] }] },
+              { car: [:model] },
+            ]
+          )
+          2.times do |i|
+            expect(instance[i].first_name).to eq('John')
+            expect(instance[i].last_name).to eq(nil)
+            expect(instance[i].age).to eq(nil)
+            expect(instance[i].address.city).to eq(nil)
+            expect(instance[i].address.zip).to eq('1N ASD123')
+            expect(instance[i].address.street.name).to eq(nil)
+            expect(instance[i].address.street.house_no).to eq(nil)
+            expect(instance[i].address.street.flat_no).to eq('2')
+            expect(instance[i].car[0].brand).to eq(nil)
+            expect(instance[i].car[0].model).to eq('Accord')
+            expect(instance[i].car[0].engine).to eq(nil)
+            expect(instance[i].car[1].brand).to eq(nil)
+            expect(instance[i].car[1].model).to eq('Corolla')
+            expect(instance[i].car[1].engine).to eq(nil)
+          end
+
+          instance = mapper.from_hash(
+            hash_collection,
+            except: [
+              :first_name,
+              { address: [:zip, { street: [:flat_no] }] },
+              { car: [:model] },
+            ]
+          )
+          2.times do |i|
+            expect(instance[i].first_name).to eq(nil)
+            expect(instance[i].last_name).to eq('Doe')
+            expect(instance[i].age).to eq(44)
+            expect(instance[i].address.city).to eq('London')
+            expect(instance[i].address.zip).to eq(nil)
+            expect(instance[i].address.street.name).to eq('Oxford Street')
+            expect(instance[i].address.street.house_no).to eq('1')
+            expect(instance[i].address.street.flat_no).to eq(nil)
+            expect(instance[i].car[0].brand).to eq('Honda')
+            expect(instance[i].car[0].model).to eq(nil)
+            expect(instance[i].car[0].engine).to eq('1.4')
+            expect(instance[i].car[1].brand).to eq('Toyota')
+            expect(instance[i].car[1].model).to eq(nil)
+            expect(instance[i].car[1].engine).to eq('2.0')
+          end
+        end
       end
 
       describe '.to_hash' do
@@ -1821,6 +2212,82 @@ RSpec.describe Shale::Type::Complex do
             ],
           })
         end
+
+        it 'converts array to partial hash' do
+          instance = mapper.from_hash(hash_collection)
+
+          result = mapper.to_hash(
+            instance,
+            only: [
+              :first_name,
+              { address: [:zip, { street: [:flat_no] }] },
+              { car: [:model] },
+            ]
+          )
+          expect(result).to eq(
+            [
+              {
+                'first_name' => 'John',
+                'address' => {
+                  'zip' => '1N ASD123',
+                  'street' => { 'flat_no' => '2' },
+                },
+                'car' => [
+                  { 'model' => 'Accord' },
+                  { 'model' => 'Corolla' },
+                ],
+              },
+              {
+                'first_name' => 'John',
+                'address' => {
+                  'zip' => '1N ASD123',
+                  'street' => { 'flat_no' => '2' },
+                },
+                'car' => [
+                  { 'model' => 'Accord' },
+                  { 'model' => 'Corolla' },
+                ],
+              },
+            ]
+          )
+
+          result = mapper.to_hash(
+            instance,
+            except: [
+              :first_name,
+              { address: [:zip, { street: [:flat_no] }] },
+              { car: [:model] },
+            ]
+          )
+          expect(result).to eq(
+            [
+              {
+                'last_name' => 'Doe',
+                'age' => 44,
+                'address' => {
+                  'city' => 'London',
+                  'street' => { 'name' => 'Oxford Street', 'house_no' => '1' },
+                },
+                'car' => [
+                  { 'brand' => 'Honda', 'engine' => '1.4' },
+                  { 'brand' => 'Toyota', 'engine' => '2.0' },
+                ],
+              },
+              {
+                'last_name' => 'Doe',
+                'age' => 44,
+                'address' => {
+                  'city' => 'London',
+                  'street' => { 'name' => 'Oxford Street', 'house_no' => '1' },
+                },
+                'car' => [
+                  { 'brand' => 'Honda', 'engine' => '1.4' },
+                  { 'brand' => 'Toyota', 'engine' => '2.0' },
+                ],
+              },
+            ]
+          )
+        end
       end
     end
 
@@ -1857,6 +2324,73 @@ RSpec.describe Shale::Type::Complex do
               }
             ]
           }
+        DOC
+      end
+
+      let(:json_collection) do
+        <<~DOC
+          [
+            {
+              "first_name": "John",
+              "last_name": "Doe",
+              "age": 44,
+              "hobby": [
+                "Singing",
+                "Dancing"
+              ],
+              "address": {
+                "city": "London",
+                "zip": "1N ASD123",
+                "street": {
+                  "name": "Oxford Street",
+                  "house_no": "1",
+                  "flat_no": "2"
+                }
+              },
+              "car": [
+                {
+                  "brand": "Honda",
+                  "model": "Accord",
+                  "engine": "1.4"
+                },
+                {
+                  "brand": "Toyota",
+                  "model": "Corolla",
+                  "engine": "2.0"
+                }
+              ]
+            },
+            {
+              "first_name": "John",
+              "last_name": "Doe",
+              "age": 44,
+              "hobby": [
+                "Singing",
+                "Dancing"
+              ],
+              "address": {
+                "city": "London",
+                "zip": "1N ASD123",
+                "street": {
+                  "name": "Oxford Street",
+                  "house_no": "1",
+                  "flat_no": "2"
+                }
+              },
+              "car": [
+                {
+                  "brand": "Honda",
+                  "model": "Accord",
+                  "engine": "1.4"
+                },
+                {
+                  "brand": "Toyota",
+                  "model": "Corolla",
+                  "engine": "2.0"
+                }
+              ]
+            }
+          ]
         DOC
       end
 
@@ -1907,6 +2441,58 @@ RSpec.describe Shale::Type::Complex do
           expect(instance.car[1].brand).to eq('Toyota')
           expect(instance.car[1].model).to eq(nil)
           expect(instance.car[1].engine).to eq('2.0')
+        end
+
+        it 'maps JSON collection to partial object' do
+          instance = mapper.from_json(
+            json_collection,
+            only: [
+              :first_name,
+              { address: [:zip, { street: [:flat_no] }] },
+              { car: [:model] },
+            ]
+          )
+          2.times do |i|
+            expect(instance[i].first_name).to eq('John')
+            expect(instance[i].last_name).to eq(nil)
+            expect(instance[i].age).to eq(nil)
+            expect(instance[i].address.city).to eq(nil)
+            expect(instance[i].address.zip).to eq('1N ASD123')
+            expect(instance[i].address.street.name).to eq(nil)
+            expect(instance[i].address.street.house_no).to eq(nil)
+            expect(instance[i].address.street.flat_no).to eq('2')
+            expect(instance[i].car[0].brand).to eq(nil)
+            expect(instance[i].car[0].model).to eq('Accord')
+            expect(instance[i].car[0].engine).to eq(nil)
+            expect(instance[i].car[1].brand).to eq(nil)
+            expect(instance[i].car[1].model).to eq('Corolla')
+            expect(instance[i].car[1].engine).to eq(nil)
+          end
+
+          instance = mapper.from_json(
+            json_collection,
+            except: [
+              :first_name,
+              { address: [:zip, { street: [:flat_no] }] },
+              { car: [:model] },
+            ]
+          )
+          2.times do |i|
+            expect(instance[i].first_name).to eq(nil)
+            expect(instance[i].last_name).to eq('Doe')
+            expect(instance[i].age).to eq(44)
+            expect(instance[i].address.city).to eq('London')
+            expect(instance[i].address.zip).to eq(nil)
+            expect(instance[i].address.street.name).to eq('Oxford Street')
+            expect(instance[i].address.street.house_no).to eq('1')
+            expect(instance[i].address.street.flat_no).to eq(nil)
+            expect(instance[i].car[0].brand).to eq('Honda')
+            expect(instance[i].car[0].model).to eq(nil)
+            expect(instance[i].car[0].engine).to eq('1.4')
+            expect(instance[i].car[1].brand).to eq('Toyota')
+            expect(instance[i].car[1].model).to eq(nil)
+            expect(instance[i].car[1].engine).to eq('2.0')
+          end
         end
       end
 
@@ -1974,6 +2560,114 @@ RSpec.describe Shale::Type::Complex do
             }
           DOC
         end
+
+        it 'converts array to partial JSON' do
+          instance = mapper.from_json(json_collection)
+
+          result = mapper.to_json(
+            instance,
+            only: [
+              :first_name,
+              { address: [:zip, { street: [:flat_no] }] },
+              { car: [:model] },
+            ],
+            pretty: true
+          )
+          expect(result).to eq(<<~DOC.gsub(/\n\z/, ''))
+            [
+              {
+                "first_name": "John",
+                "address": {
+                  "zip": "1N ASD123",
+                  "street": {
+                    "flat_no": "2"
+                  }
+                },
+                "car": [
+                  {
+                    "model": "Accord"
+                  },
+                  {
+                    "model": "Corolla"
+                  }
+                ]
+              },
+              {
+                "first_name": "John",
+                "address": {
+                  "zip": "1N ASD123",
+                  "street": {
+                    "flat_no": "2"
+                  }
+                },
+                "car": [
+                  {
+                    "model": "Accord"
+                  },
+                  {
+                    "model": "Corolla"
+                  }
+                ]
+              }
+            ]
+          DOC
+
+          result = mapper.to_json(
+            instance,
+            except: [
+              :first_name,
+              { address: [:zip, { street: [:flat_no] }] },
+              { car: [:model] },
+            ],
+            pretty: true
+          )
+          expect(result).to eq(<<~DOC.gsub(/\n\z/, ''))
+            [
+              {
+                "last_name": "Doe",
+                "age": 44,
+                "address": {
+                  "city": "London",
+                  "street": {
+                    "name": "Oxford Street",
+                    "house_no": "1"
+                  }
+                },
+                "car": [
+                  {
+                    "brand": "Honda",
+                    "engine": "1.4"
+                  },
+                  {
+                    "brand": "Toyota",
+                    "engine": "2.0"
+                  }
+                ]
+              },
+              {
+                "last_name": "Doe",
+                "age": 44,
+                "address": {
+                  "city": "London",
+                  "street": {
+                    "name": "Oxford Street",
+                    "house_no": "1"
+                  }
+                },
+                "car": [
+                  {
+                    "brand": "Honda",
+                    "engine": "1.4"
+                  },
+                  {
+                    "brand": "Toyota",
+                    "engine": "2.0"
+                  }
+                ]
+              }
+            ]
+          DOC
+        end
       end
     end
 
@@ -2001,6 +2695,52 @@ RSpec.describe Shale::Type::Complex do
           - brand: Toyota
             model: Corolla
             engine: '2.0'
+        DOC
+      end
+
+      let(:yaml_collection) do
+        <<~DOC
+          ---
+          - first_name: John
+            last_name: Doe
+            age: 44
+            hobby:
+            - Singing
+            - Dancing
+            address:
+              city: London
+              zip: 1N ASD123
+              street:
+                name: Oxford Street
+                house_no: '1'
+                flat_no: '2'
+            car:
+            - brand: Honda
+              model: Accord
+              engine: '1.4'
+            - brand: Toyota
+              model: Corolla
+              engine: '2.0'
+          - first_name: John
+            last_name: Doe
+            age: 44
+            hobby:
+            - Singing
+            - Dancing
+            address:
+              city: London
+              zip: 1N ASD123
+              street:
+                name: Oxford Street
+                house_no: '1'
+                flat_no: '2'
+            car:
+            - brand: Honda
+              model: Accord
+              engine: '1.4'
+            - brand: Toyota
+              model: Corolla
+              engine: '2.0'
         DOC
       end
 
@@ -2052,6 +2792,58 @@ RSpec.describe Shale::Type::Complex do
           expect(instance.car[1].model).to eq(nil)
           expect(instance.car[1].engine).to eq('2.0')
         end
+
+        it 'maps YAML collection to partial object' do
+          instance = mapper.from_yaml(
+            yaml_collection,
+            only: [
+              :first_name,
+              { address: [:zip, { street: [:flat_no] }] },
+              { car: [:model] },
+            ]
+          )
+          2.times do |i|
+            expect(instance[i].first_name).to eq('John')
+            expect(instance[i].last_name).to eq(nil)
+            expect(instance[i].age).to eq(nil)
+            expect(instance[i].address.city).to eq(nil)
+            expect(instance[i].address.zip).to eq('1N ASD123')
+            expect(instance[i].address.street.name).to eq(nil)
+            expect(instance[i].address.street.house_no).to eq(nil)
+            expect(instance[i].address.street.flat_no).to eq('2')
+            expect(instance[i].car[0].brand).to eq(nil)
+            expect(instance[i].car[0].model).to eq('Accord')
+            expect(instance[i].car[0].engine).to eq(nil)
+            expect(instance[i].car[1].brand).to eq(nil)
+            expect(instance[i].car[1].model).to eq('Corolla')
+            expect(instance[i].car[1].engine).to eq(nil)
+          end
+
+          instance = mapper.from_yaml(
+            yaml_collection,
+            except: [
+              :first_name,
+              { address: [:zip, { street: [:flat_no] }] },
+              { car: [:model] },
+            ]
+          )
+          2.times do |i|
+            expect(instance[i].first_name).to eq(nil)
+            expect(instance[i].last_name).to eq('Doe')
+            expect(instance[i].age).to eq(44)
+            expect(instance[i].address.city).to eq('London')
+            expect(instance[i].address.zip).to eq(nil)
+            expect(instance[i].address.street.name).to eq('Oxford Street')
+            expect(instance[i].address.street.house_no).to eq('1')
+            expect(instance[i].address.street.flat_no).to eq(nil)
+            expect(instance[i].car[0].brand).to eq('Honda')
+            expect(instance[i].car[0].model).to eq(nil)
+            expect(instance[i].car[0].engine).to eq('1.4')
+            expect(instance[i].car[1].brand).to eq('Toyota')
+            expect(instance[i].car[1].model).to eq(nil)
+            expect(instance[i].car[1].engine).to eq('2.0')
+          end
+        end
       end
 
       describe '.to_yaml' do
@@ -2098,6 +2890,74 @@ RSpec.describe Shale::Type::Complex do
               engine: '1.4'
             - brand: Toyota
               engine: '2.0'
+          DOC
+        end
+
+        it 'converts array to partial YAML' do
+          instance = mapper.from_yaml(yaml_collection)
+
+          result = mapper.to_yaml(
+            instance,
+            only: [
+              :first_name,
+              { address: [:zip, { street: [:flat_no] }] },
+              { car: [:model] },
+            ]
+          )
+          expect(result).to eq(<<~DOC)
+            ---
+            - first_name: John
+              address:
+                zip: 1N ASD123
+                street:
+                  flat_no: '2'
+              car:
+              - model: Accord
+              - model: Corolla
+            - first_name: John
+              address:
+                zip: 1N ASD123
+                street:
+                  flat_no: '2'
+              car:
+              - model: Accord
+              - model: Corolla
+          DOC
+
+          result = mapper.to_yaml(
+            instance,
+            except: [
+              :first_name,
+              { address: [:zip, { street: [:flat_no] }] },
+              { car: [:model] },
+            ]
+          )
+          expect(result).to eq(<<~DOC)
+            ---
+            - last_name: Doe
+              age: 44
+              address:
+                city: London
+                street:
+                  name: Oxford Street
+                  house_no: '1'
+              car:
+              - brand: Honda
+                engine: '1.4'
+              - brand: Toyota
+                engine: '2.0'
+            - last_name: Doe
+              age: 44
+              address:
+                city: London
+                street:
+                  name: Oxford Street
+                  house_no: '1'
+              car:
+              - brand: Honda
+                engine: '1.4'
+              - brand: Toyota
+                engine: '2.0'
           DOC
         end
       end
@@ -2388,12 +3248,38 @@ RSpec.describe Shale::Type::Complex do
         }
       end
 
+      let(:hash_collection) do
+        [
+          {
+            'first_name' => 'John',
+            'address' => {
+              'city' => 'London',
+            },
+          },
+          {
+            'first_name' => 'John',
+            'address' => {
+              'city' => 'London',
+            },
+          },
+        ]
+      end
+
       describe '.from_hash' do
         it 'maps hash to object' do
           instance = mapper.from_hash(hash, context: 'foo')
 
           expect(instance.first_name).to eq('John:foo')
           expect(instance.address.city).to eq('London:foo')
+        end
+
+        it 'maps array to object' do
+          instance = mapper.from_hash(hash_collection, context: 'foo')
+
+          2.times do |i|
+            expect(instance[i].first_name).to eq('John:foo')
+            expect(instance[i].address.city).to eq('London:foo')
+          end
         end
       end
 
@@ -2408,6 +3294,28 @@ RSpec.describe Shale::Type::Complex do
               'city' => 'London:bar',
             },
           })
+        end
+
+        it 'converts objects to array' do
+          instance = mapper.new(first_name: 'John', address: address_class.new(city: 'London'))
+
+          result = mapper.to_hash([instance, instance], context: 'bar')
+          expect(result).to eq(
+            [
+              {
+                'first_name' => 'John:bar',
+                'address' => {
+                  'city' => 'London:bar',
+                },
+              },
+              {
+                'first_name' => 'John:bar',
+                'address' => {
+                  'city' => 'London:bar',
+                },
+              },
+            ]
+          )
         end
       end
     end
@@ -2424,12 +3332,40 @@ RSpec.describe Shale::Type::Complex do
         DOC
       end
 
+      let(:json_collection) do
+        <<~DOC
+          [
+            {
+              "first_name": "John",
+              "address": {
+                "city": "London"
+              }
+            },
+            {
+              "first_name": "John",
+              "address": {
+                "city": "London"
+              }
+            }
+          ]
+        DOC
+      end
+
       describe '.from_json' do
         it 'maps JSON to object' do
           instance = mapper.from_json(json, context: 'foo')
 
           expect(instance.first_name).to eq('John:foo')
           expect(instance.address.city).to eq('London:foo')
+        end
+
+        it 'maps JSON to array' do
+          instance = mapper.from_json(json_collection, context: 'foo')
+
+          2.times do |i|
+            expect(instance[i].first_name).to eq('John:foo')
+            expect(instance[i].address.city).to eq('London:foo')
+          end
         end
       end
 
@@ -2447,6 +3383,28 @@ RSpec.describe Shale::Type::Complex do
             }
           DOC
         end
+
+        it 'converts array to JSON' do
+          instance = mapper.new(first_name: 'John', address: address_class.new(city: 'London'))
+
+          result = mapper.to_json([instance, instance], context: 'bar', pretty: true)
+          expect(result).to eq(<<~DOC.gsub(/\n\z/, ''))
+            [
+              {
+                "first_name": "John:bar",
+                "address": {
+                  "city": "London:bar"
+                }
+              },
+              {
+                "first_name": "John:bar",
+                "address": {
+                  "city": "London:bar"
+                }
+              }
+            ]
+          DOC
+        end
       end
     end
 
@@ -2460,12 +3418,33 @@ RSpec.describe Shale::Type::Complex do
         DOC
       end
 
+      let(:yaml_collection) do
+        <<~DOC
+          ---
+          - first_name: John
+            address:
+              city: London
+          - first_name: John
+            address:
+              city: London
+        DOC
+      end
+
       describe '.from_yaml' do
         it 'maps YAML to object' do
           instance = mapper.from_yaml(yaml, context: 'foo')
 
           expect(instance.first_name).to eq('John:foo')
           expect(instance.address.city).to eq('London:foo')
+        end
+
+        it 'maps YAML to array' do
+          instance = mapper.from_yaml(yaml_collection, context: 'foo')
+
+          2.times do |i|
+            expect(instance[i].first_name).to eq('John:foo')
+            expect(instance[i].address.city).to eq('London:foo')
+          end
         end
       end
 
@@ -2479,6 +3458,21 @@ RSpec.describe Shale::Type::Complex do
             first_name: John:bar
             address:
               city: London:bar
+          DOC
+        end
+
+        it 'converts array to YAML' do
+          instance = mapper.new(first_name: 'John', address: address_class.new(city: 'London'))
+
+          result = mapper.to_yaml([instance, instance], context: 'bar')
+          expect(result).to eq(<<~DOC)
+            ---
+            - first_name: John:bar
+              address:
+                city: London:bar
+            - first_name: John:bar
+              address:
+                city: London:bar
           DOC
         end
       end

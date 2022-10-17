@@ -2,6 +2,7 @@
 
 ### Added
 - Allow to specify version and add encoding to XML declaration
+- Support for mapping/generating collections
 
 ## [0.8.0] - 2022-08-30
 

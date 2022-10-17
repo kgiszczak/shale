@@ -17,7 +17,7 @@ module Shale
           class_eval(<<-RUBY, __FILE__, __LINE__ + 1)
             # Convert Hash to Object using Hash/JSON/YAML/TOML mapping
             #
-            # @param [Hash] hash Hash to convert
+            # @param [Hash, Array] hash Hash to convert
             # @param [Array<Symbol>] only
             # @param [Array<Symbol>] except
             # @param [any] context
@@ -26,6 +26,18 @@ module Shale
             #
             # @api public
             def of_#{format}(hash, only: nil, except: nil, context: nil)
+              #{
+                if format != :toml
+                  <<~CODE
+                    if hash.is_a?(Array)
+                      return hash.map do |item|
+                        of_#{format}(item, only: only, except: except, context: context)
+                      end
+                    end
+                  CODE
+                end
+              }
+
               instance = model.new
 
               attributes
@@ -109,7 +121,7 @@ module Shale
 
             # Convert Object to Hash using Hash/JSON/YAML/TOML mapping
             #
-            # @param [any] instance Object to convert
+            # @param [any, Array<any>] instance Object to convert
             # @param [Array<Symbol>] only
             # @param [Array<Symbol>] except
             # @param [any] context
@@ -120,6 +132,18 @@ module Shale
             #
             # @api public
             def as_#{format}(instance, only: nil, except: nil, context: nil)
+              #{
+                if format != :toml
+                  <<~CODE
+                    if instance.is_a?(Array)
+                      return instance.map do |item|
+                        as_#{format}(item, only: only, except: except, context: context)
+                      end
+                    end
+                  CODE
+                end
+              }
+
               unless instance.is_a?(model)
                 msg = "argument is a '\#{instance.class}' but should be a '\#{model}'"
                 raise IncorrectModelError, msg
