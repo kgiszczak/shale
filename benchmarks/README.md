@@ -1,95 +1,94 @@
 # Performance testing and comparison
 
-### JSON: building object model by hand vs using Shale.from_json
+### JSON: building object model by hand vs Shale.from_json vs Representable
 
 ```
 Warming up --------------------------------------
-          build JSON     2.000  i/100ms
-    Shale from_json     2.000  i/100ms
+             By hand    25.000  i/100ms
+               Shale     8.000  i/100ms
+       Representable     2.000  i/100ms
 Calculating -------------------------------------
-          build JSON     27.075  (± 3.7%) i/s -    136.000  in   5.027236s
-     Shale from_json     23.239  (± 4.3%) i/s -    118.000  in   5.081570s
+             By hand    254.748  (± 2.4%) i/s -      1.275k in   5.007437s
+               Shale     83.587  (± 1.2%) i/s -    424.000  in   5.073456s
+       Representable     23.777  (± 0.0%) i/s -    120.000  in   5.049212s
 
 Comparison:
-          build JSON:       27.1 i/s
-     Shale from_json:       23.2 i/s - 1.17x  (± 0.00) slower
+             By hand:      254.7 i/s
+               Shale:       83.6 i/s - 3.05x  (± 0.00) slower
+       Representable:       23.8 i/s - 10.71x  (± 0.00) slower
 ```
 
-### YAML: building object model by hand vs using Shale.from_yaml
+### JSON: Generating JSON by hand vs Shale.from_json vs Representable
 
 ```
 Warming up --------------------------------------
-          build YAML     1.000  i/100ms
-     Shale from_yaml     1.000  i/100ms
+             By hand   135.000  i/100ms
+               Shale    10.000  i/100ms
+       Representable     2.000  i/100ms
 Calculating -------------------------------------
-          build YAML      7.606  (± 0.0%) i/s -     39.000  in   5.129801s
-     Shale from_yaml      7.136  (± 0.0%) i/s -     36.000  in   5.049205s
+             By hand      1.354k (± 0.3%) i/s -      6.885k in   5.083284s
+               Shale    107.941  (± 0.9%) i/s -    540.000  in   5.002882s
+       Representable     28.491  (± 3.5%) i/s -    144.000  in   5.059841s
 
 Comparison:
-          build YAML:        7.6 i/s
-     Shale from_yaml:        7.1 i/s - 1.07x  (± 0.00) slower
+             By hand:     1354.4 i/s
+               Shale:      107.9 i/s - 12.55x  (± 0.00) slower
+       Representable:       28.5 i/s - 47.54x  (± 0.00) slower
 ```
 
-### REXML: building object model by hand vs using Shale.from_xml (REXML adapter)
+### Hash: building object model by hand vs Shale.from_hash vs Representable
 
 ```
 Warming up --------------------------------------
-  build XML (REXML)     1.000  i/100ms
-      Shale from_xml     1.000  i/100ms
+             By hand    77.000  i/100ms
+               Shale    10.000  i/100ms
+       Representable     2.000  i/100ms
 Calculating -------------------------------------
-  build XML (REXML)      0.242  (± 0.0%) i/s -      2.000  in   8.277295s
-      Shale from_xml      1.340  (± 0.0%) i/s -      7.000  in   5.281743s
+             By hand    770.255  (± 0.3%) i/s -      3.927k in   5.098336s
+               Shale    107.286  (± 0.0%) i/s -    540.000  in   5.033357s
+       Representable     25.685  (± 0.0%) i/s -    130.000  in   5.061734s
 
 Comparison:
-      Shale from_xml:        1.3 i/s
-  build XML (REXML):        0.2 i/s - 5.54x  (± 0.00) slower
+             By hand:      770.3 i/s
+               Shale:      107.3 i/s - 7.18x  (± 0.00) slower
+       Representable:       25.7 i/s - 29.99x  (± 0.00) slower
 ```
 
-### Nokogiri (CSS selectors): building object model by hand vs using Shale.from_xml (Nokogiri adapter)
+### Hash: Generating Hash by hand vs Shale.to_hash vs Representable
 
 ```
 Warming up --------------------------------------
-build XML (Nokogiri CSS selectors)
-                         1.000  i/100ms
-      Shale from_xml     1.000  i/100ms
+             By hand   134.000  i/100ms
+               Shale    11.000  i/100ms
+       Representable     3.000  i/100ms
 Calculating -------------------------------------
-build XML (Nokogiri CSS selectors)
-                          2.103  (± 0.0%) i/s -     11.000  in   5.236344s
-      Shale from_xml      9.222  (± 0.0%) i/s -     47.000  in   5.105769s
+             By hand      1.347k (± 0.5%) i/s -      6.834k in   5.072884s
+               Shale    119.426  (± 0.8%) i/s -    605.000  in   5.066094s
+       Representable     30.153  (± 0.0%) i/s -    153.000  in   5.074923s
 
 Comparison:
-      Shale from_xml:        9.2 i/s
-build XML (Nokogiri CSS selectors):        2.1 i/s - 4.38x  (± 0.00) slower
+             By hand:     1347.2 i/s
+               Shale:      119.4 i/s - 11.28x  (± 0.00) slower
+       Representable:       30.2 i/s - 44.68x  (± 0.00) slower
 ```
 
-### Nokogiri (xpath): building object model by hand vs using Shale.from_xml (Nokogiri adapter)
+### XML: building object model by hand vs Shale.from_xml vs Representable
 
 ```
 Warming up --------------------------------------
-build XML (Nokogiri xpath)
-                         1.000  i/100ms
-      Shale from_xml     1.000  i/100ms
+       By hand (CSS)     1.000  i/100ms
+     By hand (xpath)     1.000  i/100ms
+               Shale     2.000  i/100ms
+       Representable     1.000  i/100ms
 Calculating -------------------------------------
-build XML (Nokogiri xpath)
-                          2.546  (± 0.0%) i/s -     13.000  in   5.110902s
-      Shale from_xml      9.115  (±11.0%) i/s -     46.000  in   5.062700s
+       By hand (CSS)      6.342  (± 0.0%) i/s -     32.000  in   5.046412s
+     By hand (xpath)      8.318  (± 0.0%) i/s -     42.000  in   5.051052s
+               Shale     24.931  (± 4.0%) i/s -    126.000  in   5.055790s
+       Representable      5.633  (± 0.0%) i/s -     29.000  in   5.157554s
 
 Comparison:
-      Shale from_xml:        9.1 i/s
-build XML (Nokogiri xpath):        2.5 i/s - 3.58x  (± 0.00) slower
-```
-
-### Ox: building object model by hand vs using Shale.from_xml (Ox adapter)
-
-```
-Warming up --------------------------------------
-      build XML (Ox)     1.000  i/100ms
-      Shale from_xml     2.000  i/100ms
-Calculating -------------------------------------
-      build XML (Ox)     11.767  (± 8.5%) i/s -     58.000  in   5.018461s
-      Shale from_xml     20.396  (± 4.9%) i/s -    102.000  in   5.025036s
-
-Comparison:
-      Shale from_xml:       20.4 i/s
-      build XML (Ox):       11.8 i/s - 1.73x  (± 0.00) slower
+               Shale:       24.9 i/s
+     By hand (xpath):        8.3 i/s - 3.00x  (± 0.00) slower
+       By hand (CSS):        6.3 i/s - 3.93x  (± 0.00) slower
+       Representable:        5.6 i/s - 4.43x  (± 0.00) slower
 ```
