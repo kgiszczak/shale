@@ -3,6 +3,7 @@
 require 'yaml'
 
 require_relative 'shale/mapper'
+require_relative 'shale/adapter/csv'
 require_relative 'shale/adapter/json'
 require_relative 'shale/type/boolean'
 require_relative 'shale/type/date'
@@ -15,7 +16,7 @@ require_relative 'shale/version'
 # Main library namespace
 #
 # Shale uses adapters for parsing and serializing documents.
-# For handling JSON and YAML, adapter must implement .load and .dump methods, so
+# For handling JSON, YAML, TOML and CSV, adapter must implement .load and .dump methods, so
 # e.g for handling JSON, MultiJson works out of the box.
 #
 # Adapters for XML handling are more complicated and must conform to [@see shale/adapter/rexml]
@@ -29,9 +30,11 @@ require_relative 'shale/version'
 #   Shale.json_adapter = MultiJson
 #   Shale.json_adapter # => MultiJson
 #
-# @example setting YAML adapter for handling YAML documents
-#   Shale.yaml_adapter = MultiJson
-#   Shale.yaml_adapter # => MultiJson
+# @example setting TOML adapter for handling TOML documents
+#   require 'shale/adapter/toml_rb'
+#
+#   Shale.toml_adapter = Shale::Adapter::TomlRB
+#   Shale.toml_adapter # => Shale::Adapter::TomlRB
 #
 # @example setting REXML adapter for handling XML documents
 #   Shale.xml_adapter = Shale::Adapter::REXML
@@ -86,6 +89,16 @@ module Shale
     # @api public
     attr_accessor :toml_adapter
 
+    # Set CSV adapter
+    #
+    # @param [.load, .dump] adapter
+    #
+    # @example
+    #   Shale.csv_adapter = Shale::Adapter::CSV
+    #
+    # @api public
+    attr_writer :csv_adapter
+
     # XML adapter accessor. Available adapters are Shale::Adapter::REXML,
     # Shale::Adapter::Nokogiri and Shale::Adapter::Ox
     #
@@ -125,6 +138,19 @@ module Shale
     # @api public
     def yaml_adapter
       @yaml_adapter || YAML
+    end
+
+    # Return CSV adapter. By default CSV is used
+    #
+    # @return [.load, .dump]
+    #
+    # @example
+    #   Shale.csv_adapter
+    #   # => Shale::Adapter::CSV
+    #
+    # @api public
+    def csv_adapter
+      @csv_adapter || Adapter::CSV
     end
   end
 end

@@ -49,6 +49,7 @@ module Shale
     @json_mapping = Mapping::Dict.new
     @yaml_mapping = Mapping::Dict.new
     @toml_mapping = Mapping::Dict.new
+    @csv_mapping = Mapping::Dict.new(render_nil_default: true)
     @xml_mapping = Mapping::Xml.new
 
     class << self
@@ -87,6 +88,13 @@ module Shale
       # @api public
       attr_reader :toml_mapping
 
+      # Return CSV mapping object
+      #
+      # @return [Shale::Mapping::Dict]
+      #
+      # @api public
+      attr_reader :csv_mapping
+
       # Return XML mapping object
       #
       # @return [Shale::Mapping::XML]
@@ -109,12 +117,14 @@ module Shale
         subclass.instance_variable_set('@__json_mapping_init', @json_mapping.dup)
         subclass.instance_variable_set('@__yaml_mapping_init', @yaml_mapping.dup)
         subclass.instance_variable_set('@__toml_mapping_init', @toml_mapping.dup)
+        subclass.instance_variable_set('@__csv_mapping_init', @csv_mapping.dup)
         subclass.instance_variable_set('@__xml_mapping_init', @xml_mapping.dup)
 
         subclass.instance_variable_set('@hash_mapping', @hash_mapping.dup)
         subclass.instance_variable_set('@json_mapping', @json_mapping.dup)
         subclass.instance_variable_set('@yaml_mapping', @yaml_mapping.dup)
         subclass.instance_variable_set('@toml_mapping', @toml_mapping.dup)
+        subclass.instance_variable_set('@csv_mapping', @csv_mapping.dup)
 
         xml_mapping = @xml_mapping.dup
         xml_mapping.root(Utils.underscore(subclass.name || ''))
@@ -173,6 +183,7 @@ module Shale
         @json_mapping.map(name.to_s, to: name) unless @json_mapping.finalized?
         @yaml_mapping.map(name.to_s, to: name) unless @yaml_mapping.finalized?
         @toml_mapping.map(name.to_s, to: name) unless @toml_mapping.finalized?
+        @csv_mapping.map(name.to_s, to: name) unless @csv_mapping.finalized?
         @xml_mapping.map_element(name.to_s, to: name) unless @xml_mapping.finalized?
 
         @attributes_module.class_eval(<<-RUBY, __FILE__, __LINE__ + 1)
@@ -278,6 +289,30 @@ module Shale
         @toml_mapping = @__toml_mapping_init.dup
         @toml_mapping.finalize!
         @toml_mapping.instance_eval(&block)
+      end
+
+      # Define CSV mapping
+      #
+      # @param [Proc] block
+      #
+      # @example
+      #   calss Person < Shale::Mapper
+      #     attribute :first_name, Shale::Type::String
+      #     attribute :last_name, Shale::Type::String
+      #     attribute :age, Shale::Type::Integer
+      #
+      #     csv do
+      #       map 'first_name', to: :first_name
+      #       map 'last_name', to: :last_name
+      #       map 'age', to: :age
+      #     end
+      #   end
+      #
+      # @api public
+      def csv(&block)
+        @csv_mapping = @__csv_mapping_init.dup
+        @csv_mapping.finalize!
+        @csv_mapping.instance_eval(&block)
       end
 
       # Define XML mapping

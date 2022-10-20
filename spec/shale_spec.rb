@@ -51,6 +51,22 @@ RSpec.describe Shale do
     end
   end
 
+  describe '.csv_adapter' do
+    context 'when adapter is not set' do
+      it 'returns default adapter' do
+        described_class.csv_adapter = nil
+        expect(described_class.csv_adapter).to eq(Shale::Adapter::CSV)
+      end
+    end
+
+    context 'when adapter is set' do
+      it 'returns adapter' do
+        described_class.csv_adapter = :foobar
+        expect(described_class.csv_adapter).to eq(:foobar)
+      end
+    end
+  end
+
   describe '.xml_adapter' do
     context 'when adapter is not set' do
       it 'returns nil' do

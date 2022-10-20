@@ -30,6 +30,9 @@ module ShaleMapperTesting
     toml do
     end
 
+    csv do
+    end
+
     xml do
     end
     # rubocop:enable Lint/EmptyBlock
@@ -55,6 +58,10 @@ module ShaleMapperTesting
     end
 
     toml do
+      map 'child3_bar', to: :child3_foo
+    end
+
+    csv do
       map 'child3_bar', to: :child3_foo
     end
 
@@ -112,6 +119,18 @@ module ShaleMapperTesting
     end
   end
 
+  class CsvMapping < Shale::Mapper
+    attribute :foo, Shale::Type::String
+
+    csv do
+      map 'bar', to: :foo
+      group from: :method_from, to: :method_to do
+        map 'baz'
+        map 'qux'
+      end
+    end
+  end
+
   class XmlMapping < Shale::Mapper
     attribute :foo_element, Shale::Type::String
     attribute :ns2_element, Shale::Type::String
@@ -160,6 +179,9 @@ module ShaleMapperTesting
     toml do
     end
 
+    csv do
+    end
+
     xml do
     end
   end
@@ -175,6 +197,9 @@ module ShaleMapperTesting
     end
 
     toml do
+    end
+
+    csv do
     end
 
     xml do
@@ -373,6 +398,39 @@ RSpec.describe Shale::Mapper do
       expect(mapping['child3_bar'].attribute).to eq(:child3_foo)
     end
 
+    it 'copies csv_mapping from parent' do
+      mapping = ShaleMapperTesting::Parent.csv_mapping.keys
+      expect(mapping.keys).to eq(%w[foo bar baz foo_int])
+      expect(mapping['foo'].attribute).to eq(:foo)
+      expect(mapping['bar'].attribute).to eq(:bar)
+      expect(mapping['baz'].attribute).to eq(:baz)
+      expect(mapping['foo_int'].attribute).to eq(:foo_int)
+
+      mapping = ShaleMapperTesting::Child1.csv_mapping.keys
+      expect(mapping.keys).to eq(%w[foo bar baz foo_int])
+      expect(mapping['foo'].attribute).to eq(:foo)
+      expect(mapping['bar'].attribute).to eq(:bar)
+      expect(mapping['baz'].attribute).to eq(:baz)
+      expect(mapping['foo_int'].attribute).to eq(:foo_int)
+
+      mapping = ShaleMapperTesting::Child2.csv_mapping.keys
+      expect(mapping.keys).to eq(%w[foo bar baz foo_int child2_foo])
+      expect(mapping['foo'].attribute).to eq(:foo)
+      expect(mapping['bar'].attribute).to eq(:bar)
+      expect(mapping['baz'].attribute).to eq(:baz)
+      expect(mapping['foo_int'].attribute).to eq(:foo_int)
+      expect(mapping['child2_foo'].attribute).to eq(:child2_foo)
+
+      mapping = ShaleMapperTesting::Child3.csv_mapping.keys
+      expect(mapping.keys).to eq(%w[foo bar baz foo_int child2_foo child3_bar])
+      expect(mapping['foo'].attribute).to eq(:foo)
+      expect(mapping['bar'].attribute).to eq(:bar)
+      expect(mapping['baz'].attribute).to eq(:baz)
+      expect(mapping['foo_int'].attribute).to eq(:foo_int)
+      expect(mapping['child2_foo'].attribute).to eq(:child2_foo)
+      expect(mapping['child3_bar'].attribute).to eq(:child3_foo)
+    end
+
     it 'copies xml_mapping from parent' do
       mapping = ShaleMapperTesting::Parent.xml_mapping
       expect(mapping.elements.keys).to eq(%w[foo bar baz foo_int])
@@ -537,6 +595,15 @@ RSpec.describe Shale::Mapper do
         expect(mapping['foo_int'].attribute).to eq(:foo_int)
       end
 
+      it 'default csv mapping' do
+        mapping = ShaleMapperTesting::Parent.csv_mapping.keys
+        expect(mapping.keys).to eq(%w[foo bar baz foo_int])
+        expect(mapping['foo'].attribute).to eq(:foo)
+        expect(mapping['bar'].attribute).to eq(:bar)
+        expect(mapping['baz'].attribute).to eq(:baz)
+        expect(mapping['foo_int'].attribute).to eq(:foo_int)
+      end
+
       it 'default xml mapping' do
         mapping = ShaleMapperTesting::Parent.xml_mapping
 
@@ -642,6 +709,28 @@ RSpec.describe Shale::Mapper do
     end
   end
 
+  describe '.csv' do
+    it 'declares custom CSV mapping' do
+      mapping = ShaleMapperTesting::CsvMapping.csv_mapping.keys
+
+      expect(mapping.keys).to eq(%w[bar baz qux])
+      expect(mapping['bar'].attribute).to eq(:foo)
+      expect(mapping['bar'].method_from).to eq(nil)
+      expect(mapping['bar'].method_to).to eq(nil)
+      expect(mapping['bar'].group).to eq(nil)
+
+      expect(mapping['baz'].attribute).to eq(nil)
+      expect(mapping['baz'].method_from).to eq(:method_from)
+      expect(mapping['baz'].method_to).to eq(:method_to)
+      expect(mapping['baz'].group).to match('group_')
+
+      expect(mapping['qux'].attribute).to eq(nil)
+      expect(mapping['qux'].method_from).to eq(:method_from)
+      expect(mapping['qux'].method_to).to eq(:method_to)
+      expect(mapping['qux'].group).to match('group_')
+    end
+  end
+
   describe '.xml' do
     it 'declares custom XML mapping' do
       elements = ShaleMapperTesting::XmlMapping.xml_mapping.elements
@@ -717,24 +806,28 @@ RSpec.describe Shale::Mapper do
       expect(ShaleMapperTesting::FinalizedParent1.json_mapping.keys.keys).to eq([])
       expect(ShaleMapperTesting::FinalizedParent1.yaml_mapping.keys.keys).to eq([])
       expect(ShaleMapperTesting::FinalizedParent1.toml_mapping.keys.keys).to eq([])
+      expect(ShaleMapperTesting::FinalizedParent1.csv_mapping.keys.keys).to eq([])
       expect(ShaleMapperTesting::FinalizedParent1.xml_mapping.elements.keys).to eq([])
 
       expect(ShaleMapperTesting::FinalizedParent2.hash_mapping.keys.keys).to eq([])
       expect(ShaleMapperTesting::FinalizedParent2.json_mapping.keys.keys).to eq([])
       expect(ShaleMapperTesting::FinalizedParent2.yaml_mapping.keys.keys).to eq([])
       expect(ShaleMapperTesting::FinalizedParent2.toml_mapping.keys.keys).to eq([])
+      expect(ShaleMapperTesting::FinalizedParent2.csv_mapping.keys.keys).to eq([])
       expect(ShaleMapperTesting::FinalizedParent2.xml_mapping.elements.keys).to eq([])
 
       expect(ShaleMapperTesting::FinalizedChild1.hash_mapping.keys.keys).to eq(['two'])
       expect(ShaleMapperTesting::FinalizedChild1.json_mapping.keys.keys).to eq(['two'])
       expect(ShaleMapperTesting::FinalizedChild1.yaml_mapping.keys.keys).to eq(['two'])
       expect(ShaleMapperTesting::FinalizedChild1.toml_mapping.keys.keys).to eq(['two'])
+      expect(ShaleMapperTesting::FinalizedChild1.csv_mapping.keys.keys).to eq(['two'])
       expect(ShaleMapperTesting::FinalizedChild1.xml_mapping.elements.keys).to eq(['two'])
 
       expect(ShaleMapperTesting::FinalizedChild2.hash_mapping.keys.keys).to eq(['two'])
       expect(ShaleMapperTesting::FinalizedChild2.json_mapping.keys.keys).to eq(['two'])
       expect(ShaleMapperTesting::FinalizedChild2.yaml_mapping.keys.keys).to eq(['two'])
       expect(ShaleMapperTesting::FinalizedChild2.toml_mapping.keys.keys).to eq(['two'])
+      expect(ShaleMapperTesting::FinalizedChild2.csv_mapping.keys.keys).to eq(['two'])
       expect(ShaleMapperTesting::FinalizedChild2.xml_mapping.elements.keys).to eq(['two'])
     end
   end

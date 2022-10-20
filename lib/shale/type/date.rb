@@ -47,6 +47,17 @@ module Shale
         value&.iso8601
       end
 
+      # Use ISO 8601 format in CSV document
+      #
+      # @param [Date] value
+      #
+      # @return [String]
+      #
+      # @api private
+      def self.as_csv(value, **)
+        value&.iso8601
+      end
+
       # Use ISO 8601 format in XML document
       #
       # @param [Date] value Value to convert to XML

@@ -111,6 +111,28 @@ module Shale
           value
         end
 
+        # Extract value from CSV document
+        #
+        # @param [any] value
+        #
+        # @return [any]
+        #
+        # @api private
+        def of_csv(value, **)
+          value
+        end
+
+        # Convert value to form accepted by CSV document
+        #
+        # @param [any] value
+        #
+        # @return [any]
+        #
+        # @api private
+        def as_csv(value, **)
+          value
+        end
+
         # Extract value from XML document
         #
         # @param [Shale::Adapter::<XML adapter>::Node] value

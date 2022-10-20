@@ -71,11 +71,43 @@ RSpec.describe Shale::Mapping::DictBase do
         end
       end
 
-      context 'when :render_nil is set' do
+      context 'when :render_nil is set to true' do
         it 'adds mapping to keys hash' do
           obj = described_class.new
           obj.map('foo', to: :foo, render_nil: true)
           expect(obj.keys['foo'].render_nil?).to eq(true)
+        end
+      end
+
+      context 'when :render_nil is set to false' do
+        it 'adds mapping to keys hash' do
+          obj = described_class.new
+          obj.map('foo', to: :foo, render_nil: false)
+          expect(obj.keys['foo'].render_nil?).to eq(false)
+        end
+      end
+
+      context 'when :render_nil is set to nil' do
+        it 'uses default value' do
+          obj = described_class.new(render_nil_default: true)
+          obj.map('foo', to: :foo, render_nil: nil)
+          expect(obj.keys['foo'].render_nil?).to eq(true)
+
+          obj = described_class.new(render_nil_default: false)
+          obj.map('foo', to: :foo, render_nil: nil)
+          expect(obj.keys['foo'].render_nil?).to eq(false)
+        end
+      end
+
+      context 'when :render_nil is not set' do
+        it 'uses default value' do
+          obj = described_class.new(render_nil_default: true)
+          obj.map('foo', to: :foo)
+          expect(obj.keys['foo'].render_nil?).to eq(true)
+
+          obj = described_class.new(render_nil_default: false)
+          obj.map('foo', to: :foo)
+          expect(obj.keys['foo'].render_nil?).to eq(false)
         end
       end
     end

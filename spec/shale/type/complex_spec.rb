@@ -110,6 +110,16 @@ module ShaleComplexTesting
       }
     end
 
+    csv do
+      map 'root_attr1', to: :root_attr1
+      map 'root_attr3', to: :root_attr3
+      map 'root_bool', to: :root_bool
+      map 'root_attr_using', using: {
+        from: :root_attr_using_from_csv,
+        to: :root_attr_using_to_csv,
+      }
+    end
+
     xml do
       root 'root_type'
       map_attribute 'attr1', to: :root_attr1
@@ -161,6 +171,14 @@ module ShaleComplexTesting
     end
 
     def root_attr_using_to_toml(model, doc)
+      doc['root_attr_using'] = model.root_attr_using
+    end
+
+    def root_attr_using_from_csv(model, value)
+      model.root_attr_using = value
+    end
+
+    def root_attr_using_to_csv(model, doc)
       doc['root_attr_using'] = model.root_attr_using
     end
 
@@ -250,6 +268,11 @@ module ShaleComplexTesting
     end
 
     toml do
+      map 'attr_true', to: :attr_true, render_nil: true
+      map 'attr_false', to: :attr_false, render_nil: false
+    end
+
+    csv do
       map 'attr_true', to: :attr_true, render_nil: true
       map 'attr_false', to: :attr_false, render_nil: false
     end
@@ -370,6 +393,12 @@ module ShaleComplexTesting
       attribute :address, Address
       attribute :car, Car, collection: true
 
+      csv do
+        map 'first_name', to: :first_name
+        map 'last_name', to: :last_name
+        map 'age', to: :age
+      end
+
       xml do
         root 'Person'
 
@@ -473,6 +502,10 @@ module ShaleComplexTesting
         map 'address', to: :address
       end
 
+      csv do
+        map 'first_name', using: { from: :first_name_from, to: :first_name_to }
+      end
+
       xml do
         root 'person'
 
@@ -538,6 +571,16 @@ module ShaleComplexTesting
       attribute :type_time, Shale::Type::Time
       attribute :type_value, Shale::Type::Value
       attribute :child, Child
+
+      csv do
+        map 'type_boolean', to: :type_boolean
+        map 'type_date', to: :type_date
+        map 'type_float', to: :type_float
+        map 'type_integer', to: :type_integer
+        map 'type_string', to: :type_string
+        map 'type_time', to: :type_time
+        map 'type_value', to: :type_value
+      end
     end
   end
 
@@ -568,6 +611,13 @@ module ShaleComplexTesting
     end
 
     toml do
+      group from: :attrs_from_dict, to: :attrs_to_dict do
+        map 'one'
+        map 'two'
+      end
+    end
+
+    csv do
       group from: :attrs_from_dict, to: :attrs_to_dict do
         map 'one'
         map 'two'
@@ -642,6 +692,13 @@ module ShaleComplexTesting
       end
     end
 
+    csv do
+      group from: :attrs_from_dict, to: :attrs_to_dict do
+        map 'one'
+        map 'two'
+      end
+    end
+
     xml do
       root 'el'
       group from: :attrs_from_xml, to: :attrs_to_xml do
@@ -683,6 +740,7 @@ RSpec.describe Shale::Type::Complex do
     Shale.json_adapter = Shale::Adapter::JSON
     Shale.yaml_adapter = YAML
     Shale.toml_adapter = Tomlib
+    Shale.csv_adapter = Shale::Adapter::CSV
     Shale.xml_adapter = Shale::Adapter::REXML
   end
 
@@ -1043,6 +1101,199 @@ RSpec.describe Shale::Type::Complex do
           expect do
             ShaleComplexTesting::RootType.to_toml([])
           end.to raise_error(Shale::IncorrectModelError, msg)
+        end
+      end
+    end
+
+    context 'with csv mapping' do
+      describe '.from_csv' do
+        context 'without params' do
+          let(:csv) do
+            <<~CSV
+              foo,,false,using_foo
+              foo,,false,using_foo
+            CSV
+          end
+
+          it 'maps csv to object' do
+            instance = ShaleComplexTesting::RootType.from_csv(csv)
+
+            expect(instance.class).to eq(Array)
+            expect(instance.length).to eq(2)
+
+            2.times do |i|
+              expect(instance[i].class).to eq(ShaleComplexTesting::RootType)
+              expect(instance[i].root_attr1).to eq('foo')
+              expect(instance[i].root_attr2).to eq([])
+              expect(instance[i].root_attr3).to eq(nil)
+              expect(instance[i].root_bool).to eq(false)
+              expect(instance[i].root_attr_using).to eq('using_foo')
+            end
+          end
+        end
+
+        context 'with headers: true' do
+          let(:csv) do
+            <<~CSV
+              root_attr1,root_attr3,root_bool,root_attr_using
+              foo,,false,using_foo
+              foo,,false,using_foo
+            CSV
+          end
+
+          it 'maps csv to object' do
+            instance = ShaleComplexTesting::RootType.from_csv(csv, headers: true)
+
+            expect(instance.class).to eq(Array)
+            expect(instance.length).to eq(2)
+
+            2.times do |i|
+              expect(instance[i].class).to eq(ShaleComplexTesting::RootType)
+              expect(instance[i].root_attr1).to eq('foo')
+              expect(instance[i].root_attr2).to eq([])
+              expect(instance[i].root_attr3).to eq(nil)
+              expect(instance[i].root_bool).to eq(false)
+              expect(instance[i].root_attr_using).to eq('using_foo')
+            end
+          end
+        end
+
+        context 'with headers: true and other options' do
+          let(:csv) do
+            <<~CSV
+              root_attr1|root_attr3|root_bool|root_attr_using
+              foo||false|using_foo
+              foo||false|using_foo
+            CSV
+          end
+
+          it 'maps csv to object' do
+            instance = ShaleComplexTesting::RootType.from_csv(csv, col_sep: '|', headers: true)
+
+            expect(instance.class).to eq(Array)
+            expect(instance.length).to eq(2)
+
+            2.times do |i|
+              expect(instance[i].class).to eq(ShaleComplexTesting::RootType)
+              expect(instance[i].root_attr1).to eq('foo')
+              expect(instance[i].root_attr2).to eq([])
+              expect(instance[i].root_attr3).to eq(nil)
+              expect(instance[i].root_bool).to eq(false)
+              expect(instance[i].root_attr_using).to eq('using_foo')
+            end
+          end
+        end
+      end
+
+      describe '.to_csv' do
+        context 'without params' do
+          let(:csv) do
+            <<~CSV
+              foo,,false,using_foo
+              foo,,false,using_foo
+            CSV
+          end
+
+          it 'converts objects to csv' do
+            instance = ShaleComplexTesting::RootType.new(
+              root_attr1: 'foo',
+              root_bool: false,
+              root_attr_using: 'using_foo'
+            )
+
+            expect(instance.to_csv).to eq("foo,,false,using_foo\n")
+          end
+
+          it 'converts array to csv' do
+            instance = ShaleComplexTesting::RootType.new(
+              root_attr1: 'foo',
+              root_bool: false,
+              root_attr_using: 'using_foo'
+            )
+
+            result = ShaleComplexTesting::RootType.to_csv([instance, instance])
+            expect(result).to eq(csv)
+          end
+        end
+
+        context 'with headers: true' do
+          let(:csv) do
+            <<~CSV
+              root_attr1,root_attr3,root_bool,root_attr_using
+              foo,,false,using_foo
+              foo,,false,using_foo
+            CSV
+          end
+
+          let(:csv_single) do
+            <<~CSV
+              root_attr1,root_attr3,root_bool,root_attr_using
+              foo,,false,using_foo
+            CSV
+          end
+
+          it 'converts objects to csv' do
+            instance = ShaleComplexTesting::RootType.new(
+              root_attr1: 'foo',
+              root_bool: false,
+              root_attr_using: 'using_foo'
+            )
+
+            expect(instance.to_csv(headers: true)).to eq(csv_single)
+          end
+
+          it 'converts array to csv' do
+            instance = ShaleComplexTesting::RootType.new(
+              root_attr1: 'foo',
+              root_bool: false,
+              root_attr_using: 'using_foo'
+            )
+
+            result = ShaleComplexTesting::RootType.to_csv([instance, instance], headers: true)
+            expect(result).to eq(csv)
+          end
+        end
+
+        context 'with headers: true and other options' do
+          let(:csv) do
+            <<~CSV
+              root_attr1|root_attr3|root_bool|root_attr_using
+              foo||false|using_foo
+              foo||false|using_foo
+            CSV
+          end
+
+          let(:csv_single) do
+            <<~CSV
+              root_attr1|root_attr3|root_bool|root_attr_using
+              foo||false|using_foo
+            CSV
+          end
+
+          it 'converts objects to csv' do
+            instance = ShaleComplexTesting::RootType.new(
+              root_attr1: 'foo',
+              root_bool: false,
+              root_attr_using: 'using_foo'
+            )
+
+            expect(instance.to_csv(headers: true, col_sep: '|')).to eq(csv_single)
+          end
+
+          it 'converts array to csv' do
+            instance = ShaleComplexTesting::RootType.new(
+              root_attr1: 'foo',
+              root_bool: false,
+              root_attr_using: 'using_foo'
+            )
+
+            result = ShaleComplexTesting::RootType.to_csv(
+              [instance, instance],
+              headers: true,
+              col_sep: '|'
+            )
+            expect(result).to eq(csv)
+          end
         end
       end
     end
@@ -1735,6 +1986,86 @@ RSpec.describe Shale::Type::Complex do
       end
     end
 
+    context 'with csv mapping' do
+      let(:csv) do
+        <<~CSV
+          foo,,false,using_foo
+        CSV
+      end
+      let(:csv_collection) do
+        <<~CSV
+          foo,,false,using_foo
+          foo,,false,using_foo
+        CSV
+      end
+
+      describe '.from_csv' do
+        it 'maps csv to object' do
+          instance = ShaleComplexTesting::RootType.from_csv(csv)
+
+          expect(instance.class).to eq(Array)
+          expect(instance.length).to eq(1)
+          expect(instance[0].class).to eq(ShaleComplexTesting::RootTypeModel)
+          expect(instance[0].root_attr1).to eq('foo')
+          expect(instance[0].root_attr3).to eq(nil)
+          expect(instance[0].root_bool).to eq(false)
+          expect(instance[0].root_attr_using).to eq('using_foo')
+        end
+
+        it 'maps csv to array' do
+          instance = ShaleComplexTesting::RootType.from_csv(csv_collection)
+
+          expect(instance.class).to eq(Array)
+          expect(instance.length).to eq(2)
+          2.times do |i|
+            expect(instance[i].class).to eq(ShaleComplexTesting::RootTypeModel)
+            expect(instance[i].root_attr1).to eq('foo')
+            expect(instance[i].root_attr3).to eq(nil)
+            expect(instance[i].root_bool).to eq(false)
+            expect(instance[i].root_attr_using).to eq('using_foo')
+          end
+        end
+      end
+
+      describe '.to_csv' do
+        context 'with wrong model' do
+          it 'raises an exception' do
+            msg = /argument is a 'String' but should be a 'ShaleComplexTesting::RootTypeModel/
+
+            expect do
+              ShaleComplexTesting::RootType.to_csv('')
+            end.to raise_error(Shale::IncorrectModelError, msg)
+          end
+        end
+
+        context 'with correct model' do
+          it 'converts objects to csv' do
+            instance = ShaleComplexTesting::RootTypeModel.new(
+              root_attr1: 'foo',
+              root_attr3: nil,
+              root_bool: false,
+              root_attr_using: 'using_foo'
+            )
+
+            result = ShaleComplexTesting::RootType.to_csv(instance)
+            expect(result).to eq(csv)
+          end
+
+          it 'converts array to yaml' do
+            instance = ShaleComplexTesting::RootTypeModel.new(
+              root_attr1: 'foo',
+              root_attr3: nil,
+              root_bool: false,
+              root_attr_using: 'using_foo'
+            )
+
+            result = ShaleComplexTesting::RootType.to_csv([instance, instance])
+            expect(result).to eq(csv_collection)
+          end
+        end
+      end
+    end
+
     context 'with xml mapping' do
       let(:xml) do
         <<~XML
@@ -1943,6 +2274,34 @@ RSpec.describe Shale::Type::Complex do
 
         expect(instance1.to_toml).to eq(expected_nil)
         expect(instance2.to_toml).to eq(expected_set)
+      end
+    end
+
+    describe '.to_csv' do
+      let(:expected_nil) do
+        <<~CSV
+
+        CSV
+      end
+
+      let(:expected_set) do
+        <<~CSV
+          foo,bar
+        CSV
+      end
+
+      it 'converts objects to CSV' do
+        instance1 = ShaleComplexTesting::RenderNil.new(
+          attr_true: nil,
+          attr_false: nil
+        )
+        instance2 = ShaleComplexTesting::RenderNil.new(
+          attr_true: 'foo',
+          attr_false: 'bar'
+        )
+
+        expect(instance1.to_csv).to eq(expected_nil)
+        expect(instance2.to_csv).to eq(expected_set)
       end
     end
 
@@ -3099,6 +3458,83 @@ RSpec.describe Shale::Type::Complex do
       end
     end
 
+    context 'with CSV mapping' do
+      let(:csv) do
+        <<~DOC
+          first_name,last_name,age
+          John,Doe,44
+        DOC
+      end
+
+      let(:csv_collection) do
+        <<~DOC
+          first_name,last_name,age
+          John,Doe,44
+          John,Doe,44
+        DOC
+      end
+
+      describe '.from_csv' do
+        it 'maps CSV to partial object' do
+          instance = mapper.from_csv(csv, only: [:first_name], headers: true)
+          expect(instance[0].first_name).to eq('John')
+          expect(instance[0].last_name).to eq(nil)
+          expect(instance[0].age).to eq(nil)
+
+          instance = mapper.from_csv(csv, except: [:first_name], headers: true)
+          expect(instance[0].first_name).to eq(nil)
+          expect(instance[0].last_name).to eq('Doe')
+          expect(instance[0].age).to eq(44)
+        end
+
+        it 'maps CSV collection to partial object' do
+          instance = mapper.from_csv(csv_collection, only: [:first_name], headers: true)
+          2.times do |i|
+            expect(instance[i].first_name).to eq('John')
+            expect(instance[i].last_name).to eq(nil)
+            expect(instance[i].age).to eq(nil)
+          end
+
+          instance = mapper.from_csv(csv_collection, except: [:first_name], headers: true)
+          2.times do |i|
+            expect(instance[i].first_name).to eq(nil)
+            expect(instance[i].last_name).to eq('Doe')
+            expect(instance[i].age).to eq(44)
+          end
+        end
+      end
+
+      describe '.to_csv' do
+        it 'converts objects to partial CSV' do
+          instance = mapper.from_csv(csv, headers: true)
+
+          result = mapper.to_csv(instance, only: [:first_name], headers: true)
+          expect(result).to eq("first_name\nJohn\n")
+
+          result = mapper.to_csv(instance, except: [:first_name], headers: true)
+          expect(result).to eq("last_name,age\nDoe,44\n")
+        end
+
+        it 'converts array to partial CSV' do
+          instance = mapper.from_csv(csv_collection, headers: true)
+
+          result = mapper.to_csv(instance, only: [:first_name], headers: true)
+          expect(result).to eq(<<~DOC)
+            first_name
+            John
+            John
+          DOC
+
+          result = mapper.to_csv(instance, except: [:first_name], headers: true)
+          expect(result).to eq(<<~DOC)
+            last_name,age
+            Doe,44
+            Doe,44
+          DOC
+        end
+      end
+    end
+
     context 'with XML mapping' do
       let(:xml) do
         <<~DOC
@@ -3512,6 +3948,52 @@ RSpec.describe Shale::Type::Complex do
       end
     end
 
+    context 'with CSV mapping' do
+      let(:csv) do
+        <<~DOC
+          John
+        DOC
+      end
+
+      let(:csv_collection) do
+        <<~DOC
+          John
+          John
+        DOC
+      end
+
+      describe '.from_csv' do
+        it 'maps CSV to object' do
+          instance = mapper.from_csv(csv, context: 'foo')
+          expect(instance[0].first_name).to eq('John:foo')
+        end
+
+        it 'maps CSV to array' do
+          instance = mapper.from_csv(csv_collection, context: 'foo')
+
+          2.times do |i|
+            expect(instance[i].first_name).to eq('John:foo')
+          end
+        end
+      end
+
+      describe '.to_csv' do
+        it 'converts objects to CSV' do
+          instance = mapper.new(first_name: 'John')
+
+          result = instance.to_csv(context: 'bar')
+          expect(result).to eq("John:bar\n")
+        end
+
+        it 'converts array to CSV' do
+          instance = mapper.new(first_name: 'John')
+
+          result = mapper.to_csv([instance, instance], context: 'bar')
+          expect(result).to eq("John:bar\nJohn:bar\n")
+        end
+      end
+    end
+
     context 'with XML mapping' do
       let(:xml) do
         <<~DOC
@@ -3786,6 +4268,37 @@ RSpec.describe Shale::Type::Complex do
       end
     end
 
+    context 'with CSV mapping' do
+      let(:csv) do
+        <<~DOC
+          true,2022-01-01,1.1,1,foo,2021-01-01T10:10:10+01:00,foo
+        DOC
+      end
+
+      describe '.from_csv' do
+        it 'maps CSV to object' do
+          instance = mapper.from_csv(csv)[0]
+
+          expect(instance.type_boolean).to eq(true)
+          expect(instance.type_date).to eq(Date.new(2022, 1, 1))
+          expect(instance.type_float).to eq(1.1)
+          expect(instance.type_integer).to eq(1)
+          expect(instance.type_string).to eq('foo')
+          expect(instance.type_time).to eq(Time.new(2021, 1, 1, 10, 10, 10, '+01:00'))
+          expect(instance.type_value).to eq('foo')
+        end
+      end
+
+      describe '.to_csv' do
+        it 'converts objects to CSV' do
+          instance = mapper.from_csv(csv)
+
+          result = mapper.to_csv(instance)
+          expect(result).to eq(csv)
+        end
+      end
+    end
+
     context 'with XML mapping' do
       let(:xml) do
         <<~DOC
@@ -3973,6 +4486,32 @@ RSpec.describe Shale::Type::Complex do
         end
       end
 
+      context 'with CSV mapping' do
+        let(:csv) do
+          <<~DOC
+            one,two
+          DOC
+        end
+
+        describe '.from_csv' do
+          it 'maps CSV to object' do
+            instance = mapper.from_csv(csv)[0]
+
+            expect(instance.one).to eq('one')
+            expect(instance.two).to eq('two')
+          end
+        end
+
+        describe '.to_csv' do
+          it 'converts objects to CSV' do
+            instance = mapper.new(one: 'one', two: 'two')
+
+            result = instance.to_csv
+            expect(result).to eq("one,two\n")
+          end
+        end
+      end
+
       context 'with XML mapping' do
         let(:xml) do
           <<~DOC
@@ -4126,6 +4665,34 @@ RSpec.describe Shale::Type::Complex do
             expect(result).to eq(<<~DOC)
               one = "onefoo"
               two = "twofoo"
+            DOC
+          end
+        end
+      end
+
+      context 'with CSV mapping' do
+        let(:csv) do
+          <<~DOC
+            one,two
+          DOC
+        end
+
+        describe '.from_csv' do
+          it 'maps CSV to object' do
+            instance = mapper.from_csv(csv, context: 'foo')[0]
+
+            expect(instance.one).to eq('onefoo')
+            expect(instance.two).to eq('twofoo')
+          end
+        end
+
+        describe '.to_csv' do
+          it 'converts objects to CSV' do
+            instance = mapper.new(one: 'one', two: 'two')
+
+            result = instance.to_csv(context: 'foo')
+            expect(result).to eq(<<~DOC)
+              onefoo,twofoo
             DOC
           end
         end

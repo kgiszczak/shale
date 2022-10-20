@@ -81,6 +81,28 @@ RSpec.describe Shale::Type::Date do
     end
   end
 
+  describe '.as_csv' do
+    context 'when value is nil' do
+      it 'returns nil' do
+        expect(described_class.as_csv(nil)).to eq(nil)
+      end
+    end
+
+    context 'when value is present' do
+      it 'returns ISO formatted date' do
+        date = Date.new(2021, 1, 1)
+        expect(described_class.as_csv(date)).to eq('2021-01-01')
+      end
+    end
+
+    context 'with extra params' do
+      it 'returns ISO formatted date' do
+        date = Date.new(2021, 1, 1)
+        expect(described_class.as_csv(date, context: nil)).to eq('2021-01-01')
+      end
+    end
+  end
+
   describe '.as_xml_value' do
     context 'when value is nil' do
       it 'returns nil' do

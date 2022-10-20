@@ -1,18 +1,18 @@
 # Shale
 
-Shale is a Ruby object mapper and serializer for JSON, YAML, TOML and XML.
-It allows you to parse JSON, YAML, TOML and XML data and convert it into Ruby data structures,
-as well as serialize data structures into JSON, YAML, TOML or XML.
+Shale is a Ruby object mapper and serializer for JSON, YAML, TOML, CSV and XML.
+It allows you to parse JSON, YAML, TOML, CSV and XML data and convert it into Ruby data structures,
+as well as serialize data structures into JSON, YAML, TOML, CSV or XML.
 
 Documentation with interactive examples is available at [Shale website](https://www.shalerb.org)
 
 ## Features
 
-* Convert JSON, YAML, TOML and XML to Ruby data model
-* Convert Ruby data model to JSON, YAML, TOML and XML
+* Convert JSON, YAML, TOML, CSV and XML to Ruby data model
+* Convert Ruby data model to JSON, YAML, TOML, CSV and XML
 * Generate JSON and XML Schema from Ruby models
 * Compile JSON and XML Schema into Ruby models
-* Out of the box support for JSON, YAML, Tomlib, toml-rb, Nokogiri, REXML and Ox parsers
+* Out of the box support for JSON, YAML, Tomlib, toml-rb, CSV, Nokogiri, REXML and Ox parsers
 * Support for custom adapters
 
 ## Installation
@@ -51,10 +51,13 @@ $ gem install shale
 * [Converting object to Hash](#converting-object-to-hash)
 * [Converting XML to object](#converting-xml-to-object)
 * [Converting object to XML](#converting-object-to-xml)
+* [Converting CSV to object](#converting-csv-to-object)
+* [Converting object to CSV](#converting-object-to-csv)
 * [Converting collections](#converting-collections)
 * [Mapping JSON keys to object attributes](#mapping-json-keys-to-object-attributes)
 * [Mapping YAML keys to object attributes](#mapping-yaml-keys-to-object-attributes)
 * [Mapping TOML keys to object attributes](#mapping-toml-keys-to-object-attributes)
+* [Mapping CSV columns to object attributes](#mapping-csv-columns-to-object-attributes)
 * [Mapping Hash keys to object attributes](#mapping-hash-keys-to-object-attributes)
 * [Mapping XML elements and attributes to object attributes](#mapping-xml-elements-and-attributes-to-object-attributes)
 * [Using XML namespaces](#using-xml-namespaces)
@@ -347,16 +350,43 @@ person.to_xml
 # </person>
 ```
 
+### Converting CSV to object
+
+CSV represents a flat data structure, so you can't map properties to complex types directly,
+but you can use methods to map properties to complex types
+(see [Using methods to extract and generate data](#using-methods-to-extract-and-generate-data)
+section).
+
+`.from_csv` method allways returns an array of records.
+
+```ruby
+people = Person.from_csv(<<~DATA)
+John,Doe,50,false
+DATA
+```
+
+### Converting object to CSV
+
+```ruby
+people[0].to_csv # or Person.to_csv(people) if you want to convert a collection
+
+# =>
+#
+# John,Doe,50,false
+```
+
 ### Converting collections
 
-Shale allows converting collections for formats that support it (JSON and YAML).
+Shale allows converting collections for formats that support it (JSON, YAML and CSV).
 To convert Ruby array to JSON:
 
 ```ruby
 person1 = Person.new(name: 'John Doe')
 person2 = Person.new(name: 'Joe Sixpack')
 
-Person.to_json([person1, person2], pretty: true) # or Person.to_yaml([person1, person2])
+Person.to_json([person1, person2], pretty: true)
+# or Person.to_yaml([person1, person2])
+# or Person.to_csv([person1, person2])
 
 # =>
 #
@@ -424,6 +454,24 @@ class Person < Shale::Mapper
   attribute :last_name, Shale::Type::String
 
   toml do
+    map 'firstName', to: :first_name
+    map 'lastName', to: :last_name
+  end
+end
+```
+
+### Mapping CSV columns to object attributes
+
+For CSV the order of mapping matters, the first argument in the `map` method is only
+used as a label in header row. So, in the example below the first column will be mapped
+to `:first_name` attribute and the second column to `:last_name`.
+
+```ruby
+class Person < Shale::Mapper
+  attribute :first_name, Shale::Type::String
+  attribute :last_name, Shale::Type::String
+
+  csv do
     map 'firstName', to: :first_name
     map 'lastName', to: :last_name
   end
@@ -599,8 +647,9 @@ DATA
 
 ### Rendering nil values
 
-By default elements with `nil` value are not rendered. You can change this behavior
-by using `render_nil: true` on a mapping.
+For JSON, YAML, TOML and XML by default, elements with `nil` value are not rendered.
+You can change this behavior by using `render_nil: true` on a mapping.
+For CSV the default is to render `nil` elements.
 
 ```ruby
 class Person < Shale::Mapper
@@ -905,6 +954,38 @@ person.to_xml(pretty: true, declaration: true, encoding: true)
 # </Person>
 ```
 
+For CSV you can pass `headers: true` to indicate that the first row contains column
+names and shouldn't be included in the returned collection. It also accepts all the options that
+[CSV parser](https://ruby-doc.org/stdlib-3.1.2/libdoc/csv/rdoc/CSV.html#class-CSV-label-Options) accepts.
+
+```ruby
+class Person
+  attribute :first_name, Shale::Type::String
+  attribute :last_name, Shale::Type::String
+end
+
+people = Person.from_csv(<<~DATA, headers: true, col_sep: '|')
+  first_name|last_name
+  John|Doe
+  James|Sixpack
+DATA
+
+# =>
+#
+# [
+#   #<Person:0x0000000113d7a488 @first_name="John", @last_name="Doe">,
+#   #<Person:0x0000000113d7a488 @first_name="James", @last_name="Sixpack">
+# ]
+
+Person.to_csv(people, headers: true, col_sep: '|')
+
+# =>
+#
+# first_name|last_name
+# John|Doe
+# James|Sixpack
+```
+
 ### Using custom models
 
 By default Shale combines mapper and model into one class. If you want to use your own classes
@@ -994,10 +1075,10 @@ end
 ### Adapters
 
 Shale uses adapters for parsing and generating documents.
-By default Ruby's standard JSON, YAML parsers are used for handling JSON and YAML documents.
+By default Ruby's standard JSON, YAML, CSV parsers are used for handling JSON YAML, CSV documents.
 
-You can change it by providing your own adapter. For JSON, YAML and TOML, adapter must implement
-`.load` and `.dump` class methods.
+You can change it by providing your own adapter. For JSON, YAML, TOML and CSV adapter must
+implement `.load` and `.dump` class methods.
 
 ```ruby
 require 'shale'

@@ -83,6 +83,28 @@ RSpec.describe Shale::Type::Time do
     end
   end
 
+  describe '.as_csv' do
+    context 'when value is nil' do
+      it 'returns nil' do
+        expect(described_class.as_csv(nil)).to eq(nil)
+      end
+    end
+
+    context 'when value is present' do
+      it 'returns ISO formatted time' do
+        time = Time.new(2021, 1, 1, 10, 10, 10, '+01:00')
+        expect(described_class.as_csv(time)).to eq('2021-01-01T10:10:10+01:00')
+      end
+    end
+
+    context 'with extra params' do
+      it 'returns ISO formatted time' do
+        time = Time.new(2021, 1, 1, 10, 10, 10, '+01:00')
+        expect(described_class.as_csv(time, context: nil)).to eq('2021-01-01T10:10:10+01:00')
+      end
+    end
+  end
+
   describe '.as_xml_value' do
     context 'when value is nil' do
       it 'returns nil' do

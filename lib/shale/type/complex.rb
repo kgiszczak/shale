@@ -13,7 +13,7 @@ module Shale
     # @api private
     class Complex < Value
       class << self
-        %i[hash json yaml toml].each do |format|
+        %i[hash json yaml toml csv].each do |format|
           class_eval(<<-RUBY, __FILE__, __LINE__ + 1)
             # Convert Hash to Object using Hash/JSON/YAML/TOML mapping
             #
@@ -334,6 +334,65 @@ module Shale
           Shale.toml_adapter.dump(
             as_toml(instance, only: only, except: except, context: context)
           )
+        end
+
+        # Convert CSV to Object
+        #
+        # @param [String] csv CSV to convert
+        # @param [Array<Symbol>] only
+        # @param [Array<Symbol>] except
+        # @param [any] context
+        # @param [true, false] headers
+        # @param [Hash] csv_options
+        #
+        # @return [model instance]
+        #
+        # @api public
+        def from_csv(csv, only: nil, except: nil, context: nil, headers: false, **csv_options)
+          data = Shale.csv_adapter.load(csv, **csv_options.merge(headers: csv_mapping.keys.keys))
+
+          data.shift if headers
+
+          of_csv(
+            data,
+            only: only,
+            except: except,
+            context: context
+          )
+        end
+
+        # Convert Object to CSV
+        #
+        # @param [model instance] instance Object to convert
+        # @param [Array<Symbol>] only
+        # @param [Array<Symbol>] except
+        # @param [any] context
+        # @param [true, false] headers
+        # @param [Hash] csv_options
+        #
+        # @return [String]
+        #
+        # @api public
+        def to_csv(instance, only: nil, except: nil, context: nil, headers: false, **csv_options)
+          data = as_csv([*instance], only: only, except: except, context: context)
+
+          cols = csv_mapping.keys.values
+
+          if only
+            cols = cols.select { |e| only.include?(e.attribute) }
+          end
+
+          if except
+            cols = cols.reject { |e| except.include?(e.attribute) }
+          end
+
+          cols = cols.map(&:name)
+
+          if headers
+            data.prepend(cols.to_h { |e| [e, e] })
+          end
+
+          Shale.csv_adapter.dump(data, **csv_options.merge(headers: cols))
         end
 
         # Convert XML document to Object
@@ -827,6 +886,26 @@ module Shale
       # @api public
       def to_toml(only: nil, except: nil, context: nil)
         self.class.to_toml(self, only: only, except: except, context: context)
+      end
+
+      # Convert Object to CSV
+      #
+      # @param [Array<Symbol>] only
+      # @param [Array<Symbol>] except
+      # @param [any] context
+      #
+      # @return [String]
+      #
+      # @api public
+      def to_csv(only: nil, except: nil, context: nil, headers: false, **csv_options)
+        self.class.to_csv(
+          self,
+          only: only,
+          except: except,
+          context: context,
+          headers: headers,
+          **csv_options
+        )
       end
 
       # Convert Object to XML

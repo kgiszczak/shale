@@ -1,6 +1,7 @@
 ## [0.9.0] - [unreleased]
 
 ### Added
+- Support for CSV
 - Allow to specify version and add encoding to XML declaration
 - Support for mapping/generating collections
 
