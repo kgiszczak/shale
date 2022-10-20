@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.authors = ['Kamil Giszczak']
   spec.email = ['beerkg@gmail.com']
 
-  spec.summary = 'Ruby object mapper and serializer for XML, JSON, TOML and YAML.'
-  spec.description = 'Ruby object mapper and serializer for XML, JSON, TOML and YAML.'
+  spec.summary = 'Ruby object mapper and serializer for XML, JSON, TOML, CSV and YAML.'
+  spec.description = 'Ruby object mapper and serializer for XML, JSON, TOML, CSV and YAML.'
   spec.homepage = 'https://shalerb.org'
   spec.license = 'MIT'
 
