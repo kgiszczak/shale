@@ -1,4 +1,4 @@
-## [0.9.0] - [unreleased]
+## [0.9.0] - 2022-10-31
 
 ### Added
 - Support for CSV
