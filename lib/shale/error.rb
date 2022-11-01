@@ -53,10 +53,16 @@ module Shale
     end
   end
 
+  # Shale base error class
+  #
+  # @api private
+  class ShaleError < StandardError
+  end
+
   # Error for trying to assign not callable object as an attribute's default
   #
   # @api private
-  class DefaultNotCallableError < StandardError
+  class DefaultNotCallableError < ShaleError
     # Initialize error object
     #
     # @param [String] record
@@ -71,36 +77,36 @@ module Shale
   # Error for passing incorrect model type
   #
   # @api private
-  class IncorrectModelError < StandardError
+  class IncorrectModelError < ShaleError
   end
 
   # Error for passing incorrect arguments to map functions
   #
   # @api private
-  class IncorrectMappingArgumentsError < StandardError
+  class IncorrectMappingArgumentsError < ShaleError
   end
 
   # Error for passing incorrect arguments to schema generation function
   #
   # @api private
-  class NotAShaleMapperError < StandardError
+  class NotAShaleMapperError < ShaleError
   end
 
   # Schema compilation error
   #
   # @api private
-  class SchemaError < StandardError
+  class SchemaError < ShaleError
   end
 
   # Parsing error
   #
   # @api private
-  class ParseError < StandardError
+  class ParseError < ShaleError
   end
 
   # Adapter error
   #
   # @api private
-  class AdapterError < StandardError
+  class AdapterError < ShaleError
   end
 end

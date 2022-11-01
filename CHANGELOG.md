@@ -1,3 +1,8 @@
+### [1.0.0] - [unreleased]
+
+### Changed
+- Use `ShaleError` as a base class for exceptions
+
 ## [0.9.0] - 2022-10-31
 
 ### Added
