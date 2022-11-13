@@ -73,6 +73,7 @@ module Shale
       #
       # @param [String] element
       # @param [Symbol, nil] to
+      # @param [Symbol, nil] receiver
       # @param [Hash, nil] using
       # @param [String, nil] group
       # @param [String, nil] namespace
@@ -86,6 +87,7 @@ module Shale
       def map_element(
         element,
         to: nil,
+        receiver: nil,
         using: nil,
         group: nil,
         namespace: :undefined,
@@ -93,7 +95,7 @@ module Shale
         cdata: false,
         render_nil: false
       )
-        Validator.validate_arguments(element, to, using)
+        Validator.validate_arguments(element, to, receiver, using)
         Validator.validate_namespace(element, namespace, prefix)
 
         if namespace == :undefined && prefix == :undefined
@@ -109,6 +111,7 @@ module Shale
         @elements[namespaced_element] = Descriptor::Xml.new(
           name: element,
           attribute: to,
+          receiver: receiver,
           methods: using,
           group: group,
           namespace: Descriptor::XmlNamespace.new(nsp, pfx),
@@ -121,7 +124,9 @@ module Shale
       #
       # @param [String] attribute
       # @param [Symbol, nil] to
+      # @param [Symbol, nil] receiver
       # @param [Hash, nil] using
+      # @param [String, nil] group
       # @param [String, nil] namespace
       # @param [String, nil] prefix
       # @param [true, false] render_nil
@@ -132,13 +137,14 @@ module Shale
       def map_attribute(
         attribute,
         to: nil,
+        receiver: nil,
         using: nil,
         group: nil,
         namespace: nil,
         prefix: nil,
         render_nil: false
       )
-        Validator.validate_arguments(attribute, to, using)
+        Validator.validate_arguments(attribute, to, receiver, using)
         Validator.validate_namespace(attribute, namespace, prefix)
 
         namespaced_attribute = [namespace, attribute].compact.join(':')
@@ -146,6 +152,7 @@ module Shale
         @attributes[namespaced_attribute] = Descriptor::Xml.new(
           name: attribute,
           attribute: to,
+          receiver: receiver,
           methods: using,
           namespace: Descriptor::XmlNamespace.new(namespace, prefix),
           cdata: false,
@@ -157,16 +164,19 @@ module Shale
       # Map document's content to object's attribute
       #
       # @param [Symbol] to
+      # @param [Symbol, nil] receiver
       # @param [Hash, nil] using
+      # @param [String, nil] group
       # @param [true, false] cdata
       #
       # @api private
-      def map_content(to: nil, using: nil, group: nil, cdata: false)
-        Validator.validate_arguments('content', to, using)
+      def map_content(to: nil, receiver: nil, using: nil, group: nil, cdata: false)
+        Validator.validate_arguments('content', to, receiver, using)
 
         @content = Descriptor::Xml.new(
           name: nil,
           attribute: to,
+          receiver: receiver,
           methods: using,
           namespace: Descriptor::XmlNamespace.new(nil, nil),
           cdata: cdata,

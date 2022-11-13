@@ -12,6 +12,7 @@ RSpec.describe Shale::Mapping::Group::XmlGrouping do
       mapping = Shale::Mapping::Descriptor::Xml.new(
         name: nil,
         attribute: nil,
+        receiver: nil,
         methods: { from: :met_from, to: :met_to },
         group: 'group1',
         namespace: Shale::Mapping::Descriptor::XmlNamespace.new,
@@ -24,6 +25,7 @@ RSpec.describe Shale::Mapping::Group::XmlGrouping do
       mapping = Shale::Mapping::Descriptor::Xml.new(
         name: 'foo',
         attribute: nil,
+        receiver: nil,
         methods: { from: :met_from, to: :met_to },
         group: 'group1',
         namespace: Shale::Mapping::Descriptor::XmlNamespace.new,
@@ -36,6 +38,7 @@ RSpec.describe Shale::Mapping::Group::XmlGrouping do
       mapping = Shale::Mapping::Descriptor::Xml.new(
         name: 'bar',
         attribute: nil,
+        receiver: nil,
         methods: { from: :met_from, to: :met_to },
         group: 'group1',
         namespace: Shale::Mapping::Descriptor::XmlNamespace.new,
@@ -48,6 +51,7 @@ RSpec.describe Shale::Mapping::Group::XmlGrouping do
       mapping = Shale::Mapping::Descriptor::Xml.new(
         name: nil,
         attribute: nil,
+        receiver: nil,
         methods: { from: :met_from_alt, to: :met_to_alt },
         group: 'group2',
         namespace: Shale::Mapping::Descriptor::XmlNamespace.new('http://foo.com', 'foo'),
@@ -60,6 +64,7 @@ RSpec.describe Shale::Mapping::Group::XmlGrouping do
       mapping = Shale::Mapping::Descriptor::Xml.new(
         name: 'foo',
         attribute: nil,
+        receiver: nil,
         methods: { from: :met_from_alt, to: :met_to_alt },
         group: 'group2',
         namespace: Shale::Mapping::Descriptor::XmlNamespace.new('http://foo.com', 'foo'),
@@ -72,6 +77,7 @@ RSpec.describe Shale::Mapping::Group::XmlGrouping do
       mapping = Shale::Mapping::Descriptor::Xml.new(
         name: 'bar',
         attribute: nil,
+        receiver: nil,
         methods: { from: :met_from_alt, to: :met_to_alt },
         group: 'group2',
         namespace: Shale::Mapping::Descriptor::XmlNamespace.new('http://foo.com', 'foo'),

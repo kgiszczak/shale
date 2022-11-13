@@ -9,6 +9,7 @@ RSpec.describe Shale::Mapping::Descriptor::Xml do
       obj = described_class.new(
         name: 'foo',
         attribute: :foo,
+        receiver: :foo,
         methods: { from: :method_from, to: :method_to },
         group: nil,
         namespace: nil,
@@ -18,6 +19,7 @@ RSpec.describe Shale::Mapping::Descriptor::Xml do
 
       expect(obj.name).to eq('foo')
       expect(obj.attribute).to eq(:foo)
+      expect(obj.receiver).to eq(:foo)
       expect(obj.method_from).to eq(:method_from)
       expect(obj.method_to).to eq(:method_to)
       expect(obj.render_nil?).to eq(true)
@@ -31,6 +33,7 @@ RSpec.describe Shale::Mapping::Descriptor::Xml do
       obj = described_class.new(
         name: 'foo',
         attribute: :foo,
+        receiver: nil,
         methods: nil,
         group: nil,
         namespace: nsp,
@@ -47,6 +50,7 @@ RSpec.describe Shale::Mapping::Descriptor::Xml do
       obj = described_class.new(
         name: 'foo',
         attribute: :foo,
+        receiver: nil,
         methods: nil,
         group: nil,
         namespace: nil,
@@ -64,6 +68,7 @@ RSpec.describe Shale::Mapping::Descriptor::Xml do
         obj = described_class.new(
           name: 'foo',
           attribute: :foo,
+          receiver: nil,
           methods: nil,
           group: nil,
           namespace: Shale::Mapping::Descriptor::XmlNamespace.new('http://bar.com', 'bar'),
@@ -80,6 +85,7 @@ RSpec.describe Shale::Mapping::Descriptor::Xml do
         obj = described_class.new(
           name: 'foo',
           attribute: :foo,
+          receiver: nil,
           methods: nil,
           group: nil,
           namespace: Shale::Mapping::Descriptor::XmlNamespace.new,
@@ -98,6 +104,7 @@ RSpec.describe Shale::Mapping::Descriptor::Xml do
         obj = described_class.new(
           name: 'foo',
           attribute: :foo,
+          receiver: nil,
           methods: nil,
           group: nil,
           namespace: Shale::Mapping::Descriptor::XmlNamespace.new('http://bar.com', 'bar'),
@@ -114,6 +121,7 @@ RSpec.describe Shale::Mapping::Descriptor::Xml do
         obj = described_class.new(
           name: 'foo',
           attribute: :foo,
+          receiver: nil,
           methods: nil,
           group: nil,
           namespace: Shale::Mapping::Descriptor::XmlNamespace.new,

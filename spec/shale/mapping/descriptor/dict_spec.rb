@@ -4,15 +4,32 @@ require 'shale/mapping/descriptor/dict'
 
 RSpec.describe Shale::Mapping::Descriptor::Dict do
   describe '#name' do
-    it 'returns name' do
-      obj = described_class.new(
-        name: 'foo',
-        attribute: :bar,
-        methods: nil,
-        group: nil,
-        render_nil: false
-      )
-      expect(obj.name).to eq('foo')
+    context 'when name is set' do
+      it 'returns name' do
+        obj = described_class.new(
+          name: 'foo',
+          attribute: nil,
+          receiver: nil,
+          methods: nil,
+          group: nil,
+          render_nil: false
+        )
+        expect(obj.name).to eq('foo')
+      end
+    end
+
+    context 'when name is not set' do
+      it 'returns nil' do
+        obj = described_class.new(
+          name: nil,
+          attribute: nil,
+          receiver: nil,
+          methods: nil,
+          group: nil,
+          render_nil: false
+        )
+        expect(obj.name).to eq(nil)
+      end
     end
   end
 
@@ -22,6 +39,7 @@ RSpec.describe Shale::Mapping::Descriptor::Dict do
         obj = described_class.new(
           name: 'foo',
           attribute: :bar,
+          receiver: nil,
           methods: nil,
           group: nil,
           render_nil: false
@@ -35,11 +53,42 @@ RSpec.describe Shale::Mapping::Descriptor::Dict do
         obj = described_class.new(
           name: 'foo',
           attribute: nil,
+          receiver: nil,
           methods: nil,
           group: nil,
           render_nil: false
         )
         expect(obj.attribute).to eq(nil)
+      end
+    end
+  end
+
+  describe '#receiver' do
+    context 'when receiver is set' do
+      it 'returns receiver' do
+        obj = described_class.new(
+          name: 'foo',
+          attribute: nil,
+          receiver: :foo,
+          methods: nil,
+          group: nil,
+          render_nil: false
+        )
+        expect(obj.receiver).to eq(:foo)
+      end
+    end
+
+    context 'when receiver is not set' do
+      it 'returns nil' do
+        obj = described_class.new(
+          name: 'foo',
+          attribute: nil,
+          receiver: nil,
+          methods: nil,
+          group: nil,
+          render_nil: false
+        )
+        expect(obj.receiver).to eq(nil)
       end
     end
   end
@@ -50,6 +99,7 @@ RSpec.describe Shale::Mapping::Descriptor::Dict do
         obj = described_class.new(
           name: 'foo',
           attribute: :bar,
+          receiver: nil,
           methods: { from: :met_from, to: :met_to },
           group: nil,
           render_nil: false
@@ -63,6 +113,7 @@ RSpec.describe Shale::Mapping::Descriptor::Dict do
         obj = described_class.new(
           name: 'foo',
           attribute: :bar,
+          receiver: nil,
           methods: nil,
           group: nil,
           render_nil: false
@@ -78,6 +129,7 @@ RSpec.describe Shale::Mapping::Descriptor::Dict do
         obj = described_class.new(
           name: 'foo',
           attribute: :bar,
+          receiver: nil,
           methods: { from: :met_from, to: :met_to },
           group: nil,
           render_nil: false
@@ -91,6 +143,7 @@ RSpec.describe Shale::Mapping::Descriptor::Dict do
         obj = described_class.new(
           name: 'foo',
           attribute: :bar,
+          receiver: nil,
           methods: nil,
           group: nil,
           render_nil: false
@@ -106,6 +159,7 @@ RSpec.describe Shale::Mapping::Descriptor::Dict do
         obj = described_class.new(
           name: 'foo',
           attribute: nil,
+          receiver: nil,
           methods: nil,
           group: 'foobar',
           render_nil: false
@@ -119,6 +173,7 @@ RSpec.describe Shale::Mapping::Descriptor::Dict do
         obj = described_class.new(
           name: 'foo',
           attribute: nil,
+          receiver: nil,
           methods: nil,
           group: nil,
           render_nil: false
@@ -134,6 +189,7 @@ RSpec.describe Shale::Mapping::Descriptor::Dict do
         obj = described_class.new(
           name: 'foo',
           attribute: :bar,
+          receiver: nil,
           methods: nil,
           group: nil,
           render_nil: true
@@ -147,6 +203,7 @@ RSpec.describe Shale::Mapping::Descriptor::Dict do
         obj = described_class.new(
           name: 'foo',
           attribute: :bar,
+          receiver: nil,
           methods: nil,
           group: nil,
           render_nil: false
@@ -160,6 +217,7 @@ RSpec.describe Shale::Mapping::Descriptor::Dict do
         obj = described_class.new(
           name: 'foo',
           attribute: :bar,
+          receiver: nil,
           methods: nil,
           group: nil,
           render_nil: nil
@@ -173,6 +231,7 @@ RSpec.describe Shale::Mapping::Descriptor::Dict do
         obj = described_class.new(
           name: 'foo',
           attribute: :bar,
+          receiver: nil,
           methods: nil,
           group: nil,
           render_nil: 'foobar'

@@ -63,6 +63,7 @@ $ gem install shale
 * [Using XML namespaces](#using-xml-namespaces)
 * [Rendering nil values](#rendering-nil-values)
 * [Using methods to extract and generate data](#using-methods-to-extract-and-generate-data)
+* [Delegating fields to child attributes](#delegating-fields-to-child-attributes)
 * [Additional options](#additional-options)
 * [Using custom models](#using-custom-models)
 * [Supported types](#supported-types)
@@ -863,6 +864,42 @@ Person.from_json(<<~DATA)
 DATA
 
 # => #<Person:0x00007f9bc3086d60 @name="John Doe">
+```
+
+### Delegating fields to child attributes
+
+To delegate fields to child complex types you can use `receiver: :child` declaration:
+
+```ruby
+class Address < Shale::Mapper
+  attribute :city, Shale::Type::String
+  attribute :street, Shale::Type::String
+end
+
+class Person < Shale::Mapper
+  attribute :name, Shale::Type::String
+  attribute :address, Address
+
+  json do
+    map 'name', to: :name
+    map 'city', to: :city, receiver: :address
+    map 'street', to: :street, receiver: :address
+  end
+end
+
+person = Person.from_json(<<~DATA)
+{
+  "name": "John Doe",
+  "city": "London",
+  "street": "Oxford Street"
+}
+DATA
+
+# =>
+#
+# #<Person:0x00007f9bc3086d60
+#  @name="John Doe",
+#  @address=#<Address:0x0000000102cbd218 @city="London", @street="Oxford Street">>
 ```
 
 ### Additional options

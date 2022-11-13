@@ -21,6 +21,13 @@ module Shale
         # @api private
         attr_reader :attribute
 
+        # Return receiver name
+        #
+        # @return [Symbol]
+        #
+        # @api private
+        attr_reader :receiver
+
         # Return method symbol
         #
         # @return [Symbol]
@@ -46,14 +53,16 @@ module Shale
         #
         # @param [String] name
         # @param [Symbol, nil] attribute
+        # @param [Symbol, nil] receiver
         # @param [Hash, nil] methods
         # @param [String, nil] group
         # @param [true, false] render_nil
         #
         # @api private
-        def initialize(name:, attribute:, methods:, group:, render_nil:)
+        def initialize(name:, attribute:, receiver:, methods:, group:, render_nil:)
           @name = name
           @attribute = attribute
+          @receiver = receiver
           @group = group
           @render_nil = render_nil
 

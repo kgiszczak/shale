@@ -86,10 +86,16 @@ module Shale
   class IncorrectMappingArgumentsError < ShaleError
   end
 
-  # Error for passing incorrect arguments to schema generation function
+  # Error for using incorrect type
   #
   # @api private
   class NotAShaleMapperError < ShaleError
+  end
+
+  # Raised when receiver attribute is not defined
+  #
+  # @api private
+  class AttributeNotDefinedError < ShaleError
   end
 
   # Schema compilation error

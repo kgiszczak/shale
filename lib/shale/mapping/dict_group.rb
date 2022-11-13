@@ -4,7 +4,7 @@ require_relative 'dict_base'
 
 module Shale
   module Mapping
-    # Group for dictionary serialization formats (Hash/JSON/YAML)
+    # Group for dictionary serialization formats (Hash/JSON/YAML/TOML/CSV)
     #
     # @api private
     class DictGroup < DictBase

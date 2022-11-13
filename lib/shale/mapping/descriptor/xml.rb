@@ -26,7 +26,8 @@ module Shale
         # Initialize instance
         #
         # @param [String] name
-        # @param [Symbol, String] attribute
+        # @param [Symbol, nil] attribute
+        # @param [Symbol, nil] receiver
         # @param [Hash, nil] methods
         # @param [String, nil] group
         # @param [Shale::Mapping::XmlNamespace] namespace
@@ -34,10 +35,20 @@ module Shale
         # @param [true, false] render_nil
         #
         # @api private
-        def initialize(name:, attribute:, methods:, group:, namespace:, cdata:, render_nil:)
+        def initialize(
+          name:,
+          attribute:,
+          receiver:,
+          methods:,
+          group:,
+          namespace:,
+          cdata:,
+          render_nil:
+        )
           super(
             name: name,
             attribute: attribute,
+            receiver: receiver,
             methods: methods,
             group: group,
             render_nil: render_nil

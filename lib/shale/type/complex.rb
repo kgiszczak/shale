@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative '../error'
+require_relative '../mapping/delegates'
 require_relative '../mapping/group/dict_grouping'
 require_relative '../mapping/group/xml_grouping'
 require_relative 'value'
@@ -47,6 +48,7 @@ module Shale
 
               mapping_keys = #{format}_mapping.keys
               grouping = Shale::Mapping::Group::DictGrouping.new
+              delegates = Shale::Mapping::Delegates.new
 
               only = to_partial_render_attributes(only)
               except = to_partial_render_attributes(except)
@@ -66,7 +68,8 @@ module Shale
                     mapper.send(mapping.method_from, instance, value)
                   end
                 else
-                  attribute = attributes[mapping.attribute]
+                  receiver_attributes = get_receiver_attributes(mapping)
+                  attribute = receiver_attributes[mapping.attribute]
                   next unless attribute
 
                   if only
@@ -79,20 +82,22 @@ module Shale
                     next if except.key?(attribute.name) && attribute_except.nil?
                   end
 
+                  casted_value = nil
+
                   if value.nil?
-                    instance.send(attribute.setter, nil)
+                    casted_value = nil
                   elsif attribute.collection?
-                    [*value].each do |val|
-                      if val
+                    casted_value = (value.is_a?(Array) ? value : [value]).map do |val|
+                      unless val.nil?
                         val = attribute.type.of_#{format}(
                           val,
                           only: attribute_only,
                           except: attribute_except,
                           context: context
                         )
-                      end
 
-                      instance.send(attribute.name) << attribute.type.cast(val)
+                        attribute.type.cast(val)
+                      end
                     end
                   else
                     val = attribute.type.of_#{format}(
@@ -101,9 +106,21 @@ module Shale
                       except: attribute_except,
                       context: context
                     )
-                    instance.send(attribute.setter, attribute.type.cast(val))
+
+                    casted_value = attribute.type.cast(val)
+                  end
+
+                  if mapping.receiver
+                    delegates.add(attributes[mapping.receiver], attribute.setter, casted_value)
+                  else
+                    instance.send(attribute.setter, casted_value)
                   end
                 end
+              end
+
+              delegates.each do |delegate|
+                receiver = get_receiver(instance, delegate.receiver_attribute)
+                receiver.send(delegate.setter, delegate.value)
               end
 
               grouping.each do |group|
@@ -167,7 +184,14 @@ module Shale
                     mapper.send(mapping.method_to, instance, hash)
                   end
                 else
-                  attribute = attributes[mapping.attribute]
+                  if mapping.receiver
+                    receiver = instance.send(mapping.receiver)
+                  else
+                    receiver = instance
+                  end
+
+                  receiver_attributes = get_receiver_attributes(mapping)
+                  attribute = receiver_attributes[mapping.attribute]
                   next unless attribute
 
                   if only
@@ -180,7 +204,7 @@ module Shale
                     next if except.key?(attribute.name) && attribute_except.nil?
                   end
 
-                  value = instance.send(attribute.name)
+                  value = receiver.send(attribute.name) if receiver
 
                   if value.nil?
                     hash[mapping.name] = nil if mapping.render_nil?
@@ -414,6 +438,7 @@ module Shale
             .each { |attr| instance.send(attr.setter, attr.default.call) }
 
           grouping = Shale::Mapping::Group::XmlGrouping.new
+          delegates = Shale::Mapping::Delegates.new
 
           only = to_partial_render_attributes(only)
           except = to_partial_render_attributes(except)
@@ -433,16 +458,29 @@ module Shale
                 mapper.send(mapping.method_from, instance, value)
               end
             else
-              attribute = attributes[mapping.attribute]
+              receiver_attributes = get_receiver_attributes(mapping)
+              attribute = receiver_attributes[mapping.attribute]
               next unless attribute
 
               next if only && !only.key?(attribute.name)
               next if except&.key?(attribute.name)
 
+              casted_value = attribute.type.cast(value)
+
               if attribute.collection?
-                instance.send(attribute.name) << attribute.type.cast(value)
+                if mapping.receiver
+                  delegates.add_collection(
+                    attributes[mapping.receiver],
+                    attribute.setter,
+                    casted_value
+                  )
+                else
+                  instance.send(attribute.name) << casted_value
+                end
+              elsif mapping.receiver
+                delegates.add(attributes[mapping.receiver], attribute.setter, casted_value)
               else
-                instance.send(attribute.setter, attribute.type.cast(value))
+                instance.send(attribute.setter, casted_value)
               end
             end
           end
@@ -461,7 +499,8 @@ module Shale
                 mapper.send(content_mapping.method_from, instance, element)
               end
             else
-              attribute = attributes[content_mapping.attribute]
+              receiver_attributes = get_receiver_attributes(content_mapping)
+              attribute = receiver_attributes[content_mapping.attribute]
 
               if attribute
                 skip = false
@@ -471,8 +510,13 @@ module Shale
                 skip = true if except&.key?(attribute.name)
 
                 unless skip
-                  value = attribute.type.of_xml(element)
-                  instance.send(attribute.setter, attribute.type.cast(value))
+                  value = attribute.type.cast(attribute.type.of_xml(element))
+
+                  if content_mapping.receiver
+                    delegates.add(attributes[content_mapping.receiver], attribute.setter, value)
+                  else
+                    instance.send(attribute.setter, value)
+                  end
                 end
                 # rubocop:enable Metrics/BlockNesting
               end
@@ -494,7 +538,8 @@ module Shale
                 mapper.send(mapping.method_from, instance, node)
               end
             else
-              attribute = attributes[mapping.attribute]
+              receiver_attributes = get_receiver_attributes(mapping)
+              attribute = receiver_attributes[mapping.attribute]
               next unless attribute
 
               if only
@@ -514,12 +559,29 @@ module Shale
                 context: context
               )
 
+              casted_value = attribute.type.cast(value)
+
               if attribute.collection?
-                instance.send(attribute.name) << attribute.type.cast(value)
+                if mapping.receiver
+                  delegates.add_collection(
+                    attributes[mapping.receiver],
+                    attribute.setter,
+                    casted_value
+                  )
+                else
+                  instance.send(attribute.name) << casted_value
+                end
+              elsif mapping.receiver
+                delegates.add(attributes[mapping.receiver], attribute.setter, casted_value)
               else
-                instance.send(attribute.setter, attribute.type.cast(value))
+                instance.send(attribute.setter, casted_value)
               end
             end
+          end
+
+          delegates.each do |delegate|
+            receiver = get_receiver(instance, delegate.receiver_attribute)
+            receiver.send(delegate.setter, delegate.value)
           end
 
           grouping.each do |group|
@@ -626,13 +688,20 @@ module Shale
                 mapper.send(mapping.method_to, instance, element, doc)
               end
             else
-              attribute = attributes[mapping.attribute]
+              if mapping.receiver
+                receiver = instance.send(mapping.receiver)
+              else
+                receiver = instance
+              end
+
+              receiver_attributes = get_receiver_attributes(mapping)
+              attribute = receiver_attributes[mapping.attribute]
               next unless attribute
 
               next if only && !only.key?(attribute.name)
               next if except&.key?(attribute.name)
 
-              value = instance.send(attribute.name)
+              value = receiver ? receiver.send(attribute.name) : nil
 
               if mapping.render_nil? || !value.nil?
                 doc.add_namespace(mapping.namespace.prefix, mapping.namespace.name)
@@ -655,7 +724,14 @@ module Shale
                 mapper.send(content_mapping.method_to, instance, element, doc)
               end
             else
-              attribute = attributes[content_mapping.attribute]
+              if content_mapping.receiver
+                receiver = instance.send(content_mapping.receiver)
+              else
+                receiver = instance
+              end
+
+              receiver_attributes = get_receiver_attributes(content_mapping)
+              attribute = receiver_attributes[content_mapping.attribute]
 
               if attribute
                 skip = false
@@ -665,7 +741,7 @@ module Shale
                 skip = true if except&.key?(attribute.name)
 
                 unless skip
-                  value = instance.send(attribute.name)
+                  value = receiver ? receiver.send(attribute.name) : nil
 
                   if content_mapping.cdata
                     doc.create_cdata(value.to_s, element)
@@ -690,7 +766,14 @@ module Shale
                 mapper.send(mapping.method_to, instance, element, doc)
               end
             else
-              attribute = attributes[mapping.attribute]
+              if mapping.receiver
+                receiver = instance.send(mapping.receiver)
+              else
+                receiver = instance
+              end
+
+              receiver_attributes = get_receiver_attributes(mapping)
+              attribute = receiver_attributes[mapping.attribute]
               next unless attribute
 
               if only
@@ -703,7 +786,7 @@ module Shale
                 next if except.key?(attribute.name) && attribute_except.nil?
               end
 
-              value = instance.send(attribute.name)
+              value = receiver ? receiver.send(attribute.name) : nil
 
               if mapping.render_nil? || !value.nil?
                 doc.add_namespace(mapping.namespace.prefix, mapping.namespace.name)
@@ -826,6 +909,64 @@ module Shale
               obj.push([e, nil])
             end
           end.to_h
+        end
+
+        # Get receiver attributes for given mapping
+        #
+        # @param [Shale::Mapping::Descriptor::Dict] mapping
+        #
+        # @raise [AttributeNotDefinedError]
+        # @raise [NotAShaleMapperError]
+        #
+        # @return [Hash<Symbol, Shale::Attribute>]
+        #
+        # @api private
+        def get_receiver_attributes(mapping)
+          return attributes unless mapping.receiver
+
+          receiver_attribute = attributes[mapping.receiver]
+
+          unless receiver_attribute
+            msg = "attribute '#{mapping.receiver}' is not defined on #{self} mapper"
+            raise AttributeNotDefinedError, msg
+          end
+
+          unless receiver_attribute.type < Mapper
+            msg = "attribute '#{mapping.receiver}' is not a descendant of Shale::Mapper type"
+            raise NotAShaleMapperError, msg
+          end
+
+          if receiver_attribute.collection?
+            msg = "attribute '#{mapping.receiver}' can't be a collection"
+            raise NotAShaleMapperError, msg
+          end
+
+          receiver_attribute.type.attributes
+        end
+
+        # Get receiver for given mapping
+        #
+        # @param [any] instance
+        # @param [Shale::Attribute] receiver_attribute
+        #
+        # @return [Array]
+        #
+        # @api private
+        def get_receiver(instance, receiver_attribute)
+          receiver = instance.send(receiver_attribute.name)
+
+          unless receiver
+            receiver = receiver_attribute.type.model.new
+
+            receiver_attribute.type.attributes
+              .values
+              .select { |attr| attr.default }
+              .each { |attr| receiver.send(attr.setter, attr.default.call) }
+
+            instance.send(receiver_attribute.setter, receiver)
+          end
+
+          receiver
         end
       end
 

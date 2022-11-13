@@ -24,6 +24,16 @@ RSpec.describe Shale::Mapping::Dict do
       end
     end
 
+    context 'when :receiver is not nil' do
+      it 'adds mapping to keys hash' do
+        obj = described_class.new
+        obj.map('foo', to: :bar, receiver: :baz)
+
+        expect(obj.keys.keys).to eq(['foo'])
+        expect(obj.keys['foo'].receiver).to eq(:baz)
+      end
+    end
+
     context 'when :using is not nil' do
       context 'when using: { from: } is nil' do
         it 'raises an error' do

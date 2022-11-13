@@ -31,6 +31,26 @@ RSpec.describe Shale::Mapping::DictBase do
       end
     end
 
+    context 'when :to is nil and :receiver and :using is present' do
+      it 'raises an error' do
+        obj = described_class.new
+
+        expect do
+          obj.map('key', to: nil, receiver: :foo, using: {})
+        end.to raise_error(Shale::IncorrectMappingArgumentsError)
+      end
+    end
+
+    context 'when :receiver is not nil' do
+      it 'adds mapping to keys hash' do
+        obj = described_class.new
+        obj.map('foo', to: :bar, receiver: :baz)
+
+        expect(obj.keys.keys).to eq(['foo'])
+        expect(obj.keys['foo'].receiver).to eq(:baz)
+      end
+    end
+
     context 'when :using is not nil' do
       context 'when using: { from: } is nil' do
         it 'raises an error' do
@@ -132,18 +152,21 @@ RSpec.describe Shale::Mapping::DictBase do
     it 'duplicates keys instance variable' do
       original = described_class.new
       original.finalize!
-      original.map('foo', to: :bar)
+      original.map('foo', to: :bar, receiver: :bar_receiver)
 
       duplicate = original.dup
-      duplicate.map('baz', to: :qux)
+      duplicate.map('baz', to: :qux, receiver: :qux_receiver)
 
       expect(original.keys.keys).to eq(['foo'])
       expect(original.keys['foo'].attribute).to eq(:bar)
+      expect(original.keys['foo'].receiver).to eq(:bar_receiver)
       expect(original.finalized?).to eq(true)
 
       expect(duplicate.keys.keys).to eq(%w[foo baz])
       expect(duplicate.keys['foo'].attribute).to eq(:bar)
+      expect(duplicate.keys['foo'].receiver).to eq(:bar_receiver)
       expect(duplicate.keys['baz'].attribute).to eq(:qux)
+      expect(duplicate.keys['baz'].receiver).to eq(:qux_receiver)
       expect(duplicate.finalized?).to eq(false)
     end
   end

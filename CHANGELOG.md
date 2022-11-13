@@ -1,5 +1,8 @@
 ### [1.0.0] - [unreleased]
 
+### Added
+- Support for delegating fields to nested attributes
+
 ### Changed
 - Use `ShaleError` as a base class for exceptions
 

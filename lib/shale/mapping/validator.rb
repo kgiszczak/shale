@@ -8,15 +8,22 @@ module Shale
       # Validate correctness of argument passed to map functions
       #
       # @param [String] key
-      # @param [Symbol] to
-      # @param [Hash] using
+      # @param [Symbol, nil] to
+      # @param [Symbol, nil] receiver
+      # @param [Hash, nil] using
       #
       # @raise [IncorrectMappingArgumentsError] when arguments are incorrect
       #
       # @api private
-      def self.validate_arguments(key, to, using)
+      def self.validate_arguments(key, to, receiver, using)
         if to.nil? && using.nil?
           msg = ":to or :using argument is required for mapping '#{key}'"
+          raise IncorrectMappingArgumentsError, msg
+        end
+
+        if to.nil? && !receiver.nil?
+          msg = ":receiver argument for mapping '#{key}' " \
+                'can only be used together with :to argument'
           raise IncorrectMappingArgumentsError, msg
         end
 

@@ -5,7 +5,7 @@ require_relative 'validator'
 
 module Shale
   module Mapping
-    # Base class for Mapping dictionary serialization formats (Hash/JSON/YAML)
+    # Base class for Mapping dictionary serialization formats (Hash/JSON/YAML/TOML/CSV)
     #
     # @api private
     class DictBase
@@ -31,6 +31,7 @@ module Shale
       #
       # @param [String] key
       # @param [Symbol, nil] to
+      # @param [Symbol, nil] receiver
       # @param [Hash, nil] using
       # @param [String, nil] group
       # @param [true, false, nil] render_nil
@@ -38,11 +39,12 @@ module Shale
       # @raise [IncorrectMappingArgumentsError] when arguments are incorrect
       #
       # @api private
-      def map(key, to: nil, using: nil, group: nil, render_nil: nil)
-        Validator.validate_arguments(key, to, using)
+      def map(key, to: nil, receiver: nil, using: nil, group: nil, render_nil: nil)
+        Validator.validate_arguments(key, to, receiver, using)
         @keys[key] = Descriptor::Dict.new(
           name: key,
           attribute: to,
+          receiver: receiver,
           methods: using,
           group: group,
           render_nil: render_nil.nil? ? @render_nil_default : render_nil

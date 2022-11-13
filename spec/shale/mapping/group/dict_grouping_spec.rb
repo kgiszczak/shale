@@ -11,6 +11,7 @@ RSpec.describe Shale::Mapping::Group::DictGrouping do
       mapping = Shale::Mapping::Descriptor::Dict.new(
         name: 'foo',
         attribute: nil,
+        receiver: nil,
         methods: { from: :met_from, to: :met_to },
         group: 'group1',
         render_nil: false
@@ -21,6 +22,7 @@ RSpec.describe Shale::Mapping::Group::DictGrouping do
       mapping = Shale::Mapping::Descriptor::Dict.new(
         name: 'bar',
         attribute: nil,
+        receiver: nil,
         methods: { from: :met_from, to: :met_to },
         group: 'group1',
         render_nil: false
@@ -31,6 +33,7 @@ RSpec.describe Shale::Mapping::Group::DictGrouping do
       mapping = Shale::Mapping::Descriptor::Dict.new(
         name: 'baz',
         attribute: nil,
+        receiver: nil,
         methods: { from: :met_from_alt, to: :met_to_alt },
         group: 'group2',
         render_nil: false
@@ -59,6 +62,7 @@ RSpec.describe Shale::Mapping::Group::DictGrouping do
       mapping = Shale::Mapping::Descriptor::Dict.new(
         name: 'foo',
         attribute: nil,
+        receiver: nil,
         methods: { from: :met_from, to: :met_to },
         group: 'group1',
         render_nil: false
@@ -69,6 +73,7 @@ RSpec.describe Shale::Mapping::Group::DictGrouping do
       mapping = Shale::Mapping::Descriptor::Dict.new(
         name: 'bar',
         attribute: nil,
+        receiver: nil,
         methods: { from: :met_from, to: :met_to },
         group: 'group1',
         render_nil: false
@@ -79,6 +84,7 @@ RSpec.describe Shale::Mapping::Group::DictGrouping do
       mapping = Shale::Mapping::Descriptor::Dict.new(
         name: 'baz',
         attribute: nil,
+        receiver: nil,
         methods: { from: :met_from_alt, to: :met_to_alt },
         group: 'group2',
         render_nil: false
