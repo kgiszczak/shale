@@ -124,7 +124,7 @@ RSpec.describe Shale::Type::Complex do
         instance1 = mapper.new(attr_true: nil, attr_false: nil)
         instance2 = mapper.new(attr_true: 'foo', attr_false: 'bar')
 
-        expect(instance1.to_yaml).to eq("---\nattr_true:\n")
+        expect(instance1.to_yaml.gsub(/ +$/, '')).to eq("---\nattr_true:\n")
         expect(instance2.to_yaml).to eq("---\nattr_true: foo\nattr_false: bar\n")
       end
 
@@ -132,7 +132,7 @@ RSpec.describe Shale::Type::Complex do
         instance1 = mapper.new(attr_true: nil, attr_false: nil)
         instance2 = mapper.new(attr_true: 'foo', attr_false: 'bar')
 
-        result = mapper.to_yaml([instance1, instance2])
+        result = mapper.to_yaml([instance1, instance2]).gsub(/ +$/, '')
         expect(result).to eq("---\n- attr_true:\n- attr_true: foo\n  attr_false: bar\n")
       end
     end
