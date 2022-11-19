@@ -6,6 +6,9 @@
 ### Changed
 - Use `ShaleError` as a base class for exceptions
 
+### Fixed
+- Fix compilation error for bundled JSON schemas
+
 ## [0.9.0] - 2022-10-31
 
 ### Added

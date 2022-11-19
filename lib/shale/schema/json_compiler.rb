@@ -297,7 +297,8 @@ module Shale
         if schema.is_a?(Hash) && schema.key?('$ref')
           entry = resolve_ref(id, schema['$ref'])
           schema = entry[:schema]
-          fragment = entry[:id].split('/') - ['#']
+          id = build_id(base_id, schema['$id'])
+          fragment = (entry[:id].split('#')[1] || '').split('/') - ['']
         end
 
         pointer = entry[:id] || build_pointer(id, fragment)

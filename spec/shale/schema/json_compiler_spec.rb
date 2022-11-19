@@ -8,60 +8,6 @@ RSpec.describe Shale::Schema::JSONCompiler do
     Shale.json_adapter = Shale::Adapter::JSON
   end
 
-  let(:schema) do
-    <<~DATA
-      {
-        "type": "object",
-        "properties": {
-          "typeBoolean": { "type": "boolean" },
-          "typeDate": { "type": "string", "format": "date" },
-          "typeFloat": { "type": "number" },
-          "typeInteger": { "type": "integer" },
-          "typeString": { "type": "string" },
-          "typeTime": { "type": "string", "format": "date-time" },
-          "typeUnknown": { "type": "foo" },
-          "typeWithDefault": { "type": "string", "default": "foobar" },
-          "typeMultipleWithNull": { "type": ["string", "null"] },
-          "typeMultipleWithoutNull": { "type": ["string", "number"] },
-          "typeArrayWithItems": {
-            "type": "array",
-            "items": { "type": "string" }
-          },
-          "typeArrayWithoutItems": {
-            "type": "array"
-          },
-          "schemaFalse": false,
-          "schemaTrue": true,
-          "address": {
-            "type": "object",
-            "properties": {
-              "street": { "type": "string" }
-            }
-          },
-          "shipping": {
-            "$ref": "http://foo.com/schemas/address"
-          },
-          "billing": {
-            "$ref": "#/properties/shipping"
-          },
-          "mailing": {
-            "$id": "http://foo.com/schemas/mailing",
-            "type": "string"
-          }
-        },
-        "$defs": {
-          "address": {
-            "$id": "http://foo.com/schemas/address",
-            "type": "object",
-            "properties": {
-              "city": { "type": "string" }
-            }
-          }
-        }
-      }
-    DATA
-  end
-
   describe '#as_models' do
     context 'when duplicate schemas exists' do
       let(:schema) do
@@ -107,6 +53,60 @@ RSpec.describe Shale::Schema::JSONCompiler do
     end
 
     context 'with correct schema' do
+      let(:schema) do
+        <<~DATA
+          {
+            "type": "object",
+            "properties": {
+              "typeBoolean": { "type": "boolean" },
+              "typeDate": { "type": "string", "format": "date" },
+              "typeFloat": { "type": "number" },
+              "typeInteger": { "type": "integer" },
+              "typeString": { "type": "string" },
+              "typeTime": { "type": "string", "format": "date-time" },
+              "typeUnknown": { "type": "foo" },
+              "typeWithDefault": { "type": "string", "default": "foobar" },
+              "typeMultipleWithNull": { "type": ["string", "null"] },
+              "typeMultipleWithoutNull": { "type": ["string", "number"] },
+              "typeArrayWithItems": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "typeArrayWithoutItems": {
+                "type": "array"
+              },
+              "schemaFalse": false,
+              "schemaTrue": true,
+              "address": {
+                "type": "object",
+                "properties": {
+                  "street": { "type": "string" }
+                }
+              },
+              "shipping": {
+                "$ref": "http://foo.com/schemas/address"
+              },
+              "billing": {
+                "$ref": "#/properties/shipping"
+              },
+              "mailing": {
+                "$id": "http://foo.com/schemas/mailing",
+                "type": "string"
+              }
+            },
+            "$defs": {
+              "address": {
+                "$id": "http://foo.com/schemas/address",
+                "type": "object",
+                "properties": {
+                  "city": { "type": "string" }
+                }
+              }
+            }
+          }
+        DATA
+      end
+
       it 'generates Shale models' do
         models = described_class.new.as_models([schema])
 
@@ -220,6 +220,83 @@ RSpec.describe Shale::Schema::JSONCompiler do
         expect(props[16].type).to be_a(Shale::Schema::Compiler::String)
         expect(props[16].collection?).to eq(false)
         expect(props[16].default).to eq(nil)
+      end
+    end
+
+    context 'with bundled schema' do
+      let(:schema) do
+        <<~DATA
+          {
+            "$id": "https://foo.bar/schemas/common",
+
+            "type": "object",
+            "properties": {
+              "first_name": { "type": "string" },
+              "last_name": { "type": "string" },
+              "address": { "$ref": "#/$defs/address" },
+              "car": { "$ref": "https://foo.bar/schemas/ext" }
+            },
+            "$defs": {
+              "address": {
+                "type": "object",
+                "properties": {
+                  "street": { "type": "string" },
+                  "city": { "type": "string" }
+                }
+              },
+              "car": {
+                "$id": "https://foo.bar/schemas/ext",
+
+                "type": "object",
+                "properties": {
+                  "brand": { "type": "string" },
+                  "model": { "type": "string" },
+                  "manufacturer": { "$ref": "#/$defs/manufacturer" }
+                },
+                "$defs": {
+                  "manufacturer": {
+                    "type": "object",
+                    "properties": {
+                      "name": { "type": "string" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        DATA
+      end
+
+      it 'generates Shale models' do
+        models = described_class.new.as_models([schema])
+
+        expect(models.length).to eq(4)
+
+        expect(models[0].id).to eq('https://foo.bar/schemas/ext#/$defs/manufacturer')
+        expect(models[0].name).to eq('Manufacturer')
+        expect(models[0].properties.length).to eq(1)
+        expect(models[0].properties[0].mapping_name).to eq('name')
+
+        expect(models[1].id).to eq('https://foo.bar/schemas/ext')
+        expect(models[1].name).to eq('Car')
+        expect(models[1].properties.length).to eq(3)
+        expect(models[1].properties[0].mapping_name).to eq('brand')
+        expect(models[1].properties[1].mapping_name).to eq('model')
+        expect(models[1].properties[2].mapping_name).to eq('manufacturer')
+
+        expect(models[2].id).to eq('https://foo.bar/schemas/common#/$defs/address')
+        expect(models[2].name).to eq('Address')
+        expect(models[2].properties.length).to eq(2)
+        expect(models[2].properties[0].mapping_name).to eq('street')
+        expect(models[2].properties[1].mapping_name).to eq('city')
+
+        expect(models[3].id).to eq('https://foo.bar/schemas/common')
+        expect(models[3].name).to eq('Root')
+        expect(models[3].properties.length).to eq(4)
+        expect(models[3].properties[0].mapping_name).to eq('first_name')
+        expect(models[3].properties[1].mapping_name).to eq('last_name')
+        expect(models[3].properties[2].mapping_name).to eq('address')
+        expect(models[3].properties[3].mapping_name).to eq('car')
       end
     end
 
