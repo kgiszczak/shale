@@ -36,8 +36,8 @@ ARGV << '-h' if ARGV.empty?
 OptionParser.new do |opts|
   opts.banner = <<~BANNER
     Usage: shaleb [options]
-    example generate schema from Shale model: shaleb -g -i data_model.rb -c MyRoot
-    example generate Shale model from schema: shaleb -c -i schema1.json,schema2.json -c MyRoot
+    example generate schema from Shale model: shaleb -g -i data_model.rb -r MyRoot
+    example generate Shale model from schema: shaleb -c -i schema1.json,schema2.json -r MyRoot
   BANNER
 
   opts.on('-g', '--generate', 'generate schema from Shale model')
@@ -47,6 +47,7 @@ OptionParser.new do |opts|
   opts.on('-r ROOT', '--root ROOT', 'Shale model class name')
   opts.on('-f FORMAT', '--format FORMAT', 'Schema format: JSON (default), XML')
   opts.on('-p', '--pretty', 'Pretty print generated schema')
+  opts.on('-m MAPPING', '--mapping', Array, 'Namespace mapping')
 
   opts.on('-v', '--version', 'Show version') do
     puts "shaleb version #{Shale::VERSION}"
@@ -71,11 +72,24 @@ if params[:compile]
     end
   end
 
+  if params[:mapping]
+    namespace_mapping = params[:mapping]
+      .to_h { |e| [*e.split('='), nil][0, 2] }
+      .transform_keys { |key| key.empty? ? nil : key }
+  end
+
   if params[:format] == 'xml'
     load_xml_parser
-    models = Shale::Schema.from_xml(schemas)
+    models = Shale::Schema.from_xml(
+      schemas,
+      namespace_mapping: namespace_mapping
+    )
   else
-    models = Shale::Schema.from_json(schemas, root_name: params[:root])
+    models = Shale::Schema.from_json(
+      schemas,
+      root_name: params[:root],
+      namespace_mapping: namespace_mapping
+    )
   end
 
   if params[:output]
@@ -84,6 +98,7 @@ if params[:compile]
 
     models.each do |name, model|
       output_path = File.join(dir, "#{name}.rb")
+      FileUtils.mkdir_p(File.dirname(output_path))
       File.write(output_path, model)
     end
   else

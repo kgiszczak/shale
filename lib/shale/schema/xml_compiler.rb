@@ -139,55 +139,63 @@ module Shale
         <%- unless type.references.empty? -%>
 
         <%- type.references.each do |property| -%>
-        require_relative '<%= property.type.file_name %>'
+        require_relative '<%= type.relative_path(property.type.file_name) %>'
         <%- end -%>
         <%- end -%>
 
-        class <%= type.name %> < Shale::Mapper
+        <%- type.modules.each_with_index do |name, i| -%>
+        <%= '  ' * i %>module <%= name %>
+        <%- end -%>
+        <%- indent = '  ' * type.modules.length -%>
+        <%= indent %>class <%= type.root_name %> < Shale::Mapper
           <%- type.properties.select(&:content?).each do |property| -%>
-          attribute :<%= property.attribute_name %>, <%= property.type.name -%>
+          <%= indent %>attribute :<%= property.attribute_name %>, <%= property.type.name -%>
           <%- if property.collection? %>, collection: true<% end -%>
           <%- unless property.default.nil? %>, default: -> { <%= property.default %> }<% end %>
           <%- end -%>
           <%- type.properties.select(&:attribute?).each do |property| -%>
-          attribute :<%= property.attribute_name %>, <%= property.type.name -%>
+          <%= indent %>attribute :<%= property.attribute_name %>, <%= property.type.name -%>
           <%- if property.collection? %>, collection: true<% end -%>
           <%- unless property.default.nil? %>, default: -> { <%= property.default %> }<% end %>
           <%- end -%>
           <%- type.properties.select(&:element?).each do |property| -%>
-          attribute :<%= property.attribute_name %>, <%= property.type.name -%>
+          <%= indent %>attribute :<%= property.attribute_name %>, <%= property.type.name -%>
           <%- if property.collection? %>, collection: true<% end -%>
           <%- unless property.default.nil? %>, default: -> { <%= property.default %> }<% end %>
           <%- end -%>
 
-          xml do
-            root '<%= type.root %>'
+          <%= indent %>xml do
+            <%= indent %>root '<%= type.root %>'
             <%- if type.namespace -%>
-            namespace '<%= type.namespace %>', '<%= type.prefix %>'
+            <%= indent %>namespace '<%= type.namespace %>', '<%= type.prefix %>'
             <%- end -%>
             <%- unless type.properties.empty? -%>
 
             <%- type.properties.select(&:content?).each do |property| -%>
-            map_content to: :<%= property.attribute_name %>
+            <%= indent %>map_content to: :<%= property.attribute_name %>
             <%- end -%>
             <%- type.properties.select(&:attribute?).each do |property| -%>
-            map_attribute '<%= property.mapping_name %>', to: :<%= property.attribute_name -%>
+            <%= indent %>map_attribute '<%= property.mapping_name %>', to: :<%= property.attribute_name -%>
             <%- if property.namespace %>, prefix: '<%= property.prefix %>'<%- end -%>
             <%- if property.namespace %>, namespace: '<%= property.namespace %>'<% end %>
             <%- end -%>
             <%- type.properties.select(&:element?).each do |property| -%>
-            map_element '<%= property.mapping_name %>', to: :<%= property.attribute_name -%>
+            <%= indent %>map_element '<%= property.mapping_name %>', to: :<%= property.attribute_name -%>
             <%- if type.namespace != property.namespace %>, prefix: <%= property.prefix ? "'\#{property.prefix}'" : 'nil' %><%- end -%>
             <%- if type.namespace != property.namespace %>, namespace: <%= property.namespace ? "'\#{property.namespace}'" : 'nil' %><% end %>
             <%- end -%>
             <%- end -%>
-          end
-        end
+          <%= indent %>end
+        <%= indent %>end
+        <%- type.modules.length.times do |i| -%>
+        <%= '  ' * (type.modules.length - i - 1) %>end
+        <%- end -%>
       TEMPLATE
 
       # Generate Shale models from XML Schema and return them as a Ruby Array of objects
       #
       # @param [Array<String>] schemas
+      # @param [Hash<String, String>, nil] namespace_mapping
       #
       # @raise [AdapterError] when XML adapter is not set or Ox adapter is used
       # @raise [SchemaError] when XML Schema has errors
@@ -198,7 +206,7 @@ module Shale
       #   Shale::Schema::XMLCompiler.new.as_models([schema1, schema2])
       #
       # @api public
-      def as_models(schemas)
+      def as_models(schemas, namespace_mapping: nil)
         unless Shale.xml_adapter
           raise AdapterError, XML_ADAPTER_NOT_SET_MESSAGE
         end
@@ -212,6 +220,7 @@ module Shale
           Shale.xml_adapter.load(schema)
         end
 
+        @namespace_mapping = namespace_mapping || {}
         @elements_repository = {}
         @attributes_repository = {}
         @simple_types_repository = {}
@@ -244,7 +253,7 @@ module Shale
           duplicates[type.name] += 1
 
           if total_duplicates[type.name] > 1
-            type.name = format("#{type.name}%d", duplicates[type.name])
+            type.root_name = format("#{type.root_name}%d", duplicates[type.name])
           end
         end
 
@@ -256,6 +265,7 @@ module Shale
       # Generate Shale models from XML Schema
       #
       # @param [Array<String>] schemas
+      # @param [Hash<String, String>, nil] namespace_mapping
       #
       # @raise [SchemaError] when XML Schema has errors
       #
@@ -265,8 +275,8 @@ module Shale
       #   Shale::Schema::XMLCompiler.new.to_models([schema1, schema2])
       #
       # @api public
-      def to_models(schemas)
-        types = as_models(schemas)
+      def to_models(schemas, namespace_mapping: nil)
+        types = as_models(schemas, namespace_mapping: namespace_mapping)
 
         types.to_h do |type|
           [type.file_name, MODEL_TEMPLATE.result(binding)]
@@ -535,7 +545,13 @@ module Shale
             name = node.attributes['name'] || node.parent.attributes['name']
             prefix, namespace = resolve_complex_type_namespace(node)
 
-            @complex_types[id] = Compiler::XMLComplex.new(id, name, prefix, namespace)
+            @complex_types[id] = Compiler::XMLComplex.new(
+              id,
+              name,
+              prefix,
+              namespace,
+              @namespace_mapping[namespace]
+            )
           end
         end
       end

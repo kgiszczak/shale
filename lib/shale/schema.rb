@@ -38,6 +38,7 @@ module Shale
     #
     # @param [Array<String>] schemas
     # @param [String, nil] root_name
+    # @param [Hash<String, String>, nil] namespace_mapping
     #
     # @return [Array<String>]
     #
@@ -46,8 +47,12 @@ module Shale
     #   # => [model1, model2, model3]
     #
     # @api public
-    def self.from_json(schemas, root_name: nil)
-      JSONCompiler.new.to_models(schemas, root_name: root_name)
+    def self.from_json(schemas, root_name: nil, namespace_mapping: nil)
+      JSONCompiler.new.to_models(
+        schemas,
+        root_name: root_name,
+        namespace_mapping: namespace_mapping
+      )
     end
 
     # Generate XML Schema from Shale model
@@ -71,6 +76,7 @@ module Shale
     # Generate Shale model from XML Schema
     #
     # @param [Array<String>] schemas
+    # @param [Hash<String, String>, nil] namespace_mapping
     #
     # @return [Array<String>]
     #
@@ -79,8 +85,8 @@ module Shale
     #   # => [model1, model2, model3]
     #
     # @api public
-    def self.from_xml(schemas)
-      XMLCompiler.new.to_models(schemas)
+    def self.from_xml(schemas, namespace_mapping: nil)
+      XMLCompiler.new.to_models(schemas, namespace_mapping: namespace_mapping)
     end
   end
 end

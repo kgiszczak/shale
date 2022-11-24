@@ -11,517 +11,6 @@ require 'shale/schema/compiler/time'
 require 'shale/schema/compiler/value'
 require 'shale/schema/xml_compiler'
 
-schema_top_level_complex_types = <<~SCHEMA
-  <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
-    <xs:element name="person_sequence" type="PersonSequence"/>
-    <xs:element name="person_all" type="PersonAll"/>
-    <xs:element name="person_choice" type="PersonChoice"/>
-    <xs:element name="shipping" type="Shipping"/>
-    <xs:element name="billing" type="Billing"/>
-
-    <xs:complexType name="PersonAll">
-      <xs:all>
-        <xs:element name="FirstName" type="xs:string" default="John" />
-        <xs:element name="LastName" type="xs:string"/>
-        <xs:element name="Married" type="xs:boolean" default="false" />
-      </xs:all>
-      <xs:attribute name="age" type="xs:string"/>
-    </xs:complexType>
-
-    <xs:complexType name="PersonSequence">
-      <xs:sequence>
-        <xs:element name="first_name" type="xs:string"/>
-        <xs:element name="last_name" type="xs:string"/>
-      </xs:sequence>
-      <xs:attribute name="Age" type="xs:string"/>
-    </xs:complexType>
-
-    <xs:complexType name="PersonChoice">
-      <xs:choice>
-        <xs:element name="first_name" type="xs:string"/>
-        <xs:element name="last_name" type="xs:string"/>
-      </xs:choice>
-      <xs:attribute name="age" type="xs:string"/>
-    </xs:complexType>
-
-    <xs:complexType name="Address">
-      <xs:sequence>
-        <xs:element name="city" type="xs:string"/>
-        <xs:element name="street" type="xs:string"/>
-      </xs:sequence>
-    </xs:complexType>
-
-    <xs:complexType name="Shipping">
-      <xs:sequence>
-        <xs:element name="shipping_address" type="Address"/>
-      </xs:sequence>
-    </xs:complexType>
-
-    <xs:complexType name="Billing">
-      <xs:sequence>
-        <xs:element name="billing_address" type="Address"/>
-      </xs:sequence>
-    </xs:complexType>
-  </xs:schema>
-SCHEMA
-
-schema_inline_complex_types = <<~SCHEMA
-  <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
-    <xs:element name="BillingInfo">
-      <xs:complexType>
-        <xs:sequence>
-          <xs:element name="Address">
-            <xs:complexType>
-              <xs:sequence>
-                <xs:element name="Street">
-                  <xs:complexType>
-                    <xs:sequence>
-                      <xs:element name="Name" type="xs:string" />
-                    </xs:sequence>
-                    <xs:attribute name="Number" type="xs:string"/>
-                  </xs:complexType>
-                </xs:element>
-              </xs:sequence>
-              <xs:attribute name="Flat" type="xs:string"/>
-            </xs:complexType>
-          </xs:element>
-        </xs:sequence>
-      </xs:complexType>
-    </xs:element>
-
-    <xs:element name="ShippingInfo">
-      <xs:complexType>
-        <xs:sequence>
-          <xs:element name="Address">
-            <xs:complexType>
-              <xs:sequence>
-                <xs:element name="City" type="xs:string" />
-              </xs:sequence>
-            </xs:complexType>
-          </xs:element>
-        </xs:sequence>
-      </xs:complexType>
-    </xs:element>
-  </xs:schema>
-SCHEMA
-
-schema_simple_types = <<~SCHEMA
-  <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
-    <xs:element name="complex-type" type="complex-type" />
-    <xs:element name="complex-type-inline" type="complex-type-inline" />
-
-    <xs:simpleType name="simple-type-restriction">
-      <xs:restriction base="xs:integer">
-      </xs:restriction>
-    </xs:simpleType>
-
-    <xs:simpleType name="simple-type-restriction-ref">
-      <xs:restriction base="simple-type-restriction">
-      </xs:restriction>
-    </xs:simpleType>
-
-    <xs:simpleType name="simple-type-restriction-ref-ref">
-      <xs:restriction base="simple-type-restriction-ref">
-      </xs:restriction>
-    </xs:simpleType>
-
-    <xs:simpleType name="simple-type-list">
-      <xs:list itemType="xs:integer" />
-    </xs:simpleType>
-
-    <xs:simpleType name="simple-type-union">
-      <xs:union memberTypes="xs:integer xs:string" />
-    </xs:simpleType>
-
-    <xs:simpleType name="simple-type-restriction-inline">
-      <xs:restriction>
-        <xs:simpleType>
-          <xs:restriction base="xs:integer">
-          </xs:restriction>
-        </xs:simpleType>
-      </xs:restriction>
-    </xs:simpleType>
-
-    <xs:complexType name="complex-type">
-      <xs:sequence>
-        <xs:element name="el-simple-type-restriction" type="simple-type-restriction" />
-        <xs:element name="el-simple-type-restriction-ref" type="simple-type-restriction-ref" />
-        <xs:element name="el-simple-type-restriction-ref-ref" type="simple-type-restriction-ref-ref" />
-        <xs:element name="el-simple-type-restriction-inline" type="simple-type-restriction-inline" />
-        <xs:element name="el-simple-type-restriction-list" type="simple-type-list" />
-        <xs:element name="el-simple-type-restriction-union" type="simple-type-union" />
-      </xs:sequence>
-    </xs:complexType>
-
-    <xs:complexType name="complex-type-inline">
-      <xs:sequence>
-        <xs:element name="el1">
-          <xs:simpleType>
-            <xs:restriction base="xs:integer">
-            </xs:restriction>
-          </xs:simpleType>
-        </xs:element>
-      </xs:sequence>
-    </xs:complexType>
-  </xs:schema>
-SCHEMA
-
-schema_groups = <<~SCHEMA
-  <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
-    <xs:element name="element-test1" type="element-test1" />
-    <xs:element name="element-test2" type="element-test2" />
-    <xs:element name="attribute-test1" type="attribute-test1" />
-
-    <xs:group name="element-group1">
-      <xs:sequence>
-        <xs:element name="element-group1-el1" type="xs:string" />
-        <xs:group ref="element-group2" />
-        <xs:element name="element-group1-el2" type="xs:string" />
-      </xs:sequence>
-    </xs:group>
-
-    <xs:group name="element-group2">
-      <xs:sequence>
-        <xs:element name="element-group2-el1" type="xs:string" />
-        <xs:element name="element-group2-el2" type="xs:string" />
-        <xs:element name="element-group2-el3-inline">
-          <xs:complexType>
-            <xs:sequence>
-              <xs:element name="complex-inline-el1" type="xs:string" />
-            </xs:sequence>
-          </xs:complexType>
-        </xs:element>
-      </xs:sequence>
-    </xs:group>
-
-    <xs:complexType name="element-test1">
-      <xs:sequence>
-        <xs:group ref="element-group1"/>
-      </xs:sequence>
-    </xs:complexType>
-
-    <xs:complexType name="element-test2">
-      <xs:group ref="element-group1" />
-    </xs:complexType>
-
-    <xs:attributeGroup name="attribute-group1">
-      <xs:attribute name="attribute-group1-el1" type="xs:string" />
-      <xs:attributeGroup ref="attribute-group2" />
-      <xs:attribute name="attribute-group1-el2" type="xs:string" />
-    </xs:attributeGroup>
-
-    <xs:attributeGroup name="attribute-group2">
-      <xs:attribute name="attribute-group2-el1" type="xs:string" />
-      <xs:attribute name="attribute-group2-el2" type="xs:string" />
-    </xs:attributeGroup>
-
-    <xs:complexType name="attribute-test1">
-      <xs:attributeGroup ref="attribute-group1" />
-    </xs:complexType>
-  </xs:schema>
-SCHEMA
-
-schema_refs = <<~SCHEMA
-  <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
-    <xs:element name="person" type="Person" />
-    <xs:element name="person-att" type="PersonAtt" />
-
-    <xs:element name="el1" type="xs:string" />
-    <xs:element name="el2" type="Address" />
-    <xs:element name="el3">
-      <xs:complexType>
-        <xs:sequence>
-          <xs:element name="age" type="xs:string" />
-          <xs:element name="sex" type="xs:string" />
-        </xs:sequence>
-      </xs:complexType>
-    </xs:element>
-
-    <xs:complexType name="Address">
-      <xs:sequence>
-        <xs:element name="city" type="xs:string" />
-        <xs:element name="street" type="xs:string" />
-      </xs:sequence>
-    </xs:complexType>
-
-    <xs:complexType name="Person">
-      <xs:sequence>
-        <xs:element ref="el1" />
-        <xs:element ref="el2" />
-        <xs:element ref="el3" />
-      </xs:sequence>
-    </xs:complexType>
-
-
-    <xs:attribute name="att1" type="xs:string" />
-    <xs:attribute name="att2" type="customInt" />
-    <xs:attribute name="att3">
-      <xs:simpleType>
-        <xs:restriction base="xs:integer">
-        </xs:restriction>
-      </xs:simpleType>
-    </xs:attribute>
-
-    <xs:simpleType name="customInt">
-      <xs:restriction base="xs:integer">
-      </xs:restriction>
-    </xs:simpleType>
-
-    <xs:complexType name="PersonAtt">
-      <xs:attribute ref="att1" />
-      <xs:attribute ref="att2" />
-      <xs:attribute ref="att3" />
-    </xs:complexType>
-  </xs:schema>
-SCHEMA
-
-schema_simple_content = <<~SCHEMA
-  <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
-    <xs:element name="complex1" type="complex1" />
-    <xs:element name="complex2" type="complex2" />
-
-    <xs:simpleType name="customInt">
-      <xs:restriction base="xs:integer">
-      </xs:restriction>
-    </xs:simpleType>
-
-    <xs:complexType name="complex1">
-      <xs:simpleContent>
-        <xs:extension base="customInt">
-        </xs:extension>
-      </xs:simpleContent>
-    </xs:complexType>
-
-    <xs:complexType name="complex2" mixed="true">
-      <xs:sequence>
-        <xs:element name="el1" type="xs:integer" />
-      </xs:sequence>
-    </xs:complexType>
-
-    <xs:element name="shoesize">
-      <xs:complexType>
-        <xs:simpleContent>
-          <xs:extension base="xs:integer">
-            <xs:attribute name="country" type="xs:float" />
-          </xs:extension>
-        </xs:simpleContent>
-      </xs:complexType>
-    </xs:element>
-  </xs:schema>
-SCHEMA
-
-schema_complex_content = <<~SCHEMA
-  <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
-    <xs:element name="MixedContent" type="MixedContent" />
-    <xs:element name="ChildExtension" type="ChildExtension" />
-    <xs:element name="ChildRestriction" type="ChildRestriction" />
-    <xs:element name="ChildChildExtension" type="ChildChildExtension" />
-    <xs:element name="Address" type="Address" />
-    <xs:element name="RestrictedAddress" type="RestrictedAddress" />
-
-    <xs:complexType name="BaseType">
-      <xs:sequence>
-        <xs:element name="BaseElement1" type="xs:string" />
-        <xs:element name="BaseElement2" type="xs:integer" />
-      </xs:sequence>
-      <xs:attribute name="BaseAttribute1" type="xs:date" />
-      <xs:attribute name="BaseAttribute2" type="xs:dateTime" />
-    </xs:complexType>
-
-    <xs:complexType name="MixedContent">
-      <xs:complexContent mixed="true">
-        <xs:extension base="BaseType">
-        </xs:extension>
-      </xs:complexContent>
-    </xs:complexType>
-
-    <xs:complexType name="ChildExtension">
-      <xs:complexContent>
-        <xs:extension base="BaseType">
-          <xs:sequence>
-            <xs:element name="ChildElementA" type="xs:string" />
-          </xs:sequence>
-        </xs:extension>
-      </xs:complexContent>
-    </xs:complexType>
-
-    <xs:complexType name="ChildRestriction">
-      <xs:complexContent>
-        <xs:restriction base="BaseType">
-          <xs:sequence>
-            <xs:element name="ChildElementB" type="xs:string" />
-          </xs:sequence>
-        </xs:restriction>
-      </xs:complexContent>
-    </xs:complexType>
-
-    <xs:complexType name="ChildChildExtension">
-      <xs:complexContent>
-        <xs:extension base="ChildExtension">
-          <xs:sequence>
-            <xs:element name="ChildElementC" type="xs:string" />
-          </xs:sequence>
-        </xs:extension>
-      </xs:complexContent>
-    </xs:complexType>
-
-    <xs:complexType name="Address" mixed="true">
-      <xs:sequence>
-        <xs:element name="Street" type="xs:string" />
-        <xs:element name="City" type="xs:string" />
-        <xs:element name="Country" type="xs:string" />
-      </xs:sequence>
-      <xs:attribute name="zip" type="xs:string" />
-    </xs:complexType>
-
-    <xs:complexType name="RestrictedAddress">
-      <xs:complexContent>
-        <xs:restriction base="Address">
-          <xs:sequence>
-            <xs:element name="Street" type="xs:string" />
-            <xs:element name="City" type="xs:string" />
-          </xs:sequence>
-        </xs:restriction>
-      </xs:complexContent>
-    </xs:complexType>
-  </xs:schema>
-SCHEMA
-
-schema_duplicates = <<~SCHEMA
-  <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
-    <xs:element name="Shipping" type="Shipping" />
-    <xs:element name="Billing" type="Billing" />
-
-    <xs:complexType name="Shipping">
-      <xs:sequence>
-        <xs:element name="Address">
-          <xs:complexType>
-            <xs:sequence>
-              <xs:element name="shipping" type="xs:string" />
-            </xs:sequence>
-          </xs:complexType>
-        </xs:element>
-      </xs:sequence>
-    </xs:complexType>
-
-    <xs:complexType name="Billing">
-      <xs:sequence>
-        <xs:element name="Address">
-          <xs:complexType>
-            <xs:sequence>
-              <xs:element name="billing" type="xs:string" />
-            </xs:sequence>
-          </xs:complexType>
-        </xs:element>
-      </xs:sequence>
-    </xs:complexType>
-  </xs:schema>
-SCHEMA
-
-schema_circular_references = <<~SCHEMA
-  <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
-    <xs:element name="Type1" type="Type1" />
-
-    <xs:complexType name="Type1">
-      <xs:sequence>
-        <xs:element name="Type2" type="Type2" />
-      </xs:sequence>
-    </xs:complexType>
-
-    <xs:complexType name="Type2">
-      <xs:sequence>
-        <xs:element name="Type1" type="Type1" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:schema>
-SCHEMA
-
-schema_collections = <<~SCHEMA
-  <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
-    <xs:element name="complex1" type="complex1" />
-    <xs:element name="complex2" type="complex2" />
-    <xs:element name="top-el1" type="xs:string" />
-
-    <xs:group name="group1">
-      <xs:sequence>
-        <xs:element name="grup1-el1" type="xs:string" maxOccurs="10" />
-      </xs:sequence>
-    </xs:group>
-
-    <xs:group name="group2">
-      <xs:sequence>
-        <xs:element name="grup2-el1" type="xs:string" />
-      </xs:sequence>
-    </xs:group>
-
-    <xs:complexType name="complex1">
-      <xs:sequence>
-        <xs:element name="el1" type="xs:string" maxOccurs="10" />
-        <xs:group ref="group1" />
-        <xs:group ref="group2" maxOccurs="10" />
-        <xs:element ref="top-el1" maxOccurs="10" />
-      </xs:sequence>
-    </xs:complexType>
-
-    <xs:complexType name="complex2">
-      <xs:sequence maxOccurs="10">
-        <xs:element name="el1" type="xs:string" />
-        <xs:group ref="group2" />
-        <xs:element ref="top-el1" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:schema>
-SCHEMA
-
-schema_namespaces1 = <<~SCHEMA
-  <xs:schema
-    xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    xmlns:foo="http://foo.com"
-    xmlns:bar="http://bar.com"
-    targetNamespace="http://bar.com"
-    elementFormDefault="qualified"
-  >
-    <xs:import namespace="http://foo.com" schemaLocation="test11-2.xml" />
-
-    <xs:element name="Person" type="bar:Person" />
-    <xs:element name="foobar" type="xs:string" />
-    <xs:attribute name="pet" type="xs:string" />
-
-    <xs:complexType name="Person">
-      <xs:sequence>
-        <xs:element name="FirstName" type="xs:string" />
-        <xs:element name="LastName" type="xs:string" />
-        <xs:element ref="bar:foobar" />
-        <xs:element ref="foo:Address" />
-      </xs:sequence>
-      <xs:attribute name="age" type="xs:string" />
-      <xs:attribute ref="foo:lang" />
-      <xs:attribute ref="bar:pet" />
-    </xs:complexType>
-  </xs:schema>
-SCHEMA
-
-schema_namespaces2 = <<~SCHEMA
-  <xs:schema
-    xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    xmlns:foo="http://foo.com"
-    targetNamespace="http://foo.com"
-    elementFormDefault="qualified"
-    attributeFormDefault="qualified"
-  >
-    <xs:element name="Address" type="foo:Address" />
-    <xs:attribute name="lang" type="xs:string" />
-
-    <xs:complexType name="Address">
-      <xs:sequence>
-        <xs:element name="City" type="xs:string" />
-        <xs:element name="Street" type="xs:string" />
-      </xs:sequence>
-      <xs:attribute name="Number" type="xs:string" />
-    </xs:complexType>
-  </xs:schema>
-SCHEMA
-
 RSpec.describe Shale::Schema::XMLCompiler do
   before(:each) do
     Shale.xml_adapter = Shale::Adapter::REXML
@@ -557,8 +46,64 @@ RSpec.describe Shale::Schema::XMLCompiler do
     end
 
     context 'with top level complex types' do
+      let(:schema) do
+        <<~SCHEMA
+          <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xs:element name="person_sequence" type="PersonSequence"/>
+            <xs:element name="person_all" type="PersonAll"/>
+            <xs:element name="person_choice" type="PersonChoice"/>
+            <xs:element name="shipping" type="Shipping"/>
+            <xs:element name="billing" type="Billing"/>
+
+            <xs:complexType name="PersonAll">
+              <xs:all>
+                <xs:element name="FirstName" type="xs:string" default="John" />
+                <xs:element name="LastName" type="xs:string"/>
+                <xs:element name="Married" type="xs:boolean" default="false" />
+              </xs:all>
+              <xs:attribute name="age" type="xs:string"/>
+            </xs:complexType>
+
+            <xs:complexType name="PersonSequence">
+              <xs:sequence>
+                <xs:element name="first_name" type="xs:string"/>
+                <xs:element name="last_name" type="xs:string"/>
+              </xs:sequence>
+              <xs:attribute name="Age" type="xs:string"/>
+            </xs:complexType>
+
+            <xs:complexType name="PersonChoice">
+              <xs:choice>
+                <xs:element name="first_name" type="xs:string"/>
+                <xs:element name="last_name" type="xs:string"/>
+              </xs:choice>
+              <xs:attribute name="age" type="xs:string"/>
+            </xs:complexType>
+
+            <xs:complexType name="Address">
+              <xs:sequence>
+                <xs:element name="city" type="xs:string"/>
+                <xs:element name="street" type="xs:string"/>
+              </xs:sequence>
+            </xs:complexType>
+
+            <xs:complexType name="Shipping">
+              <xs:sequence>
+                <xs:element name="shipping_address" type="Address"/>
+              </xs:sequence>
+            </xs:complexType>
+
+            <xs:complexType name="Billing">
+              <xs:sequence>
+                <xs:element name="billing_address" type="Address"/>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:schema>
+        SCHEMA
+      end
+
       it 'generates models' do
-        models = described_class.new.as_models([schema_top_level_complex_types])
+        models = described_class.new.as_models([schema])
 
         expect(models.length).to eq(6)
 
@@ -679,8 +224,50 @@ RSpec.describe Shale::Schema::XMLCompiler do
     end
 
     context 'with inline complex types' do
+      let(:schema) do
+        <<~SCHEMA
+          <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xs:element name="BillingInfo">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="Address">
+                    <xs:complexType>
+                      <xs:sequence>
+                        <xs:element name="Street">
+                          <xs:complexType>
+                            <xs:sequence>
+                              <xs:element name="Name" type="xs:string" />
+                            </xs:sequence>
+                            <xs:attribute name="Number" type="xs:string"/>
+                          </xs:complexType>
+                        </xs:element>
+                      </xs:sequence>
+                      <xs:attribute name="Flat" type="xs:string"/>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+
+            <xs:element name="ShippingInfo">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="Address">
+                    <xs:complexType>
+                      <xs:sequence>
+                        <xs:element name="City" type="xs:string" />
+                      </xs:sequence>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+          </xs:schema>
+        SCHEMA
+      end
+
       it 'generates models' do
-        models = described_class.new.as_models([schema_inline_complex_types])
+        models = described_class.new.as_models([schema])
 
         expect(models.length).to eq(5)
 
@@ -754,8 +341,71 @@ RSpec.describe Shale::Schema::XMLCompiler do
     end
 
     context 'with simple types' do
+      let(:schema) do
+        <<~SCHEMA
+          <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xs:element name="complex-type" type="complex-type" />
+            <xs:element name="complex-type-inline" type="complex-type-inline" />
+
+            <xs:simpleType name="simple-type-restriction">
+              <xs:restriction base="xs:integer">
+              </xs:restriction>
+            </xs:simpleType>
+
+            <xs:simpleType name="simple-type-restriction-ref">
+              <xs:restriction base="simple-type-restriction">
+              </xs:restriction>
+            </xs:simpleType>
+
+            <xs:simpleType name="simple-type-restriction-ref-ref">
+              <xs:restriction base="simple-type-restriction-ref">
+              </xs:restriction>
+            </xs:simpleType>
+
+            <xs:simpleType name="simple-type-list">
+              <xs:list itemType="xs:integer" />
+            </xs:simpleType>
+
+            <xs:simpleType name="simple-type-union">
+              <xs:union memberTypes="xs:integer xs:string" />
+            </xs:simpleType>
+
+            <xs:simpleType name="simple-type-restriction-inline">
+              <xs:restriction>
+                <xs:simpleType>
+                  <xs:restriction base="xs:integer">
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:restriction>
+            </xs:simpleType>
+
+            <xs:complexType name="complex-type">
+              <xs:sequence>
+                <xs:element name="el-simple-type-restriction" type="simple-type-restriction" />
+                <xs:element name="el-simple-type-restriction-ref" type="simple-type-restriction-ref" />
+                <xs:element name="el-simple-type-restriction-ref-ref" type="simple-type-restriction-ref-ref" />
+                <xs:element name="el-simple-type-restriction-inline" type="simple-type-restriction-inline" />
+                <xs:element name="el-simple-type-restriction-list" type="simple-type-list" />
+                <xs:element name="el-simple-type-restriction-union" type="simple-type-union" />
+              </xs:sequence>
+            </xs:complexType>
+
+            <xs:complexType name="complex-type-inline">
+              <xs:sequence>
+                <xs:element name="el1">
+                  <xs:simpleType>
+                    <xs:restriction base="xs:integer">
+                    </xs:restriction>
+                  </xs:simpleType>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:schema>
+        SCHEMA
+      end
+
       it 'generates models' do
-        models = described_class.new.as_models([schema_simple_types])
+        models = described_class.new.as_models([schema])
 
         expect(models.length).to eq(2)
 
@@ -814,8 +464,65 @@ RSpec.describe Shale::Schema::XMLCompiler do
     end
 
     context 'with groups' do
+      let(:schema) do
+        <<~SCHEMA
+          <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xs:element name="element-test1" type="element-test1" />
+            <xs:element name="element-test2" type="element-test2" />
+            <xs:element name="attribute-test1" type="attribute-test1" />
+
+            <xs:group name="element-group1">
+              <xs:sequence>
+                <xs:element name="element-group1-el1" type="xs:string" />
+                <xs:group ref="element-group2" />
+                <xs:element name="element-group1-el2" type="xs:string" />
+              </xs:sequence>
+            </xs:group>
+
+            <xs:group name="element-group2">
+              <xs:sequence>
+                <xs:element name="element-group2-el1" type="xs:string" />
+                <xs:element name="element-group2-el2" type="xs:string" />
+                <xs:element name="element-group2-el3-inline">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element name="complex-inline-el1" type="xs:string" />
+                    </xs:sequence>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+            </xs:group>
+
+            <xs:complexType name="element-test1">
+              <xs:sequence>
+                <xs:group ref="element-group1"/>
+              </xs:sequence>
+            </xs:complexType>
+
+            <xs:complexType name="element-test2">
+              <xs:group ref="element-group1" />
+            </xs:complexType>
+
+            <xs:attributeGroup name="attribute-group1">
+              <xs:attribute name="attribute-group1-el1" type="xs:string" />
+              <xs:attributeGroup ref="attribute-group2" />
+              <xs:attribute name="attribute-group1-el2" type="xs:string" />
+            </xs:attributeGroup>
+
+            <xs:attributeGroup name="attribute-group2">
+              <xs:attribute name="attribute-group2-el1" type="xs:string" />
+              <xs:attribute name="attribute-group2-el2" type="xs:string" />
+            </xs:attributeGroup>
+
+            <xs:complexType name="attribute-test1">
+              <xs:attributeGroup ref="attribute-group1" />
+            </xs:complexType>
+          </xs:schema>
+        SCHEMA
+      end
+
       it 'generates models' do
-        models = described_class.new.as_models([schema_groups])
+        models = described_class.new.as_models([schema])
 
         expect(models.length).to eq(4)
 
@@ -932,8 +639,63 @@ RSpec.describe Shale::Schema::XMLCompiler do
     end
 
     context 'with refs' do
+      let(:schema) do
+        <<~SCHEMA
+          <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xs:element name="person" type="Person" />
+            <xs:element name="person-att" type="PersonAtt" />
+
+            <xs:element name="el1" type="xs:string" />
+            <xs:element name="el2" type="Address" />
+            <xs:element name="el3">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="age" type="xs:string" />
+                  <xs:element name="sex" type="xs:string" />
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+
+            <xs:complexType name="Address">
+              <xs:sequence>
+                <xs:element name="city" type="xs:string" />
+                <xs:element name="street" type="xs:string" />
+              </xs:sequence>
+            </xs:complexType>
+
+            <xs:complexType name="Person">
+              <xs:sequence>
+                <xs:element ref="el1" />
+                <xs:element ref="el2" />
+                <xs:element ref="el3" />
+              </xs:sequence>
+            </xs:complexType>
+
+            <xs:attribute name="att1" type="xs:string" />
+            <xs:attribute name="att2" type="customInt" />
+            <xs:attribute name="att3">
+              <xs:simpleType>
+                <xs:restriction base="xs:integer">
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:attribute>
+
+            <xs:simpleType name="customInt">
+              <xs:restriction base="xs:integer">
+              </xs:restriction>
+            </xs:simpleType>
+
+            <xs:complexType name="PersonAtt">
+              <xs:attribute ref="att1" />
+              <xs:attribute ref="att2" />
+              <xs:attribute ref="att3" />
+            </xs:complexType>
+          </xs:schema>
+        SCHEMA
+      end
+
       it 'generates models' do
-        models = described_class.new.as_models([schema_refs])
+        models = described_class.new.as_models([schema])
 
         expect(models.length).to eq(4)
 
@@ -1020,8 +782,45 @@ RSpec.describe Shale::Schema::XMLCompiler do
     end
 
     context 'with simple content' do
+      let(:schema) do
+        <<~SCHEMA
+          <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xs:element name="complex1" type="complex1" />
+            <xs:element name="complex2" type="complex2" />
+
+            <xs:simpleType name="customInt">
+              <xs:restriction base="xs:integer">
+              </xs:restriction>
+            </xs:simpleType>
+
+            <xs:complexType name="complex1">
+              <xs:simpleContent>
+                <xs:extension base="customInt">
+                </xs:extension>
+              </xs:simpleContent>
+            </xs:complexType>
+
+            <xs:complexType name="complex2" mixed="true">
+              <xs:sequence>
+                <xs:element name="el1" type="xs:integer" />
+              </xs:sequence>
+            </xs:complexType>
+
+            <xs:element name="shoesize">
+              <xs:complexType>
+                <xs:simpleContent>
+                  <xs:extension base="xs:integer">
+                    <xs:attribute name="country" type="xs:float" />
+                  </xs:extension>
+                </xs:simpleContent>
+              </xs:complexType>
+            </xs:element>
+          </xs:schema>
+        SCHEMA
+      end
+
       it 'generates models' do
-        models = described_class.new.as_models([schema_simple_content])
+        models = described_class.new.as_models([schema])
 
         expect(models.length).to eq(3)
 
@@ -1073,8 +872,87 @@ RSpec.describe Shale::Schema::XMLCompiler do
     end
 
     context 'with complex content' do
+      let(:schema) do
+        <<~SCHEMA
+          <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xs:element name="MixedContent" type="MixedContent" />
+            <xs:element name="ChildExtension" type="ChildExtension" />
+            <xs:element name="ChildRestriction" type="ChildRestriction" />
+            <xs:element name="ChildChildExtension" type="ChildChildExtension" />
+            <xs:element name="Address" type="Address" />
+            <xs:element name="RestrictedAddress" type="RestrictedAddress" />
+
+            <xs:complexType name="BaseType">
+              <xs:sequence>
+                <xs:element name="BaseElement1" type="xs:string" />
+                <xs:element name="BaseElement2" type="xs:integer" />
+              </xs:sequence>
+              <xs:attribute name="BaseAttribute1" type="xs:date" />
+              <xs:attribute name="BaseAttribute2" type="xs:dateTime" />
+            </xs:complexType>
+
+            <xs:complexType name="MixedContent">
+              <xs:complexContent mixed="true">
+                <xs:extension base="BaseType">
+                </xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+
+            <xs:complexType name="ChildExtension">
+              <xs:complexContent>
+                <xs:extension base="BaseType">
+                  <xs:sequence>
+                    <xs:element name="ChildElementA" type="xs:string" />
+                  </xs:sequence>
+                </xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+
+            <xs:complexType name="ChildRestriction">
+              <xs:complexContent>
+                <xs:restriction base="BaseType">
+                  <xs:sequence>
+                    <xs:element name="ChildElementB" type="xs:string" />
+                  </xs:sequence>
+                </xs:restriction>
+              </xs:complexContent>
+            </xs:complexType>
+
+            <xs:complexType name="ChildChildExtension">
+              <xs:complexContent>
+                <xs:extension base="ChildExtension">
+                  <xs:sequence>
+                    <xs:element name="ChildElementC" type="xs:string" />
+                  </xs:sequence>
+                </xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+
+            <xs:complexType name="Address" mixed="true">
+              <xs:sequence>
+                <xs:element name="Street" type="xs:string" />
+                <xs:element name="City" type="xs:string" />
+                <xs:element name="Country" type="xs:string" />
+              </xs:sequence>
+              <xs:attribute name="zip" type="xs:string" />
+            </xs:complexType>
+
+            <xs:complexType name="RestrictedAddress">
+              <xs:complexContent>
+                <xs:restriction base="Address">
+                  <xs:sequence>
+                    <xs:element name="Street" type="xs:string" />
+                    <xs:element name="City" type="xs:string" />
+                  </xs:sequence>
+                </xs:restriction>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:schema>
+        SCHEMA
+      end
+
       it 'generates models' do
-        models = described_class.new.as_models([schema_complex_content])
+        models = described_class.new.as_models([schema])
 
         expect(models.length).to eq(6)
 
@@ -1273,8 +1151,41 @@ RSpec.describe Shale::Schema::XMLCompiler do
     end
 
     context 'with duplicated names' do
+      let(:schema) do
+        <<~SCHEMA
+          <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xs:element name="Shipping" type="Shipping" />
+            <xs:element name="Billing" type="Billing" />
+
+            <xs:complexType name="Shipping">
+              <xs:sequence>
+                <xs:element name="Address">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element name="shipping" type="xs:string" />
+                    </xs:sequence>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+
+            <xs:complexType name="Billing">
+              <xs:sequence>
+                <xs:element name="Address">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element name="billing" type="xs:string" />
+                    </xs:sequence>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:schema>
+        SCHEMA
+      end
+
       it 'generates models' do
-        models = described_class.new.as_models([schema_duplicates])
+        models = described_class.new.as_models([schema])
 
         expect(models.length).to eq(4)
 
@@ -1325,8 +1236,28 @@ RSpec.describe Shale::Schema::XMLCompiler do
     end
 
     context 'with circular references' do
+      let(:schema) do
+        <<~SCHEMA
+          <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xs:element name="Type1" type="Type1" />
+
+            <xs:complexType name="Type1">
+              <xs:sequence>
+                <xs:element name="Type2" type="Type2" />
+              </xs:sequence>
+            </xs:complexType>
+
+            <xs:complexType name="Type2">
+              <xs:sequence>
+                <xs:element name="Type1" type="Type1" />
+              </xs:sequence>
+            </xs:complexType>
+          </xs:schema>
+        SCHEMA
+      end
+
       it 'generates models' do
-        models = described_class.new.as_models([schema_circular_references])
+        models = described_class.new.as_models([schema])
 
         expect(models.length).to eq(2)
 
@@ -1355,8 +1286,47 @@ RSpec.describe Shale::Schema::XMLCompiler do
     end
 
     context 'with collections' do
+      let(:schema) do
+        <<~SCHEMA
+          <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xs:element name="complex1" type="complex1" />
+            <xs:element name="complex2" type="complex2" />
+            <xs:element name="top-el1" type="xs:string" />
+
+            <xs:group name="group1">
+              <xs:sequence>
+                <xs:element name="grup1-el1" type="xs:string" maxOccurs="10" />
+              </xs:sequence>
+            </xs:group>
+
+            <xs:group name="group2">
+              <xs:sequence>
+                <xs:element name="grup2-el1" type="xs:string" />
+              </xs:sequence>
+            </xs:group>
+
+            <xs:complexType name="complex1">
+              <xs:sequence>
+                <xs:element name="el1" type="xs:string" maxOccurs="10" />
+                <xs:group ref="group1" />
+                <xs:group ref="group2" maxOccurs="10" />
+                <xs:element ref="top-el1" maxOccurs="10" />
+              </xs:sequence>
+            </xs:complexType>
+
+            <xs:complexType name="complex2">
+              <xs:sequence maxOccurs="10">
+                <xs:element name="el1" type="xs:string" />
+                <xs:group ref="group2" />
+                <xs:element ref="top-el1" />
+              </xs:sequence>
+            </xs:complexType>
+          </xs:schema>
+        SCHEMA
+      end
+
       it 'generates models' do
-        models = described_class.new.as_models([schema_collections])
+        models = described_class.new.as_models([schema])
 
         expect(models.length).to eq(2)
 
@@ -1415,8 +1385,61 @@ RSpec.describe Shale::Schema::XMLCompiler do
     end
 
     context 'with namespaces' do
+      let(:schema1) do
+        <<~SCHEMA
+          <xs:schema
+            xmlns:xs="http://www.w3.org/2001/XMLSchema"
+            xmlns:foo="http://foo.com"
+            xmlns:bar="http://bar.com"
+            targetNamespace="http://bar.com"
+            elementFormDefault="qualified"
+          >
+            <xs:import namespace="http://foo.com" schemaLocation="test11-2.xml" />
+
+            <xs:element name="Person" type="bar:Person" />
+            <xs:element name="foobar" type="xs:string" />
+            <xs:attribute name="pet" type="xs:string" />
+
+            <xs:complexType name="Person">
+              <xs:sequence>
+                <xs:element name="FirstName" type="xs:string" />
+                <xs:element name="LastName" type="xs:string" />
+                <xs:element ref="bar:foobar" />
+                <xs:element ref="foo:Address" />
+              </xs:sequence>
+              <xs:attribute name="age" type="xs:string" />
+              <xs:attribute ref="foo:lang" />
+              <xs:attribute ref="bar:pet" />
+            </xs:complexType>
+          </xs:schema>
+        SCHEMA
+      end
+
+      let(:schema2) do
+        <<~SCHEMA
+          <xs:schema
+            xmlns:xs="http://www.w3.org/2001/XMLSchema"
+            xmlns:foo="http://foo.com"
+            targetNamespace="http://foo.com"
+            elementFormDefault="qualified"
+            attributeFormDefault="qualified"
+          >
+            <xs:element name="Address" type="foo:Address" />
+            <xs:attribute name="lang" type="xs:string" />
+
+            <xs:complexType name="Address">
+              <xs:sequence>
+                <xs:element name="City" type="xs:string" />
+                <xs:element name="Street" type="xs:string" />
+              </xs:sequence>
+              <xs:attribute name="Number" type="xs:string" />
+            </xs:complexType>
+          </xs:schema>
+        SCHEMA
+      end
+
       it 'generates models' do
-        models = described_class.new.as_models([schema_namespaces1, schema_namespaces2])
+        models = described_class.new.as_models([schema1, schema2])
 
         expect(models.length).to eq(2)
 
@@ -1495,6 +1518,268 @@ RSpec.describe Shale::Schema::XMLCompiler do
         expect(models[1].properties[6].namespace).to eq('http://foo.com')
       end
     end
+
+    context 'with namespace mapping' do
+      context 'without namespaces' do
+        let(:schema) do
+          <<~SCHEMA
+            <xs:schema
+              xmlns:xs="http://www.w3.org/2001/XMLSchema"
+              elementFormDefault="qualified"
+            >
+              <xs:element name="Person" type="Person" />
+
+              <xs:complexType name="Person">
+                <xs:sequence>
+                  <xs:element name="Name" type="xs:string" />
+                  <xs:element name="Address" type="Address" />
+                </xs:sequence>
+              </xs:complexType>
+
+              <xs:complexType name="Address">
+                <xs:sequence>
+                  <xs:element name="Street" type="xs:string" />
+                </xs:sequence>
+              </xs:complexType>
+            </xs:schema>
+          SCHEMA
+        end
+
+        let(:mapping) do
+          { nil => 'Foo::Bar' }
+        end
+
+        it 'generates models' do
+          models = described_class.new.as_models([schema], namespace_mapping: mapping)
+
+          expect(models.length).to eq(2)
+
+          expect(models[0].id).to eq('Address')
+          expect(models[0].name).to eq('Foo::Bar::Address')
+          expect(models[0].root).to eq('Address')
+          expect(models[0].prefix).to eq(nil)
+          expect(models[0].namespace).to eq(nil)
+          expect(models[0].properties.length).to eq(1)
+          expect(models[0].properties[0].mapping_name).to eq('Street')
+          expect(models[0].properties[0].type).to be_a(Shale::Schema::Compiler::String)
+          expect(models[0].properties[0].collection?).to eq(false)
+          expect(models[0].properties[0].default).to eq(nil)
+          expect(models[0].properties[0].prefix).to eq(nil)
+          expect(models[0].properties[0].namespace).to eq(nil)
+
+          expect(models[1].id).to eq('Person')
+          expect(models[1].name).to eq('Foo::Bar::Person')
+          expect(models[1].root).to eq('Person')
+          expect(models[1].prefix).to eq(nil)
+          expect(models[1].namespace).to eq(nil)
+          expect(models[1].properties.length).to eq(2)
+          expect(models[1].properties[0].mapping_name).to eq('Name')
+          expect(models[1].properties[0].type).to be_a(Shale::Schema::Compiler::String)
+          expect(models[1].properties[0].collection?).to eq(false)
+          expect(models[1].properties[0].default).to eq(nil)
+          expect(models[1].properties[0].prefix).to eq(nil)
+          expect(models[1].properties[0].namespace).to eq(nil)
+          expect(models[1].properties[1].mapping_name).to eq('Address')
+          expect(models[1].properties[1].type).to eq(models[0])
+          expect(models[1].properties[1].collection?).to eq(false)
+          expect(models[1].properties[1].default).to eq(nil)
+          expect(models[1].properties[1].prefix).to eq(nil)
+          expect(models[1].properties[1].namespace).to eq(nil)
+        end
+      end
+
+      context 'with namespaces' do
+        let(:schema1) do
+          <<~SCHEMA
+            <xs:schema
+              xmlns:xs="http://www.w3.org/2001/XMLSchema"
+              xmlns:foo="http://foo.com"
+              xmlns:bar="http://bar.com"
+              targetNamespace="http://foo.com"
+              elementFormDefault="qualified"
+            >
+              <xs:import namespace="http://foo.com" />
+
+              <xs:element name="Person" type="foo:Person" />
+
+              <xs:complexType name="Person">
+                <xs:sequence>
+                  <xs:element name="Name" type="xs:string" />
+                  <xs:element ref="bar:Address" />
+                </xs:sequence>
+              </xs:complexType>
+            </xs:schema>
+          SCHEMA
+        end
+
+        let(:schema2) do
+          <<~SCHEMA
+            <xs:schema
+              xmlns:xs="http://www.w3.org/2001/XMLSchema"
+              xmlns:bar="http://bar.com"
+              targetNamespace="http://bar.com"
+              elementFormDefault="qualified"
+              attributeFormDefault="qualified"
+            >
+              <xs:element name="Address" type="bar:Address" />
+
+              <xs:complexType name="Address">
+                <xs:sequence>
+                  <xs:element name="Street" type="xs:string" />
+                </xs:sequence>
+              </xs:complexType>
+            </xs:schema>
+          SCHEMA
+        end
+
+        let(:mapping) do
+          {
+            'http://foo.com' => 'Foo',
+            'http://bar.com' => 'Bar',
+          }
+        end
+
+        it 'generates models' do
+          models = described_class.new.as_models([schema1, schema2], namespace_mapping: mapping)
+
+          expect(models.length).to eq(2)
+
+          expect(models[0].id).to eq('http://bar.com:Address')
+          expect(models[0].name).to eq('Bar::Address')
+          expect(models[0].root).to eq('Address')
+          expect(models[0].prefix).to eq('bar')
+          expect(models[0].namespace).to eq('http://bar.com')
+          expect(models[0].properties.length).to eq(1)
+          expect(models[0].properties[0].mapping_name).to eq('Street')
+          expect(models[0].properties[0].type).to be_a(Shale::Schema::Compiler::String)
+          expect(models[0].properties[0].collection?).to eq(false)
+          expect(models[0].properties[0].default).to eq(nil)
+          expect(models[0].properties[0].prefix).to eq('bar')
+          expect(models[0].properties[0].namespace).to eq('http://bar.com')
+
+          expect(models[1].id).to eq('http://foo.com:Person')
+          expect(models[1].name).to eq('Foo::Person')
+          expect(models[1].root).to eq('Person')
+          expect(models[1].prefix).to eq('foo')
+          expect(models[1].namespace).to eq('http://foo.com')
+          expect(models[1].properties.length).to eq(2)
+          expect(models[1].properties[0].mapping_name).to eq('Name')
+          expect(models[1].properties[0].type).to be_a(Shale::Schema::Compiler::String)
+          expect(models[1].properties[0].collection?).to eq(false)
+          expect(models[1].properties[0].default).to eq(nil)
+          expect(models[1].properties[0].prefix).to eq('foo')
+          expect(models[1].properties[0].namespace).to eq('http://foo.com')
+          expect(models[1].properties[1].mapping_name).to eq('Address')
+          expect(models[1].properties[1].type).to eq(models[0])
+          expect(models[1].properties[1].collection?).to eq(false)
+          expect(models[1].properties[1].default).to eq(nil)
+          expect(models[1].properties[1].prefix).to eq('bar')
+          expect(models[1].properties[1].namespace).to eq('http://bar.com')
+        end
+      end
+
+      context 'with duplicated names' do
+        let(:schema1) do
+          <<~SCHEMA
+            <xs:schema
+              xmlns:xs="http://www.w3.org/2001/XMLSchema"
+              xmlns:foo="http://foo.com"
+              targetNamespace="http://foo.com"
+              elementFormDefault="qualified"
+              attributeFormDefault="qualified"
+            >
+              <xs:element name="Shipping" type="foo:Shipping" />
+              <xs:element name="Billing" type="foo:Billing" />
+
+              <xs:complexType name="Shipping">
+                <xs:sequence>
+                  <xs:element name="Address">
+                    <xs:complexType>
+                      <xs:sequence>
+                        <xs:element name="shipping" type="xs:string" />
+                      </xs:sequence>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+
+              <xs:complexType name="Billing">
+                <xs:sequence>
+                  <xs:element name="Address">
+                    <xs:complexType>
+                      <xs:sequence>
+                        <xs:element name="billing" type="xs:string" />
+                      </xs:sequence>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:schema>
+          SCHEMA
+        end
+
+        let(:schema2) do
+          <<~SCHEMA
+            <xs:schema
+              xmlns:xs="http://www.w3.org/2001/XMLSchema"
+              xmlns:bar="http://bar.com"
+              targetNamespace="http://bar.com"
+              elementFormDefault="qualified"
+              attributeFormDefault="qualified"
+            >
+              <xs:element name="Shipping" type="bar:Shipping" />
+              <xs:element name="Billing" type="bar:Billing" />
+
+              <xs:complexType name="Shipping">
+                <xs:sequence>
+                  <xs:element name="Address">
+                    <xs:complexType>
+                      <xs:sequence>
+                        <xs:element name="shipping" type="xs:string" />
+                      </xs:sequence>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+
+              <xs:complexType name="Billing">
+                <xs:sequence>
+                  <xs:element name="Address">
+                    <xs:complexType>
+                      <xs:sequence>
+                        <xs:element name="billing" type="xs:string" />
+                      </xs:sequence>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:schema>
+          SCHEMA
+        end
+
+        let(:mapping) do
+          {
+            'http://foo.com' => 'Foo',
+            'http://bar.com' => 'Bar',
+          }
+        end
+
+        it 'generates models' do
+          models = described_class.new.as_models([schema1, schema2], namespace_mapping: mapping)
+
+          expect(models.length).to eq(8)
+
+          expect(models[0].name).to eq('Bar::Address2')
+          expect(models[1].name).to eq('Bar::Billing')
+          expect(models[2].name).to eq('Bar::Address1')
+          expect(models[3].name).to eq('Bar::Shipping')
+          expect(models[4].name).to eq('Foo::Address2')
+          expect(models[5].name).to eq('Foo::Billing')
+          expect(models[6].name).to eq('Foo::Address1')
+          expect(models[7].name).to eq('Foo::Shipping')
+        end
+      end
+    end
   end
 
   describe '#to_models' do
@@ -1532,6 +1817,194 @@ RSpec.describe Shale::Schema::XMLCompiler do
       models = described_class.new.to_models([schema])
 
       expect(models).to eq({ 'root' => result })
+    end
+
+    context 'with namespace mapping' do
+      context 'without namespaces' do
+        let(:schema) do
+          <<~SCHEMA
+            <xs:schema
+              xmlns:xs="http://www.w3.org/2001/XMLSchema"
+              elementFormDefault="qualified"
+            >
+              <xs:element name="Person" type="Person" />
+
+              <xs:complexType name="Person">
+                <xs:sequence>
+                  <xs:element name="Name" type="xs:string" />
+                  <xs:element name="Address" type="Address" />
+                </xs:sequence>
+              </xs:complexType>
+
+              <xs:complexType name="Address">
+                <xs:sequence>
+                  <xs:element name="Street" type="xs:string" />
+                </xs:sequence>
+              </xs:complexType>
+            </xs:schema>
+          SCHEMA
+        end
+
+        let(:mapping) do
+          { nil => 'Foo::Bar' }
+        end
+
+        let(:address) do
+          <<~DATA
+            require 'shale'
+
+            module Foo
+              module Bar
+                class Address < Shale::Mapper
+                  attribute :street, Shale::Type::String
+
+                  xml do
+                    root 'Address'
+
+                    map_element 'Street', to: :street
+                  end
+                end
+              end
+            end
+          DATA
+        end
+
+        let(:person) do
+          <<~DATA
+            require 'shale'
+
+            require_relative 'address'
+
+            module Foo
+              module Bar
+                class Person < Shale::Mapper
+                  attribute :name, Shale::Type::String
+                  attribute :address, Foo::Bar::Address
+
+                  xml do
+                    root 'Person'
+
+                    map_element 'Name', to: :name
+                    map_element 'Address', to: :address
+                  end
+                end
+              end
+            end
+          DATA
+        end
+
+        it 'genrates output' do
+          models = described_class.new.to_models([schema], namespace_mapping: mapping)
+
+          expect(models).to eq({
+            'foo/bar/person' => person,
+            'foo/bar/address' => address,
+          })
+        end
+      end
+
+      context 'with namespaces' do
+        let(:schema1) do
+          <<~SCHEMA
+            <xs:schema
+              xmlns:xs="http://www.w3.org/2001/XMLSchema"
+              xmlns:foo="http://foo.com"
+              xmlns:bar="http://bar.com"
+              targetNamespace="http://foo.com"
+              elementFormDefault="qualified"
+            >
+              <xs:import namespace="http://foo.com" />
+
+              <xs:element name="Person" type="foo:Person" />
+
+              <xs:complexType name="Person">
+                <xs:sequence>
+                  <xs:element name="Name" type="xs:string" />
+                  <xs:element ref="bar:Address" />
+                </xs:sequence>
+              </xs:complexType>
+            </xs:schema>
+          SCHEMA
+        end
+
+        let(:schema2) do
+          <<~SCHEMA
+            <xs:schema
+              xmlns:xs="http://www.w3.org/2001/XMLSchema"
+              xmlns:bar="http://bar.com"
+              targetNamespace="http://bar.com"
+              elementFormDefault="qualified"
+              attributeFormDefault="qualified"
+            >
+              <xs:element name="Address" type="bar:Address" />
+
+              <xs:complexType name="Address">
+                <xs:sequence>
+                  <xs:element name="Street" type="xs:string" />
+                </xs:sequence>
+              </xs:complexType>
+            </xs:schema>
+          SCHEMA
+        end
+
+        let(:mapping) do
+          {
+            'http://foo.com' => 'Foo',
+            'http://bar.com' => 'Bar',
+          }
+        end
+
+        let(:address) do
+          <<~DATA
+            require 'shale'
+
+            module Bar
+              class Address < Shale::Mapper
+                attribute :street, Shale::Type::String
+
+                xml do
+                  root 'Address'
+                  namespace 'http://bar.com', 'bar'
+
+                  map_element 'Street', to: :street
+                end
+              end
+            end
+          DATA
+        end
+
+        let(:person) do
+          <<~DATA
+            require 'shale'
+
+            require_relative '../bar/address'
+
+            module Foo
+              class Person < Shale::Mapper
+                attribute :name, Shale::Type::String
+                attribute :address, Bar::Address
+
+                xml do
+                  root 'Person'
+                  namespace 'http://foo.com', 'foo'
+
+                  map_element 'Name', to: :name
+                  map_element 'Address', to: :address, prefix: 'bar', namespace: 'http://bar.com'
+                end
+              end
+            end
+          DATA
+        end
+
+        it 'genrates output' do
+          models = described_class.new.to_models([schema1, schema2], namespace_mapping: mapping)
+
+          expect(models).to eq({
+            'foo/person' => person,
+            'bar/address' => address,
+          })
+        end
+      end
     end
   end
 end

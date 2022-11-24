@@ -3,25 +3,61 @@
 require 'shale/utils'
 
 RSpec.describe Shale::Utils do
+  describe '.upcase_first' do
+    it 'returns value' do
+      expect(described_class.upcase_first(nil)).to eq('')
+      expect(described_class.upcase_first('')).to eq('')
+      expect(described_class.upcase_first('foobar')).to eq('Foobar')
+      expect(described_class.upcase_first('fooBar')).to eq('FooBar')
+      expect(described_class.upcase_first('FooBar')).to eq('FooBar')
+    end
+  end
+
   describe '.classify' do
     it 'returns value' do
-      expect(described_class.classify(nil)).to eq('')
-      expect(described_class.classify('')).to eq('')
-      expect(described_class.classify('foobar')).to eq('Foobar')
-      expect(described_class.classify('foo_bar')).to eq('FooBar')
-      expect(described_class.classify('foo/bar')).to eq('Foo::Bar')
-      expect(described_class.classify('Foobar')).to eq('Foobar')
+      [
+        [nil, ''],
+        ['', ''],
+        %w[foobar Foobar],
+        %w[fooBar FooBar],
+        %w[foo_bar FooBar],
+        %w[Foobar Foobar],
+        %w[FooBar FooBar],
+        ['packageOne/packageTwo/fooBar', 'PackageOne::PackageTwo::FooBar'],
+        ['PackageOne/PackageTwo/FooBar', 'PackageOne::PackageTwo::FooBar'],
+        ['Package_One/Package_Two/Foo_Bar', 'PackageOne::PackageTwo::FooBar'],
+        ['package_one/package_two/foo_bar', 'PackageOne::PackageTwo::FooBar'],
+        ['packageOne::packageTwo::fooBar', 'PackageOne::PackageTwo::FooBar'],
+        ['PackageOne::PackageTwo::FooBar', 'PackageOne::PackageTwo::FooBar'],
+        ['Package_One::Package_Two::Foo_Bar', 'PackageOne::PackageTwo::FooBar'],
+        ['package_one::package_two::foo_bar', 'PackageOne::PackageTwo::FooBar'],
+      ].each do |value, expected|
+        expect(described_class.classify(value)).to eq(expected)
+      end
     end
   end
 
   describe '.snake_case' do
     it 'returns value' do
-      expect(described_class.snake_case(nil)).to eq('')
-      expect(described_class.snake_case('')).to eq('')
-      expect(described_class.snake_case('foobar')).to eq('foobar')
-      expect(described_class.snake_case('foo_bar')).to eq('foo_bar')
-      expect(described_class.snake_case('FooBar')).to eq('foo_bar')
-      expect(described_class.snake_case('fooBar')).to eq('foo_bar')
+      [
+        [nil, ''],
+        ['', ''],
+        %w[foobar foobar],
+        %w[fooBar foo_bar],
+        %w[foo_bar foo_bar],
+        %w[Foobar foobar],
+        %w[FooBar foo_bar],
+        ['packageOne/packageTwo/fooBar', 'package_one/package_two/foo_bar'],
+        ['PackageOne/PackageTwo/FooBar', 'package_one/package_two/foo_bar'],
+        ['Package_One/Package_Two/Foo_Bar', 'package_one/package_two/foo_bar'],
+        ['package_one/package_two/foo_bar', 'package_one/package_two/foo_bar'],
+        ['packageOne::packageTwo::fooBar', 'package_one/package_two/foo_bar'],
+        ['PackageOne::PackageTwo::FooBar', 'package_one/package_two/foo_bar'],
+        ['Package_One::Package_Two::Foo_Bar', 'package_one/package_two/foo_bar'],
+        ['package_one::package_two::foo_bar', 'package_one/package_two/foo_bar'],
+      ].each do |value, expected|
+        expect(described_class.snake_case(value)).to eq(expected)
+      end
     end
   end
 

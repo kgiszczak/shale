@@ -4,6 +4,7 @@ require 'erb'
 require 'uri'
 
 require_relative '../../shale'
+require_relative '../utils'
 require_relative 'compiler/boolean'
 require_relative 'compiler/complex'
 require_relative 'compiler/date'
@@ -31,29 +32,37 @@ module Shale
         <%- unless type.references.empty? -%>
 
         <%- type.references.each do |property| -%>
-        require_relative '<%= property.type.file_name %>'
+        require_relative '<%= type.relative_path(property.type.file_name) %>'
         <%- end -%>
         <%- end -%>
 
-        class <%= type.name %> < Shale::Mapper
+        <%- type.modules.each_with_index do |name, i| -%>
+        <%= '  ' * i %>module <%= name %>
+        <%- end -%>
+        <%- indent = '  ' * type.modules.length -%>
+        <%= indent %>class <%= type.root_name %> < Shale::Mapper
           <%- type.properties.each do |property| -%>
-          attribute :<%= property.attribute_name %>, <%= property.type.name -%>
+          <%= indent %>attribute :<%= property.attribute_name %>, <%= property.type.name -%>
           <%- if property.collection? %>, collection: true<% end -%>
           <%- unless property.default.nil? %>, default: -> { <%= property.default %> }<% end %>
           <%- end -%>
 
-          json do
+          <%= indent %>json do
             <%- type.properties.each do |property| -%>
-            map '<%= property.mapping_name %>', to: :<%= property.attribute_name %>
+            <%= indent %>map '<%= property.mapping_name %>', to: :<%= property.attribute_name %>
             <%- end -%>
-          end
-        end
+          <%= indent %>end
+        <%= indent %>end
+        <%- type.modules.length.times do |i| -%>
+        <%= '  ' * (type.modules.length - i - 1) %>end
+        <%- end -%>
       TEMPLATE
 
       # Generate Shale models from JSON Schema and return them as a Ruby Array of objects
       #
       # @param [Array<String>] schemas
       # @param [String, nil] root_name
+      # @param [Hash<String, String>, nil] namespace_mapping
       #
       # @raise [SchemaError] when JSON Schema has errors
       #
@@ -63,12 +72,13 @@ module Shale
       #   Shale::Schema::JSONCompiler.new.as_models([schema1, schema2])
       #
       # @api public
-      def as_models(schemas, root_name: nil)
+      def as_models(schemas, root_name: nil, namespace_mapping: nil)
         schemas = schemas.map do |schema|
           Shale.json_adapter.load(schema)
         end
 
         @root_name = root_name
+        @namespace_mapping = namespace_mapping || {}
         @schema_repository = {}
         @types = []
 
@@ -89,7 +99,7 @@ module Shale
           duplicates[type.name] += 1
 
           if total_duplicates[type.name] > 1
-            type.name = format("#{type.name}%d", duplicates[type.name])
+            type.root_name = format("#{type.root_name}%d", duplicates[type.name])
           end
         end
 
@@ -100,6 +110,7 @@ module Shale
       #
       # @param [Array<String>] schemas
       # @param [String, nil] root_name
+      # @param [Hash<String, String>, nil] namespace_mapping
       #
       # @raise [SchemaError] when JSON Schema has errors
       #
@@ -109,8 +120,8 @@ module Shale
       #   Shale::Schema::JSONCompiler.new.to_models([schema1, schema2])
       #
       # @api public
-      def to_models(schemas, root_name: nil)
-        types = as_models(schemas, root_name: root_name)
+      def to_models(schemas, root_name: nil, namespace_mapping: nil)
+        types = as_models(schemas, root_name: root_name, namespace_mapping: namespace_mapping)
 
         types.to_h do |type|
           [type.file_name, MODEL_TEMPLATE.result(binding)]
@@ -207,7 +218,8 @@ module Shale
         end
 
         if type == 'object'
-          Compiler::Complex.new(id, name)
+          base_id = Utils.presence(id.split('#')[0])
+          Compiler::Complex.new(id, name, @namespace_mapping[base_id])
         elsif type == 'string' && format == 'date'
           Compiler::Date.new
         elsif type == 'string' && format == 'date-time'
@@ -297,8 +309,9 @@ module Shale
         if schema.is_a?(Hash) && schema.key?('$ref')
           entry = resolve_ref(id, schema['$ref'])
           schema = entry[:schema]
-          id = build_id(base_id, schema['$id'])
-          fragment = (entry[:id].split('#')[1] || '').split('/') - ['']
+          entry_id, entry_fragment = entry[:id].split('#')
+          id = build_id(id, entry_id)
+          fragment = (entry_fragment || '').split('/') - ['']
         end
 
         pointer = entry[:id] || build_pointer(id, fragment)

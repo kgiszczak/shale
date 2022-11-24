@@ -47,6 +47,8 @@ Style/IfUnlessModifier:
   Enabled: false
 Style/OptionalBooleanParameter:
   AllowedMethods: ['as_xml']
+Style/SlicingWithRange:
+  Enabled: false
 Style/SymbolProc:
   Enabled: false
 Style/TrailingCommaInArrayLiteral:

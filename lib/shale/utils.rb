@@ -5,6 +5,21 @@ module Shale
   #
   # @api private
   module Utils
+    # Upcase first letter of a string
+    #
+    # @param [String] val
+    #
+    # @example
+    #   Shale::Utils.upcase_first('fooBar')
+    #   # => 'FooBar'
+    #
+    # @api private
+    def self.upcase_first(str)
+      return '' unless str
+      return '' if str.empty?
+      str[0].upcase + str[1..-1]
+    end
+
     # Convert string to Ruby's class naming convention
     #
     # @param [String] val
@@ -17,11 +32,11 @@ module Shale
     def self.classify(str)
       str = str.to_s.sub(/.*\./, '')
 
-      str = str.sub(/^[a-z\d]*/) { |match| match.capitalize || match }
+      str = str.sub(/^[a-z\d]*/) { |match| upcase_first(match) || match }
 
-      str.gsub(%r{(?:_|-|(/))([a-z\d]*)}i) do
+      str.gsub('::', '/').gsub(%r{(?:_|-|(/))([a-z\d]*)}i) do
         word = Regexp.last_match(2)
-        substituted = word.capitalize || word
+        substituted = upcase_first(word) || word
         Regexp.last_match(1) ? "::#{substituted}" : substituted
       end
     end

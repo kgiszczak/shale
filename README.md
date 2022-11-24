@@ -1249,7 +1249,9 @@ Shale::Schema::JSONGenerator.register_json_type(MyEmailType, MyEmailJSONType)
 
 :warning: Only **[Draft 2020-12](https://json-schema.org/draft/2020-12/schema)** JSON Schema is supported
 
-To generate Shale data model from JSON Schema use:
+To generate Shale data model from JSON Schema use `Shale::Schema.from_json`.
+You can pass `root_name: 'Foobar'` to change the name of the root type and
+`namespace_mapping: {}` to map schemas to Ruby modules:
 
 ```ruby
 require 'shale/schema'
@@ -1260,7 +1262,11 @@ schema = <<~SCHEMA
   "properties": {
     "firstName": { "type": "string" },
     "lastName": { "type": "string" },
-    "address": {
+    "address": { "$ref": "http://bar.com" }
+  },
+  "$defs": {
+    "Address": {
+      "$id": "http://bar.com",
       "type": "object",
       "properties": {
         "street": { "type": "string" },
@@ -1271,38 +1277,53 @@ schema = <<~SCHEMA
 }
 SCHEMA
 
-Shale::Schema.from_json([schema], root_name: 'Person')
+Shale::Schema.from_json(
+  [schema],
+  root_name: 'Person',
+  namespace_mapping: {
+    nil => 'Api::Foo', # default schema (without ID)
+    'http://bar.com' => 'Api::Bar',
+  }
+)
 
 # =>
 #
 # {
-#   "address" => "
+#   "api/bar/address" => "
 #     require 'shale'
 #
-#     class Address < Shale::Mapper
-#       attribute :street, Shale::Type::String
-#       attribute :city, Shale::Type::String
+#     module Api
+#       module Bar
+#         class Address < Shale::Mapper
+#           attribute :street, Shale::Type::String
+#           attribute :city, Shale::Type::String
 #
-#       json do
-#         map 'street', to: :street
-#         map 'city', to: :city
+#           json do
+#             map 'street', to: :street
+#             map 'city', to: :city
+#           end
+#         end
 #       end
 #     end
 #   ",
-#   "person" => "
+#   "api/foo/person" => "
 #     require 'shale'
 #
-#     require_relative 'address'
+#     require_relative '../bar/address'
 #
-#     class Person < Shale::Mapper
-#       attribute :first_name, Shale::Type::String
-#       attribute :last_name, Shale::Type::String
-#       attribute :address, Address
+#     module Api
+#       module Foo
+#         class Person < Shale::Mapper
+#           attribute :first_name, Shale::Type::String
+#           attribute :last_name, Shale::Type::String
+#           attribute :address, Api::Bar::Address
 #
-#       json do
-#         map 'firstName', to: :first_name
-#         map 'lastName', to: :last_name
-#         map 'address', to: :address
+#           json do
+#             map 'firstName', to: :first_name
+#             map 'lastName', to: :last_name
+#             map 'address', to: :address
+#           end
+#         end
 #       end
 #     end
 #   "
@@ -1312,7 +1333,7 @@ Shale::Schema.from_json([schema], root_name: 'Person')
 You can also use a command line tool to do it:
 
 ```
-$ shaleb -c -i schema.json -r Person
+$ shaleb -c -i schema.json -r Person -m http://bar.com=Api::Bar,=Api::Foo
 ```
 
 ### Generating XML Schema
@@ -1383,22 +1404,39 @@ Shale::Schema::XMLGenerator.register_xml_type(MyEmailType, 'myEmailXMLType')
 
 ### Compiling XML Schema into Shale model
 
-To generate Shale data model from XML Schema use:
+To generate Shale data model from XML Schema use `Shale::Schema.from_xml`.
+You can pass `namespace_mapping: {}` to map XML namespaces to Ruby modules:
 
 ```ruby
 require 'shale/schema'
 
-schema = <<~SCHEMA
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+schema1 = <<~SCHEMA
+<xs:schema
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:bar="http://bar.com"
+  elementFormDefault="qualified"
+>
+  <xs:import namespace="http://bar.com" />
+
   <xs:element name="Person" type="Person" />
 
   <xs:complexType name="Person">
     <xs:sequence>
-      <xs:element name="FirstName" type="xs:string" />
-      <xs:element name="LastName" type="xs:string" />
-      <xs:element name="Address" type="Address" />
+      <xs:element name="Name" type="xs:string" />
+      <xs:element ref="bar:Address" />
     </xs:sequence>
   </xs:complexType>
+</xs:schema>
+SCHEMA
+
+schema2 = <<~SCHEMA
+<xs:schema
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:bar="http://bar.com"
+  targetNamespace="http://bar.com"
+  elementFormDefault="qualified"
+>
+  <xs:element name="Address" type="bar:Address" />
 
   <xs:complexType name="Address">
     <xs:sequence>
@@ -1414,37 +1452,44 @@ Shale::Schema.from_xml([schema])
 # =>
 #
 # {
-#   "address" => "
+#   "api/bar/address" => "
 #     require 'shale'
 #
-#     class Address < Shale::Mapper
-#       attribute :street, Shale::Type::String
-#       attribute :city, Shale::Type::String
+#     module Api
+#       module Bar
+#         class Address < Shale::Mapper
+#           attribute :street, Shale::Type::String
+#           attribute :city, Shale::Type::String
 #
-#       xml do
-#         root 'Address'
+#           xml do
+#             root 'Address'
+#             namespace 'http://bar.com', 'bar'
 #
-#         map_element 'Street', to: :street
-#         map_element 'City', to: :city
+#             map_element 'Street', to: :street
+#             map_element 'City', to: :city
+#           end
+#         end
 #       end
 #     end
 #   ",
-#   "person" => "
+#   "api/foo/person" => "
 #     require 'shale'
 #
-#     require_relative 'address'
+#     require_relative '../bar/address'
 #
-#     class Person < Shale::Mapper
-#       attribute :first_name, Shale::Type::String
-#       attribute :last_name, Shale::Type::String
-#       attribute :address, Address
+#     module Api
+#       module Foo
+#         class Person < Shale::Mapper
+#           attribute :name, Shale::Type::String
+#           attribute :address, Api::Bar::Address
 #
-#       xml do
-#         root 'Person'
+#           xml do
+#             root 'Person'
 #
-#         map_element 'FirstName', to: :first_name
-#         map_element 'LastName', to: :last_name
-#         map_element 'Address', to: :address
+#             map_element 'Name', to: :name
+#             map_element 'Address', to: :address, prefix: 'bar', namespace: 'http://bar.com'
+#           end
+#         end
 #       end
 #     end
 #   "
@@ -1454,7 +1499,7 @@ Shale::Schema.from_xml([schema])
 You can also use a command line tool to do it:
 
 ```
-$ shaleb -c -f xml -i schema.xml
+$ shaleb -c -f xml -i schema.xml -m http://bar.com=Api::Bar,=Api::Foo
 ```
 
 ## Contributing

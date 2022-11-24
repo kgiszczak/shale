@@ -300,6 +300,144 @@ RSpec.describe Shale::Schema::JSONCompiler do
       end
     end
 
+    context 'with bundled schema and references' do
+      let(:schema) do
+        <<~DATA
+          {
+            "$id": "https://foo.bar/schemas/common",
+
+            "$ref": "#/$defs/person",
+            "$defs": {
+              "person": {
+                "type": "object",
+                "properties": {
+                  "first_name": { "type": "string" },
+                  "last_name": { "type": "string" },
+                  "address": { "$ref": "#/$defs/address" },
+                  "car": { "$ref": "https://foo.bar/schemas/ext" }
+                }
+              },
+              "address": {
+                "type": "object",
+                "properties": {
+                  "street": { "type": "string" },
+                  "city": { "type": "string" }
+                }
+              },
+              "car": {
+                "$id": "https://foo.bar/schemas/ext",
+
+                "type": "object",
+                "properties": {
+                  "brand": { "type": "string" },
+                  "model": { "type": "string" },
+                  "manufacturer": { "$ref": "#/$defs/manufacturer" }
+                },
+                "$defs": {
+                  "manufacturer": {
+                    "type": "object",
+                    "properties": {
+                      "name": { "type": "string" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        DATA
+      end
+
+      it 'generates Shale models' do
+        models = described_class.new.as_models([schema])
+
+        expect(models.length).to eq(4)
+
+        expect(models[0].id).to eq('https://foo.bar/schemas/ext#/$defs/manufacturer')
+        expect(models[0].name).to eq('Manufacturer')
+        expect(models[0].properties.length).to eq(1)
+        expect(models[0].properties[0].mapping_name).to eq('name')
+
+        expect(models[1].id).to eq('https://foo.bar/schemas/ext')
+        expect(models[1].name).to eq('Car')
+        expect(models[1].properties.length).to eq(3)
+        expect(models[1].properties[0].mapping_name).to eq('brand')
+        expect(models[1].properties[1].mapping_name).to eq('model')
+        expect(models[1].properties[2].mapping_name).to eq('manufacturer')
+
+        expect(models[2].id).to eq('https://foo.bar/schemas/common#/$defs/address')
+        expect(models[2].name).to eq('Address')
+        expect(models[2].properties.length).to eq(2)
+        expect(models[2].properties[0].mapping_name).to eq('street')
+        expect(models[2].properties[1].mapping_name).to eq('city')
+
+        expect(models[3].id).to eq('https://foo.bar/schemas/common#/$defs/person')
+        expect(models[3].name).to eq('Person')
+        expect(models[3].properties.length).to eq(4)
+        expect(models[3].properties[0].mapping_name).to eq('first_name')
+        expect(models[3].properties[1].mapping_name).to eq('last_name')
+        expect(models[3].properties[2].mapping_name).to eq('address')
+        expect(models[3].properties[3].mapping_name).to eq('car')
+      end
+    end
+
+    context 'with bundled schema and nested properties' do
+      let(:schema) do
+        <<~DATA
+          {
+            "$id": "https://foo.bar/schemas/common",
+
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "address": { "$ref": "https://foo.bar/schemas/ext#/$defs/address" }
+            },
+            "$defs": {
+              "car": {
+                "$id": "https://foo.bar/schemas/ext",
+
+                "type": "object",
+                "$defs": {
+                  "address": {
+                    "type": "object",
+                    "properties": {
+                      "street": {
+                        "type": "object",
+                        "properties": {
+                          "name": { "type": "string" }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        DATA
+      end
+
+      it 'generates Shale models' do
+        models = described_class.new.as_models([schema])
+
+        expect(models.length).to eq(3)
+
+        expect(models[0].id).to eq('https://foo.bar/schemas/ext#/$defs/address/properties/street')
+        expect(models[0].name).to eq('Street')
+        expect(models[0].properties.length).to eq(1)
+        expect(models[0].properties[0].mapping_name).to eq('name')
+
+        expect(models[1].id).to eq('https://foo.bar/schemas/ext#/$defs/address')
+        expect(models[1].name).to eq('Address')
+        expect(models[1].properties.length).to eq(1)
+        expect(models[1].properties[0].mapping_name).to eq('street')
+
+        expect(models[2].id).to eq('https://foo.bar/schemas/common')
+        expect(models[2].name).to eq('Root')
+        expect(models[2].properties.length).to eq(2)
+        expect(models[2].properties[0].mapping_name).to eq('name')
+        expect(models[2].properties[1].mapping_name).to eq('address')
+      end
+    end
+
     context 'with circular dependency' do
       let(:schema) do
         <<~DATA
@@ -342,6 +480,42 @@ RSpec.describe Shale::Schema::JSONCompiler do
         expect(models[1].properties[0].type.name).to eq('A')
         expect(models[1].properties[1].mapping_name).to eq('b')
         expect(models[1].properties[1].type.name).to eq('B')
+      end
+    end
+
+    context 'with duplicated names' do
+      let(:schema) do
+        <<~SCHEMA
+          {
+            "type": "object",
+            "properties": {
+              "home": {
+                "type": "object",
+                "properties": {
+                  "address": { "type": "object" }
+                }
+              },
+              "work": {
+                "type": "object",
+                "properties": {
+                  "address": { "type": "object" }
+                }
+              }
+            }
+          }
+        SCHEMA
+      end
+
+      it 'generates models' do
+        models = described_class.new.as_models([schema])
+
+        expect(models.length).to eq(5)
+
+        expect(models[0].name).to eq('Address2')
+        expect(models[1].name).to eq('Work')
+        expect(models[2].name).to eq('Address1')
+        expect(models[3].name).to eq('Home')
+        expect(models[4].name).to eq('Root')
       end
     end
 
@@ -414,6 +588,155 @@ RSpec.describe Shale::Schema::JSONCompiler do
         expect(models[0].name).to eq('Foo')
       end
     end
+
+    context 'with namespace mapping' do
+      context 'without id' do
+        let(:schema) do
+          <<~SCHEMA
+            {
+              "$ref": "#/$defs/Person",
+              "$defs": {
+                "Person": {
+                  "type": "object",
+                  "properties": {
+                    "name": { "type": "string" },
+                    "address": { "$ref": "#/$defs/Address" }
+                  }
+                },
+                "Address": {
+                  "type": "object",
+                  "properties": {
+                    "street": { "type": "string" }
+                  }
+                }
+              }
+            }
+          SCHEMA
+        end
+
+        let(:mapping) do
+          { nil => 'Foo::Bar' }
+        end
+
+        it 'generates models' do
+          models = described_class.new.as_models([schema], namespace_mapping: mapping)
+
+          expect(models.length).to eq(2)
+
+          expect(models[0].name).to eq('Foo::Bar::Address')
+          expect(models[1].name).to eq('Foo::Bar::Person')
+        end
+      end
+
+      context 'with ids' do
+        let(:schema) do
+          <<~SCHEMA
+            {
+              "$id": "http://foo.com",
+              "$ref": "#/$defs/Person",
+              "$defs": {
+                "Person": {
+                  "type": "object",
+                  "properties": {
+                    "address": { "$ref": "http://bar.com" }
+                  }
+                },
+                "Address": {
+                  "$id": "http://bar.com",
+                  "type": "object"
+                }
+              }
+            }
+          SCHEMA
+        end
+
+        let(:mapping) do
+          {
+            'http://foo.com' => 'Foo',
+            'http://bar.com' => 'Bar',
+          }
+        end
+
+        it 'generates models' do
+          models = described_class.new.as_models([schema], namespace_mapping: mapping)
+
+          expect(models.length).to eq(2)
+
+          expect(models[0].name).to eq('Bar::Address')
+          expect(models[1].name).to eq('Foo::Person')
+        end
+      end
+
+      context 'with duplicated names' do
+        let(:schema) do
+          <<~SCHEMA
+            {
+              "$id": "http://foo.com",
+              "type": "object",
+              "properties": {
+                "home": {
+                  "type": "object",
+                  "properties": {
+                    "address": { "type": "object" }
+                  }
+                },
+                "work": {
+                  "type": "object",
+                  "properties": {
+                    "address": { "type": "object" }
+                  }
+                },
+                "child": { "$ref": "http://bar.com" }
+              },
+              "$defs": {
+                "Child": {
+                  "$id": "http://bar.com",
+                  "type": "object",
+                  "properties": {
+                    "home": {
+                      "type": "object",
+                      "properties": {
+                        "address": { "type": "object" }
+                      }
+                    },
+                    "work": {
+                      "type": "object",
+                      "properties": {
+                        "address": { "type": "object" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          SCHEMA
+        end
+
+        let(:mapping) do
+          {
+            'http://foo.com' => 'Foo',
+            'http://bar.com' => 'Bar',
+          }
+        end
+
+        it 'generates models' do
+          models = described_class.new.as_models([schema], namespace_mapping: mapping)
+
+          expect(models.length).to eq(10)
+
+          expect(models[0].name).to eq('Bar::Address2')
+          expect(models[1].name).to eq('Bar::Work')
+          expect(models[2].name).to eq('Bar::Address1')
+          expect(models[3].name).to eq('Bar::Home')
+          expect(models[4].name).to eq('Bar::Child')
+          expect(models[5].name).to eq('Foo::Address2')
+          expect(models[6].name).to eq('Foo::Work')
+          expect(models[7].name).to eq('Foo::Address1')
+          expect(models[8].name).to eq('Foo::Home')
+          expect(models[9].name).to eq('Foo::Root')
+        end
+      end
+    end
   end
 
   describe '#to_models' do
@@ -446,6 +769,165 @@ RSpec.describe Shale::Schema::JSONCompiler do
       models = described_class.new.to_models([schema])
 
       expect(models).to eq({ 'root' => result })
+    end
+
+    context 'with namespace mapping' do
+      context 'without ids' do
+        let(:schema) do
+          <<~SCHEMA
+            {
+              "$ref": "#/$defs/Person",
+              "$defs": {
+                "Person": {
+                  "type": "object",
+                  "properties": {
+                    "name": { "type": "string" },
+                    "address": { "$ref": "#/$defs/Address" }
+                  }
+                },
+                "Address": {
+                  "type": "object",
+                  "properties": {
+                    "street": { "type": "string" }
+                  }
+                }
+              }
+            }
+          SCHEMA
+        end
+
+        let(:mapping) do
+          { nil => 'Foo::Bar' }
+        end
+
+        let(:address) do
+          <<~DATA
+            require 'shale'
+
+            module Foo
+              module Bar
+                class Address < Shale::Mapper
+                  attribute :street, Shale::Type::String
+
+                  json do
+                    map 'street', to: :street
+                  end
+                end
+              end
+            end
+          DATA
+        end
+
+        let(:person) do
+          <<~DATA
+            require 'shale'
+
+            require_relative 'address'
+
+            module Foo
+              module Bar
+                class Person < Shale::Mapper
+                  attribute :name, Shale::Type::String
+                  attribute :address, Foo::Bar::Address
+
+                  json do
+                    map 'name', to: :name
+                    map 'address', to: :address
+                  end
+                end
+              end
+            end
+          DATA
+        end
+
+        it 'genrates output' do
+          models = described_class.new.to_models([schema], namespace_mapping: mapping)
+
+          expect(models).to eq({
+            'foo/bar/person' => person,
+            'foo/bar/address' => address,
+          })
+        end
+      end
+
+      context 'with ids' do
+        let(:schema) do
+          <<~SCHEMA
+            {
+              "$id": "http://foo.com",
+              "$ref": "#/$defs/Person",
+              "$defs": {
+                "Person": {
+                  "type": "object",
+                  "properties": {
+                    "name": { "type": "string" },
+                    "address": { "$ref": "http://bar.com" }
+                  }
+                },
+                "Address": {
+                  "$id": "http://bar.com",
+                  "type": "object",
+                  "properties": {
+                    "street": { "type": "string" }
+                  }
+                }
+              }
+            }
+          SCHEMA
+        end
+
+        let(:mapping) do
+          {
+            'http://foo.com' => 'Foo',
+            'http://bar.com' => 'Bar',
+          }
+        end
+
+        let(:address) do
+          <<~DATA
+            require 'shale'
+
+            module Bar
+              class Address < Shale::Mapper
+                attribute :street, Shale::Type::String
+
+                json do
+                  map 'street', to: :street
+                end
+              end
+            end
+          DATA
+        end
+
+        let(:person) do
+          <<~DATA
+            require 'shale'
+
+            require_relative '../bar/address'
+
+            module Foo
+              class Person < Shale::Mapper
+                attribute :name, Shale::Type::String
+                attribute :address, Bar::Address
+
+                json do
+                  map 'name', to: :name
+                  map 'address', to: :address
+                end
+              end
+            end
+          DATA
+        end
+
+        it 'genrates output' do
+          models = described_class.new.to_models([schema], namespace_mapping: mapping)
+
+          expect(models).to eq({
+            'foo/person' => person,
+            'bar/address' => address,
+          })
+        end
+      end
     end
   end
 end

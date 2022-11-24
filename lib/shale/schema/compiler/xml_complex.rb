@@ -33,14 +33,15 @@ module Shale
         # Initialize object
         #
         # @param [String] id
-        # @param [String] name
+        # @param [String] root_name
         # @param [String] prefix
         # @param [String] namespace
+        # @param [String, nil] package
         #
         # @api private
-        def initialize(id, name, prefix, namespace)
-          super(id, name)
-          @root = name
+        def initialize(id, root_name, prefix, namespace, package)
+          super(id, root_name, package)
+          @root = root_name
           @prefix = prefix
           @namespace = namespace
         end
