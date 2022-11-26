@@ -1447,7 +1447,13 @@ schema2 = <<~SCHEMA
 </xs:schema>
 SCHEMA
 
-Shale::Schema.from_xml([schema1, schema2])
+Shale::Schema.from_xml(
+  [schema1, schema2],
+  namespace_mapping: {
+    nil => 'Api::Foo', # no namespace
+    'http://bar.com' => 'Api::Bar',
+  }
+)
 
 # =>
 #
