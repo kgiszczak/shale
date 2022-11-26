@@ -115,6 +115,42 @@ module ShaleSchemaXMLGeneratorTesting
   class CircularDependencyB
     attribute :circular_dependency_a, CircularDependencyA
   end
+
+  class Address
+    attr_accessor :street, :city
+  end
+
+  class Person
+    attr_accessor :first_name, :last_name, :address
+  end
+
+  class AddressMapper < Shale::Mapper
+    model Address
+    attribute :street, Shale::Type::String
+    attribute :city, Shale::Type::String
+
+    xml do
+      root 'Bar'
+
+      map_element 'Street', to: :street
+      map_element 'City', to: :city
+    end
+  end
+
+  class PersonMapper < Shale::Mapper
+    model Person
+    attribute :first_name, Shale::Type::String
+    attribute :last_name, Shale::Type::String
+    attribute :address, AddressMapper
+
+    xml do
+      root 'Foo'
+
+      map_element 'FirstName', to: :first_name
+      map_element 'LastName', to: :last_name
+      map_element 'Address', to: :address
+    end
+  end
 end
 
 RSpec.describe Shale::Schema::XMLGenerator do
@@ -252,6 +288,39 @@ RSpec.describe Shale::Schema::XMLGenerator do
         schema0 = Shale.xml_adapter.dump(schemas[0].as_xml, pretty: true)
 
         expect(schema0).to eq(expected_schema_circular)
+      end
+    end
+
+    context 'with custom models' do
+      let(:schema) do
+        <<~DATA.gsub(/\n\z/, '')
+          <xs:schema elementFormDefault="qualified" attributeFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xs:element name="Foo" type="ShaleSchemaXMLGeneratorTesting_Person"/>
+            <xs:complexType name="ShaleSchemaXMLGeneratorTesting_Address">
+              <xs:sequence>
+                <xs:element name="Street" type="xs:string" minOccurs="0"/>
+                <xs:element name="City" type="xs:string" minOccurs="0"/>
+              </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="ShaleSchemaXMLGeneratorTesting_Person">
+              <xs:sequence>
+                <xs:element name="FirstName" type="xs:string" minOccurs="0"/>
+                <xs:element name="LastName" type="xs:string" minOccurs="0"/>
+                <xs:element name="Address" type="ShaleSchemaXMLGeneratorTesting_Address" minOccurs="0"/>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:schema>
+        DATA
+      end
+
+      it 'generates XML schema' do
+        schemas = described_class.new.as_schemas(
+          ShaleSchemaXMLGeneratorTesting::PersonMapper
+        )
+
+        result = Shale.xml_adapter.dump(schemas[0].as_xml, pretty: true)
+
+        expect(result).to eq(schema)
       end
     end
   end

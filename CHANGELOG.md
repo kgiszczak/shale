@@ -6,6 +6,7 @@
 
 ### Changed
 - Use `ShaleError` as a base class for exceptions
+- Use model instead of mapper names for schema types
 
 ### Fixed
 - Fix compilation error for bundled JSON schemas

@@ -63,6 +63,27 @@ module ShaleSchemaJSONGeneratorTesting
   class CircularDependencyB
     attribute :circular_dependency_a, CircularDependencyA
   end
+
+  class Address
+    attr_accessor :street, :city
+  end
+
+  class Person
+    attr_accessor :first_name, :last_name, :address
+  end
+
+  class AddressMapper < Shale::Mapper
+    model Address
+    attribute :street, Shale::Type::String
+    attribute :city, Shale::Type::String
+  end
+
+  class PersonMapper < Shale::Mapper
+    model Person
+    attribute :first_name, Shale::Type::String
+    attribute :last_name, Shale::Type::String
+    attribute :address, AddressMapper
+  end
 end
 
 RSpec.describe Shale::Schema::JSONGenerator do
@@ -275,6 +296,40 @@ RSpec.describe Shale::Schema::JSONGenerator do
         )
 
         expect(schema).to eq(expected_circular_schema_hash)
+      end
+    end
+
+    context 'with custom models' do
+      let(:expected_schema) do
+        {
+          '$schema' => 'https://json-schema.org/draft/2020-12/schema',
+          '$ref' => '#/$defs/ShaleSchemaJSONGeneratorTesting_Person',
+          '$defs' => {
+            'ShaleSchemaJSONGeneratorTesting_Address' => {
+              'type' => %w[object null],
+              'properties' => {
+                'street' => { 'type' => %w[string null] },
+                'city' => { 'type' => %w[string null] },
+              },
+            },
+            'ShaleSchemaJSONGeneratorTesting_Person' => {
+              'type' => 'object',
+              'properties' => {
+                'first_name' => { 'type' => %w[string null] },
+                'last_name' => { 'type' => %w[string null] },
+                'address' => { '$ref' => '#/$defs/ShaleSchemaJSONGeneratorTesting_Address' },
+              },
+            },
+          },
+        }
+      end
+
+      it 'generates JSON schema' do
+        schema = described_class.new.as_schema(
+          ShaleSchemaJSONGeneratorTesting::PersonMapper
+        )
+
+        expect(schema).to eq(expected_schema)
       end
     end
   end

@@ -87,7 +87,7 @@ module Shale
             next unless attribute
 
             if mapper_type?(attribute.type)
-              json_type = Ref.new(mapping.name, attribute.type.name)
+              json_type = Ref.new(mapping.name, attribute.type.model.name)
             else
               json_klass = self.class.get_json_type(attribute.type)
 
@@ -103,7 +103,7 @@ module Shale
             properties << json_type
           end
 
-          objects << Object.new(type.name, properties)
+          objects << Object.new(type.model.name, properties)
         end
 
         Schema.new(objects, id: id, title: title, description: description).as_json

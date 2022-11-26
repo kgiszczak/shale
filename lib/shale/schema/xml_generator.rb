@@ -84,7 +84,7 @@ module Shale
 
         root_element = TypedElement.new(
           name: klass.xml_mapping.unprefixed_root,
-          type: [default_namespace.prefix, schematize(klass.name)].compact.join(':'),
+          type: [default_namespace.prefix, schematize(klass.model.name)].compact.join(':'),
           required: true
         )
 
@@ -195,7 +195,7 @@ module Shale
           end
 
           complex = ComplexType.new(
-            schematize(type.name),
+            schematize(type.model.name),
             children,
             mixed: !type.xml_mapping.content.nil?
           )
@@ -287,7 +287,7 @@ module Shale
       # @api private
       def get_xml_type_for_attribute(type, namespace)
         if mapper_type?(type)
-          [namespace.prefix, schematize(type.name)].compact.join(':')
+          [namespace.prefix, schematize(type.model.name)].compact.join(':')
         else
           "xs:#{self.class.get_xml_type(type)}"
         end
