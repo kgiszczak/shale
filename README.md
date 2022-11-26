@@ -1447,7 +1447,7 @@ schema2 = <<~SCHEMA
 </xs:schema>
 SCHEMA
 
-Shale::Schema.from_xml([schema])
+Shale::Schema.from_xml([schema1, schema2])
 
 # =>
 #
