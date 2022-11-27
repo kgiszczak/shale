@@ -1519,6 +1519,63 @@ RSpec.describe Shale::Schema::XMLCompiler do
       end
     end
 
+    context 'with default namespace' do
+      let(:schema) do
+        <<~SCHEMA
+          <schema
+            xmlns="http://www.w3.org/2001/XMLSchema"
+            xmlns:foo="http://foo.com"
+            targetNamespace="http://foo.com"
+            elementFormDefault="qualified"
+            attributeFormDefault="qualified"
+          >
+            <element name="Person" type="foo:Person"/>
+
+            <complexType name="Person">
+              <sequence>
+                <element name="dob" type="date"/>
+                <element name="age" type="foo:age"/>
+              </sequence>
+            </complexType>
+
+            <simpleType name="age">
+              <restriction base="integer">
+                <minInclusive value="0"/>
+                <maxInclusive value="99"/>
+              </restriction>
+            </simpleType>
+          </schema>
+        SCHEMA
+      end
+
+      it 'generates models' do
+        models = described_class.new.as_models([schema])
+
+        expect(models.length).to eq(1)
+
+        expect(models[0].id).to eq('http://foo.com:Person')
+        expect(models[0].name).to eq('Person')
+        expect(models[0].root).to eq('Person')
+        expect(models[0].prefix).to eq('foo')
+        expect(models[0].namespace).to eq('http://foo.com')
+        expect(models[0].properties.length).to eq(2)
+
+        expect(models[0].properties[0].mapping_name).to eq('dob')
+        expect(models[0].properties[0].type).to be_a(Shale::Schema::Compiler::Date)
+        expect(models[0].properties[0].collection?).to eq(false)
+        expect(models[0].properties[0].default).to eq(nil)
+        expect(models[0].properties[0].prefix).to eq('foo')
+        expect(models[0].properties[0].namespace).to eq('http://foo.com')
+
+        expect(models[0].properties[1].mapping_name).to eq('age')
+        expect(models[0].properties[1].type).to be_a(Shale::Schema::Compiler::Integer)
+        expect(models[0].properties[1].collection?).to eq(false)
+        expect(models[0].properties[1].default).to eq(nil)
+        expect(models[0].properties[1].prefix).to eq('foo')
+        expect(models[0].properties[1].namespace).to eq('http://foo.com')
+      end
+    end
+
     context 'with namespace mapping' do
       context 'without namespaces' do
         let(:schema) do

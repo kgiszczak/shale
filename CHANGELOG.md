@@ -10,6 +10,7 @@
 
 ### Fixed
 - Fix compilation error for bundled JSON schemas
+- Fix type inference for XML schema when default namespace is used
 
 ## [0.9.0] - 2022-10-31
 

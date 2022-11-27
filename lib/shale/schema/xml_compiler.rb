@@ -425,6 +425,10 @@ module Shale
           type = type.sub(/^#{prefix}/, name)
         end
 
+        if namespaces.key?('xmlns') && !type.include?(':')
+          type = "#{namespaces['xmlns']}:#{type}"
+        end
+
         type
       end
 
@@ -587,6 +591,14 @@ module Shale
         infer_type_from_xs_type(type, namespaces)
       end
 
+      # Infer type from XSD type
+      #
+      # @param [String] type
+      # @param [Hash<String, String>] namespaces
+      #
+      # @return [Shale::Schema::Compiler::<any>]
+      #
+      # @api private
       def infer_type_from_xs_type(type, namespaces)
         type = replace_ns_prefixes(type, namespaces)
 
