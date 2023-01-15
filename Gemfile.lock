@@ -11,9 +11,9 @@ GEM
     diff-lcs (1.5.0)
     docile (1.4.0)
     json (2.6.3)
-    nokogiri (1.14.0-arm64-darwin)
-      racc (~> 1.4)
-    nokogiri (1.14.0-x86_64-linux)
+    mini_portile2 (2.8.1)
+    nokogiri (1.13.10)
+      mini_portile2 (~> 2.8.0)
       racc (~> 1.4)
     ox (2.14.12)
     parallel (1.22.1)
@@ -66,7 +66,7 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
-  nokogiri
+  nokogiri (= 1.13.10)
   ox
   rake (~> 13.0)
   rexml
