@@ -23,11 +23,11 @@ RSpec.describe Shale::Adapter::REXML do
 
   describe '.dump' do
     let(:doc) do
-      bar = ::REXML::Element.new('bar')
+      bar = REXML::Element.new('bar')
       bar.add_text('Hello')
-      foo = ::REXML::Element.new('foo')
+      foo = REXML::Element.new('foo')
       foo.add_element(bar)
-      doc = ::REXML::Document.new(nil, prologue_quote: :quote)
+      doc = REXML::Document.new(nil, prologue_quote: :quote)
       doc.add_element(foo)
       doc
     end

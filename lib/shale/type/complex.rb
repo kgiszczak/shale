@@ -701,7 +701,7 @@ module Shale
               next if only && !only.key?(attribute.name)
               next if except&.key?(attribute.name)
 
-              value = receiver ? receiver.send(attribute.name) : nil
+              value = receiver.send(attribute.name) if receiver
 
               if mapping.render_nil? || !value.nil?
                 doc.add_namespace(mapping.namespace.prefix, mapping.namespace.name)
@@ -741,7 +741,7 @@ module Shale
                 skip = true if except&.key?(attribute.name)
 
                 unless skip
-                  value = receiver ? receiver.send(attribute.name) : nil
+                  value = receiver.send(attribute.name) if receiver
 
                   if content_mapping.cdata
                     doc.create_cdata(value.to_s, element)
@@ -786,7 +786,7 @@ module Shale
                 next if except.key?(attribute.name) && attribute_except.nil?
               end
 
-              value = receiver ? receiver.send(attribute.name) : nil
+              value = receiver.send(attribute.name) if receiver
 
               if mapping.render_nil? || !value.nil?
                 doc.add_namespace(mapping.namespace.prefix, mapping.namespace.name)

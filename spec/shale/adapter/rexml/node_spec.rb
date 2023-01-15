@@ -7,7 +7,7 @@ RSpec.describe Shale::Adapter::REXML::Node do
   describe '#namespaces' do
     context 'without namespaces' do
       it 'returns empty hash' do
-        el = ::REXML::Element.new('bar')
+        el = REXML::Element.new('bar')
 
         node = described_class.new(el)
         expect(node.namespaces).to eq({})
@@ -16,7 +16,7 @@ RSpec.describe Shale::Adapter::REXML::Node do
 
     context 'with namespaces' do
       it 'returns namespaces' do
-        el = ::REXML::Element.new('bar')
+        el = REXML::Element.new('bar')
         el.add_namespace(nil, 'http://default.com')
         el.add_namespace('foo', 'http://foo.com')
         el.add_namespace('bar', 'http://bar.com')
@@ -37,7 +37,7 @@ RSpec.describe Shale::Adapter::REXML::Node do
   describe '#name' do
     context 'with simple name' do
       it 'returns name of the node' do
-        el = ::REXML::Element.new('foo')
+        el = REXML::Element.new('foo')
         node = described_class.new(el)
         expect(node.name).to eq('foo')
       end
@@ -45,7 +45,7 @@ RSpec.describe Shale::Adapter::REXML::Node do
 
     context 'with namespaced name' do
       it 'returns name of the node' do
-        el = ::REXML::Element.new('bar')
+        el = REXML::Element.new('bar')
         el.add_namespace(nil, 'http://foo.com')
 
         node = described_class.new(el)
@@ -56,7 +56,7 @@ RSpec.describe Shale::Adapter::REXML::Node do
 
   describe '#attributes' do
     it "returns node's attributes" do
-      el = ::REXML::Element.new('foo')
+      el = REXML::Element.new('foo')
       el.add_namespace('ns1', 'http://ns1.com')
       el.add_namespace('ns2', 'http://ns2.com')
 
@@ -80,7 +80,7 @@ RSpec.describe Shale::Adapter::REXML::Node do
   describe '#parent' do
     context 'when parent is present' do
       it 'returns parent node' do
-        doc = ::REXML::Document.new('<parent><child>foo</child></parent>')
+        doc = REXML::Document.new('<parent><child>foo</child></parent>')
         node = described_class.new(doc.root)
         expect(node.children[0].parent.name).to eq('parent')
       end
@@ -88,7 +88,7 @@ RSpec.describe Shale::Adapter::REXML::Node do
 
     context 'when parent is not present' do
       it 'returns nil' do
-        doc = ::REXML::Document.new('<parent><child>foo</child></parent>')
+        doc = REXML::Document.new('<parent><child>foo</child></parent>')
         node = described_class.new(doc)
         expect(node.parent).to eq(nil)
       end
@@ -96,7 +96,7 @@ RSpec.describe Shale::Adapter::REXML::Node do
 
     context 'when parent is document' do
       it 'returns nil' do
-        doc = ::REXML::Document.new('<parent><child>foo</child></parent>')
+        doc = REXML::Document.new('<parent><child>foo</child></parent>')
         node = described_class.new(doc.root)
         expect(node.parent).to eq(nil)
       end
@@ -105,7 +105,7 @@ RSpec.describe Shale::Adapter::REXML::Node do
 
   describe '#children' do
     it 'returns element nodes' do
-      doc = ::REXML::Document.new('<root><a/>text1<b/>text2<c/></root>')
+      doc = REXML::Document.new('<root><a/>text1<b/>text2<c/></root>')
       node = described_class.new(doc.root)
       expect(node.children.map(&:name)).to eq(%w[a b c])
     end
@@ -114,7 +114,7 @@ RSpec.describe Shale::Adapter::REXML::Node do
   describe '#text' do
     context 'with plain text' do
       it 'returns text nodes' do
-        doc = ::REXML::Document.new('<root><a/>text1<b/>text2<c/></root>')
+        doc = REXML::Document.new('<root><a/>text1<b/>text2<c/></root>')
         node = described_class.new(doc.root)
         expect(node.text).to eq('text1')
       end
@@ -122,7 +122,7 @@ RSpec.describe Shale::Adapter::REXML::Node do
 
     context 'with cdata' do
       it 'returns text nodes' do
-        doc = ::REXML::Document.new('<root><a/><![CDATA[text1]]><b/>text2<c/></root>')
+        doc = REXML::Document.new('<root><a/><![CDATA[text1]]><b/>text2<c/></root>')
         node = described_class.new(doc.root)
         expect(node.text).to eq('text1')
       end

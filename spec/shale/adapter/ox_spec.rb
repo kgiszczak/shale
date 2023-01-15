@@ -23,11 +23,11 @@ RSpec.describe Shale::Adapter::Ox do
 
   describe '.dump' do
     let(:doc) do
-      bar = ::Ox::Element.new('bar')
+      bar = Ox::Element.new('bar')
       bar << 'Hello'
-      foo = ::Ox::Element.new('foo')
+      foo = Ox::Element.new('foo')
       foo << bar
-      doc = ::Ox::Document.new
+      doc = Ox::Document.new
       doc << foo
       doc
     end

@@ -19,7 +19,7 @@ RSpec.describe Shale::Adapter::Nokogiri::Document do
         el = doc.create_element('foo')
         doc.add_element(doc.doc, el)
 
-        expect(doc.doc.class).to eq(::Nokogiri::XML::Document)
+        expect(doc.doc.class).to eq(Nokogiri::XML::Document)
         expect(doc.doc.root.namespaces).to eq({})
       end
     end
@@ -30,7 +30,7 @@ RSpec.describe Shale::Adapter::Nokogiri::Document do
         doc.add_element(doc.doc, el)
         doc.add_namespace('foo', 'http://foo.com')
 
-        expect(doc.doc.class).to eq(::Nokogiri::XML::Document)
+        expect(doc.doc.class).to eq(Nokogiri::XML::Document)
         expect(doc.doc.root.namespaces).to eq({ 'xmlns:foo' => 'http://foo.com' })
       end
     end
@@ -39,7 +39,7 @@ RSpec.describe Shale::Adapter::Nokogiri::Document do
   describe '#create_element' do
     it 'returns Nokogiri::XML::Element instance' do
       el = doc.create_element('foo')
-      expect(el.class).to eq(::Nokogiri::XML::Element)
+      expect(el.class).to eq(Nokogiri::XML::Element)
       expect(el.name).to eq('foo')
     end
   end

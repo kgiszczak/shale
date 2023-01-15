@@ -9,10 +9,10 @@ GEM
     benchmark-ips (2.10.0)
     declarative (0.0.20)
     multi_json (1.15.0)
-    nokogiri (1.13.8-arm64-darwin)
+    nokogiri (1.14.0-arm64-darwin)
       racc (~> 1.4)
-    ox (2.14.11)
-    racc (1.6.0)
+    ox (2.14.12)
+    racc (1.6.2)
     representable (3.2.0)
       declarative (< 0.1.0)
       trailblazer-option (>= 0.1.1, < 0.2.0)
@@ -23,6 +23,7 @@ GEM
 
 PLATFORMS
   arm64-darwin-21
+  arm64-darwin-22
 
 DEPENDENCIES
   benchmark-ips
@@ -34,4 +35,4 @@ DEPENDENCIES
   shale!
 
 BUNDLED WITH
-   2.3.10
+   2.4.3

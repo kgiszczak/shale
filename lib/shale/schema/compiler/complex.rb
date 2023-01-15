@@ -40,7 +40,7 @@ module Shale
         def initialize(id, root_name, package)
           @id = id
           @root_name = root_name
-          @package = Utils.classify(package) if package
+          @package = package ? Utils.classify(package) : nil
           @properties = []
         end
 

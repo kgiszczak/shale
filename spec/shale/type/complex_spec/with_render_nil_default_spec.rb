@@ -221,7 +221,7 @@ RSpec.describe Shale::Type::Complex do
     describe '.to_yaml' do
       it 'converts objects to format' do
         instance = mapper.new(foo: 'foo')
-        expect(instance.to_yaml).to eq("---\nbase:\nfoo: foo\nbar:\n")
+        expect(instance.to_yaml.gsub(/ +$/, '')).to eq("---\nbase:\nfoo: foo\nbar:\n")
       end
     end
 
@@ -274,7 +274,7 @@ RSpec.describe Shale::Type::Complex do
     describe '.to_yaml' do
       it 'converts objects to format' do
         instance = mapper.new(foo: 'foo')
-        expect(instance.to_yaml).to eq("---\nbase:\nfoo: foo\n")
+        expect(instance.to_yaml.gsub(/ +$/, '')).to eq("---\nbase:\nfoo: foo\n")
       end
     end
 
@@ -326,7 +326,7 @@ RSpec.describe Shale::Type::Complex do
     describe '.to_yaml' do
       it 'converts objects to format' do
         instance = mapper.new(foo: 'foo')
-        expect(instance.to_yaml).to eq("---\nbase:\nfoo: foo\n")
+        expect(instance.to_yaml.gsub(/ +$/, '')).to eq("---\nbase:\nfoo: foo\n")
       end
     end
 

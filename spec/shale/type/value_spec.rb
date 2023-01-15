@@ -73,7 +73,7 @@ RSpec.describe Shale::Type::Value do
 
   describe '.of_xml' do
     it 'extracts text from XML node' do
-      element = ::REXML::Element.new('name')
+      element = REXML::Element.new('name')
       element.add_text('foobar')
 
       node = Shale::Adapter::REXML::Node.new(element)

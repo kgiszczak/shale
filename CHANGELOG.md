@@ -1,6 +1,7 @@
 ## [1.0.0] - [unreleased]
 
 ### Added
+- Support for Ruby 3.2
 - Support for delegating fields to nested attributes
 - JSON and XML schema namespace mapping support
 - Allow to set render_nil defaults

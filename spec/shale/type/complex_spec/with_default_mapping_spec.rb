@@ -676,7 +676,7 @@ RSpec.describe Shale::Type::Complex do
         context 'with declaration: true' do
           let(:xml) do
             <<~DOC.gsub(/\n|\s{2,}/, '')
-              <?xml version=\"1.0\"?>
+              <?xml version="1.0"?>
               <parent>
                 <one>foo</one>
                 <two>foo</two>

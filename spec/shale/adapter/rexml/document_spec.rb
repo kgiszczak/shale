@@ -12,7 +12,7 @@ RSpec.describe Shale::Adapter::REXML::Document do
         el = doc.create_element('foo')
         doc.add_element(doc.doc, el)
 
-        expect(doc.doc.class).to eq(::REXML::Document)
+        expect(doc.doc.class).to eq(REXML::Document)
         expect(doc.doc.root.namespaces).to eq({})
       end
     end
@@ -23,7 +23,7 @@ RSpec.describe Shale::Adapter::REXML::Document do
         doc.add_element(doc.doc, el)
         doc.add_namespace('foo', 'http://foo.com')
 
-        expect(doc.doc.class).to eq(::REXML::Document)
+        expect(doc.doc.class).to eq(REXML::Document)
         expect(doc.doc.root.namespaces).to eq({ 'foo' => 'http://foo.com' })
       end
     end
@@ -32,7 +32,7 @@ RSpec.describe Shale::Adapter::REXML::Document do
   describe '#create_element' do
     it 'returns REXML::Element instance' do
       el = doc.create_element('foo')
-      expect(el.class).to eq(::REXML::Element)
+      expect(el.class).to eq(REXML::Element)
       expect(el.name).to eq('foo')
     end
   end

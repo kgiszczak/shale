@@ -18,13 +18,13 @@ RSpec.describe Shale::Type::Float do
 
     context 'when value is Infinity' do
       it 'returns float number' do
-        expect(described_class.cast('Infinity')).to eq(::Float::INFINITY)
+        expect(described_class.cast('Infinity')).to eq(Float::INFINITY)
       end
     end
 
     context 'when value is -Infinity' do
       it 'returns float number' do
-        expect(described_class.cast('-Infinity')).to eq(-::Float::INFINITY)
+        expect(described_class.cast('-Infinity')).to eq(-Float::INFINITY)
       end
     end
 

@@ -25,10 +25,10 @@ RSpec.describe Shale::Adapter::Nokogiri do
     let(:version) { nil }
 
     let(:doc) do
-      doc = ::Nokogiri::XML::Document.new(version)
-      foo = ::Nokogiri::XML::Element.new('foo', doc)
+      doc = Nokogiri::XML::Document.new(version)
+      foo = Nokogiri::XML::Element.new('foo', doc)
       doc.add_child(foo)
-      bar = ::Nokogiri::XML::Element.new('bar', doc)
+      bar = Nokogiri::XML::Element.new('bar', doc)
       bar.content = 'Hello'
       foo.add_child(bar)
       doc
