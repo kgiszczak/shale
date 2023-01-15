@@ -41,6 +41,7 @@ module Shale
       # @api private
       def map(key, to: nil, receiver: nil, using: nil, group: nil, render_nil: nil)
         Validator.validate_arguments(key, to, receiver, using)
+
         @keys[key] = Descriptor::Dict.new(
           name: key,
           attribute: to,

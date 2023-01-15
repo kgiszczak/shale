@@ -214,10 +214,49 @@ RSpec.describe Shale::Mapping::XmlBase do
       end
     end
 
-    context 'when :render_nil is set' do
+    context 'when :render_nil is set to true' do
       it 'adds mapping to elements hash' do
         obj = described_class.new
-        obj.map_element('foo', to: :bar, render_nil: true)
+        obj.map_element('foo', to: :foo, render_nil: true)
+        expect(obj.elements.keys).to eq(['foo'])
+        expect(obj.elements['foo'].render_nil?).to eq(true)
+      end
+    end
+
+    context 'when :render_nil is set to false' do
+      it 'adds mapping to elements hash' do
+        obj = described_class.new
+        obj.map_element('foo', to: :foo, render_nil: false)
+        expect(obj.elements.keys).to eq(['foo'])
+        expect(obj.elements['foo'].render_nil?).to eq(false)
+      end
+    end
+
+    context 'when :render_nil is set to nil' do
+      it 'uses default value' do
+        obj = described_class.new
+        obj.map_element('foo', to: :foo, render_nil: nil)
+        expect(obj.elements.keys).to eq(['foo'])
+        expect(obj.elements['foo'].render_nil?).to eq(false)
+
+        obj = described_class.new
+        obj.instance_variable_set(:@render_nil_default, true)
+        obj.map_element('foo', to: :foo, render_nil: nil)
+        expect(obj.elements.keys).to eq(['foo'])
+        expect(obj.elements['foo'].render_nil?).to eq(true)
+      end
+    end
+
+    context 'when :render_nil is not set' do
+      it 'uses default value' do
+        obj = described_class.new
+        obj.map_element('foo', to: :foo)
+        expect(obj.elements.keys).to eq(['foo'])
+        expect(obj.elements['foo'].render_nil?).to eq(false)
+
+        obj = described_class.new
+        obj.instance_variable_set(:@render_nil_default, true)
+        obj.map_element('foo', to: :foo)
         expect(obj.elements.keys).to eq(['foo'])
         expect(obj.elements['foo'].render_nil?).to eq(true)
       end
@@ -354,6 +393,54 @@ RSpec.describe Shale::Mapping::XmlBase do
       it 'adds mapping to attributes hash' do
         obj = described_class.new
         obj.map_attribute('foo', to: :bar, render_nil: true)
+        expect(obj.attributes.keys).to eq(['foo'])
+        expect(obj.attributes['foo'].render_nil?).to eq(true)
+      end
+    end
+
+    context 'when :render_nil is set to true' do
+      it 'adds mapping to attributes hash' do
+        obj = described_class.new
+        obj.map_attribute('foo', to: :foo, render_nil: true)
+        expect(obj.attributes.keys).to eq(['foo'])
+        expect(obj.attributes['foo'].render_nil?).to eq(true)
+      end
+    end
+
+    context 'when :render_nil is set to false' do
+      it 'adds mapping to attributes hash' do
+        obj = described_class.new
+        obj.map_attribute('foo', to: :foo, render_nil: false)
+        expect(obj.attributes.keys).to eq(['foo'])
+        expect(obj.attributes['foo'].render_nil?).to eq(false)
+      end
+    end
+
+    context 'when :render_nil is set to nil' do
+      it 'uses default value' do
+        obj = described_class.new
+        obj.map_attribute('foo', to: :foo, render_nil: nil)
+        expect(obj.attributes.keys).to eq(['foo'])
+        expect(obj.attributes['foo'].render_nil?).to eq(false)
+
+        obj = described_class.new
+        obj.instance_variable_set(:@render_nil_default, true)
+        obj.map_attribute('foo', to: :foo, render_nil: nil)
+        expect(obj.attributes.keys).to eq(['foo'])
+        expect(obj.attributes['foo'].render_nil?).to eq(true)
+      end
+    end
+
+    context 'when :render_nil is not set' do
+      it 'uses default value' do
+        obj = described_class.new
+        obj.map_attribute('foo', to: :foo, render_nil: nil)
+        expect(obj.attributes.keys).to eq(['foo'])
+        expect(obj.attributes['foo'].render_nil?).to eq(false)
+
+        obj = described_class.new
+        obj.instance_variable_set(:@render_nil_default, true)
+        obj.map_attribute('foo', to: :foo, render_nil: nil)
         expect(obj.attributes.keys).to eq(['foo'])
         expect(obj.attributes['foo'].render_nil?).to eq(true)
       end

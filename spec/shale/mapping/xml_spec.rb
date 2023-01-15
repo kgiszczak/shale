@@ -358,6 +358,18 @@ RSpec.describe Shale::Mapping::Xml do
     end
   end
 
+  describe '#render_nil' do
+    it 'sets render_nil default' do
+      obj = described_class.new
+      obj.map_element('foo1', to: :foo1)
+      expect(obj.elements['foo1'].render_nil?).to eq(false)
+
+      obj.render_nil(true)
+      obj.map_element('foo2', to: :foo2)
+      expect(obj.elements['foo2'].render_nil?).to eq(true)
+    end
+  end
+
   describe '#group' do
     context 'without namespaces' do
       it 'creates methods mappings' do

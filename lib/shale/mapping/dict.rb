@@ -24,6 +24,15 @@ module Shale
         super(key, to: to, receiver: receiver, using: using, render_nil: render_nil)
       end
 
+      # Set render_nil default
+      #
+      # @param [true, false] val
+      #
+      # @api private
+      def render_nil(val)
+        @render_nil_default = val
+      end
+
       # Map group of keys to mapping methods
       #
       # @param [Symbol] from

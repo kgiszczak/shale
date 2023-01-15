@@ -18,7 +18,7 @@ module Shale
       # @param [String, nil] namespace
       # @param [String, nil] prefix
       # @param [true, false] cdata
-      # @param [true, false] render_nil
+      # @param [true, false, nil] render_nil
       #
       # @api private
       def map_element(
@@ -29,7 +29,7 @@ module Shale
         namespace: :undefined,
         prefix: :undefined,
         cdata: false,
-        render_nil: false
+        render_nil: nil
       )
         super(
           element,
@@ -51,7 +51,7 @@ module Shale
       # @param [Hash, nil] using
       # @param [String, nil] namespace
       # @param [String, nil] prefix
-      # @param [true, false] render_nil
+      # @param [true, false, nil] render_nil
       #
       # @api private
       def map_attribute(
@@ -61,7 +61,7 @@ module Shale
         using: nil,
         namespace: nil,
         prefix: nil,
-        render_nil: false
+        render_nil: nil
       )
         super(
           attribute,
@@ -84,6 +84,15 @@ module Shale
       # @api private
       def map_content(to: nil, receiver: nil, using: nil, cdata: false)
         super(to: to, receiver: receiver, using: using, cdata: cdata)
+      end
+
+      # Set render_nil default
+      #
+      # @param [true, false] val
+      #
+      # @api private
+      def render_nil(val)
+        @render_nil_default = val
       end
 
       # Map group of nodes to mapping methods

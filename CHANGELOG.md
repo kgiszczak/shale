@@ -3,6 +3,7 @@
 ### Added
 - Support for delegating fields to nested attributes
 - JSON and XML schema namespace mapping support
+- Allow to set render_nil defaults
 
 ### Changed
 - Use `ShaleError` as a base class for exceptions

@@ -693,6 +693,49 @@ puts person.to_xml(pretty: true)
 # </person>
 ```
 
+If you want to change how nil values are rendered for all mappings you can use `render_nil` method:
+
+```ruby
+class Base < Shale::Mapper
+  json do
+    # change render_nil default for all JSON mappings inheriting from Base class
+    render_nil true
+  end
+end
+
+class Person < Base
+  attribute :first_name, Shale::Type::String
+  attribute :last_name, Shale::Type::String
+  attribute :age, Shale::Type::Integer
+
+  json do
+    # override default from Base class
+    render_nil false
+
+    map 'first_name', to: :first_name
+    map 'last_name', to: :last_name
+    map 'age', to: :age, render_nil: true # override default
+  end
+end
+```
+
+:warning: The default affects only the mappings declared after setting the default value e.g.
+
+```ruby
+class Person < Base
+  attribute :first_name, Shale::Type::String
+  attribute :last_name, Shale::Type::String
+
+  json do
+    render_nil false
+    map 'first_name', to: :first_name # render_nil will be false for this mapping
+
+    render_nil true
+    map 'last_name', to: :last_name # render_nil will be true for this mapping
+  end
+end
+```
+
 ### Using methods to extract and generate data
 
 If you need full controll over extracting and generating data from/to document,

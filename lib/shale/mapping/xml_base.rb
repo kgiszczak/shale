@@ -67,6 +67,7 @@ module Shale
         @root = ''
         @default_namespace = Descriptor::XmlNamespace.new
         @finalized = false
+        @render_nil_default = false
       end
 
       # Map element to attribute
@@ -79,7 +80,7 @@ module Shale
       # @param [String, nil] namespace
       # @param [String, nil] prefix
       # @param [true, false] cdata
-      # @param [true, false] render_nil
+      # @param [true, false, nil] render_nil
       #
       # @raise [IncorrectMappingArgumentsError] when arguments are incorrect
       #
@@ -93,7 +94,7 @@ module Shale
         namespace: :undefined,
         prefix: :undefined,
         cdata: false,
-        render_nil: false
+        render_nil: nil
       )
         Validator.validate_arguments(element, to, receiver, using)
         Validator.validate_namespace(element, namespace, prefix)
@@ -116,7 +117,7 @@ module Shale
           group: group,
           namespace: Descriptor::XmlNamespace.new(nsp, pfx),
           cdata: cdata,
-          render_nil: render_nil
+          render_nil: render_nil.nil? ? @render_nil_default : render_nil
         )
       end
 
@@ -129,7 +130,7 @@ module Shale
       # @param [String, nil] group
       # @param [String, nil] namespace
       # @param [String, nil] prefix
-      # @param [true, false] render_nil
+      # @param [true, false, nil] render_nil
       #
       # @raise [IncorrectMappingArgumentsError] when arguments are incorrect
       #
@@ -142,7 +143,7 @@ module Shale
         group: nil,
         namespace: nil,
         prefix: nil,
-        render_nil: false
+        render_nil: nil
       )
         Validator.validate_arguments(attribute, to, receiver, using)
         Validator.validate_namespace(attribute, namespace, prefix)
@@ -157,7 +158,7 @@ module Shale
           namespace: Descriptor::XmlNamespace.new(namespace, prefix),
           cdata: false,
           group: group,
-          render_nil: render_nil
+          render_nil: render_nil.nil? ? @render_nil_default : render_nil
         )
       end
 
@@ -225,8 +226,6 @@ module Shale
       def initialize_dup(other)
         @elements = other.instance_variable_get('@elements').dup
         @attributes = other.instance_variable_get('@attributes').dup
-        @content = other.instance_variable_get('@content').dup
-        @root = other.instance_variable_get('@root').dup
         @default_namespace = other.instance_variable_get('@default_namespace').dup
         @finalized = false
 
