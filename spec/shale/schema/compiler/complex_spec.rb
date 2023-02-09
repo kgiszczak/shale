@@ -110,6 +110,13 @@ RSpec.describe Shale::Schema::Compiler::Complex do
         expect(complex.file_name).to eq('package_one/package_two/foo_bar')
       end
     end
+
+    context 'a period is present in the root_name and id' do
+      it 'returns the value' do
+        complex = described_class.new('Foo.Bar:http://www.example.com', 'Foo.Bar', 'PackageOne::PackageTwo')
+        expect(complex.file_name).to eq('package_one/package_two/foo_bar')
+      end
+    end
   end
 
   describe '#relative_path' do

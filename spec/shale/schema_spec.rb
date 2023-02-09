@@ -177,6 +177,35 @@ RSpec.describe Shale::Schema do
   end
 
   describe '.from_xml' do
+    context 'elements with periods' do
+      let(:schema) do
+        <<~SCHEMA
+          <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+          <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="foo" targetNamespace="foo">
+            <xs:element name="Invoice.Item">
+              <xs:complexType>
+                <xs:element type="string"/>
+              </xs:complexType>
+            </xs:element>
+            <xs:element name="Root">
+              <xs:complexType>
+                  <xs:element ref="Invoice.Item"/>
+              </xs:complexType>
+            </xs:element>
+          </xs:schema>
+        SCHEMA
+      end
+
+      it 'generates Shale models' do
+        require 'debug'
+        Shale.xml_adapter = Shale::Adapter::REXML
+        models = described_class.from_xml([schema],
+          namespace_mapping: { 'foo' => 'Namespace' })
+        expect(models.keys).to include('namespace/invoice_item')
+        expect(models.keys).to include('namespace/root')
+      end
+    end
+
     context 'without namespace mapping' do
       let(:schema) do
         <<~DATA
