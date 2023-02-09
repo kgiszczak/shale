@@ -23,6 +23,7 @@ RSpec.describe Shale::Utils do
         %w[foo_bar FooBar],
         %w[Foobar Foobar],
         %w[FooBar FooBar],
+        %w[Foo.Bar FooBar],
         ['packageOne/packageTwo/fooBar', 'PackageOne::PackageTwo::FooBar'],
         ['PackageOne/PackageTwo/FooBar', 'PackageOne::PackageTwo::FooBar'],
         ['Package_One/Package_Two/Foo_Bar', 'PackageOne::PackageTwo::FooBar'],
