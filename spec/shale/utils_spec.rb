@@ -43,6 +43,15 @@ RSpec.describe Shale::Utils do
       [
         [nil, ''],
         ['', ''],
+
+        # XML allows periods and hyphens in name
+        %w[Foo.Bar foo_bar],
+        %w[foo.Bar foo_bar],
+        %w[foo.bar foo_bar],
+        %w[Foo-Bar foo_bar],
+        %w[foo-Bar foo_bar],
+        %w[foo-bar foo_bar],
+
         %w[foobar foobar],
         %w[fooBar foo_bar],
         %w[foo_bar foo_bar],
