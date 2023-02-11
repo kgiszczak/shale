@@ -30,7 +30,8 @@ module Shale
     #
     # @api private
     def self.classify(str)
-      str = str.to_s.sub(/.*\./, '')
+      # names may include a period, which will need to be stripped out
+      str = str.to_s.sub(/\./, '')
 
       str = str.sub(/^[a-z\d]*/) { |match| upcase_first(match) || match }
 
@@ -51,6 +52,8 @@ module Shale
     #
     # @api private
     def self.snake_case(str)
+      # XML elements allow periods and hyphens
+      str = str.to_s.gsub('.', '_')
       return str.to_s unless /[A-Z-]|::/.match?(str)
       word = str.to_s.gsub('::', '/')
       word = word.gsub(/([A-Z]+)(?=[A-Z][a-z])|([a-z\d])(?=[A-Z])/) do

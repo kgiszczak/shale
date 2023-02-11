@@ -45,6 +45,31 @@ RSpec.describe Shale::Schema::XMLCompiler do
       end
     end
 
+    context 'xml schema with a period in the element name' do
+      let(:schema) do
+        <<~SCHEMA
+          <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+          <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xs:element name="Foo.Bar"/>
+            <xs:element name="Root">
+              <xs:complexType>
+                <xs:element ref="Foo.Bar"/>
+              </xs:complexType>
+            </xs:element>
+          </xs:schema>
+        SCHEMA
+      end
+
+      it 'generates models' do
+        models = described_class.new.as_models([schema])
+
+        expect(models.length).to eq(1)
+        expect(models[0].id).to eq('Root')
+        expect(models[0].properties[0].mapping_name).to eq('Foo.Bar')
+        expect(models[0].properties[0].attribute_name).to eq('foo_bar')
+      end
+    end
+
     context 'with top level complex types' do
       let(:schema) do
         <<~SCHEMA

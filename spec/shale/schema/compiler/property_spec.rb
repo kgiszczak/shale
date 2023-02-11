@@ -18,6 +18,18 @@ RSpec.describe Shale::Schema::Compiler::Property do
       property = described_class.new('fooBar', type, false, nil)
       expect(property.attribute_name).to eq('foo_bar')
     end
+
+    # in the wild XML elements have had periods in the element name
+    #
+    # for example
+    #    <xs:element name="Invoice.Item">
+    #      <xs:element name="Value" type="String"/>
+    #    </xs:element>
+    it 'removes periods' do
+      property = described_class.new('Foo.Bar', type, false, nil)
+      expect(property.mapping_name).to eq('Foo.Bar')
+      expect(property.attribute_name).to eq('foo_bar')
+    end
   end
 
   describe '#type' do

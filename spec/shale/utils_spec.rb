@@ -23,6 +23,7 @@ RSpec.describe Shale::Utils do
         %w[foo_bar FooBar],
         %w[Foobar Foobar],
         %w[FooBar FooBar],
+        %w[Foo.Bar FooBar],
         ['packageOne/packageTwo/fooBar', 'PackageOne::PackageTwo::FooBar'],
         ['PackageOne/PackageTwo/FooBar', 'PackageOne::PackageTwo::FooBar'],
         ['Package_One/Package_Two/Foo_Bar', 'PackageOne::PackageTwo::FooBar'],
@@ -42,6 +43,15 @@ RSpec.describe Shale::Utils do
       [
         [nil, ''],
         ['', ''],
+
+        # XML allows periods and hyphens in name
+        %w[Foo.Bar foo_bar],
+        %w[foo.Bar foo_bar],
+        %w[foo.bar foo_bar],
+        %w[Foo-Bar foo_bar],
+        %w[foo-Bar foo_bar],
+        %w[foo-bar foo_bar],
+
         %w[foobar foobar],
         %w[fooBar foo_bar],
         %w[foo_bar foo_bar],
