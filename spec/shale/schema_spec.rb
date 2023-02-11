@@ -197,7 +197,6 @@ RSpec.describe Shale::Schema do
       end
 
       it 'generates Shale models' do
-        require 'debug'
         Shale.xml_adapter = Shale::Adapter::REXML
         models = described_class.from_xml([schema],
           namespace_mapping: { 'foo' => 'Namespace' })
