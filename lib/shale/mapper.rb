@@ -151,7 +151,7 @@ module Shale
       # @raise [DefaultNotCallableError] when attribute's default is not callable
       #
       # @example
-      #   calss Person < Shale::Mapper
+      #   class Person < Shale::Mapper
       #     attribute :first_name, Shale::Type::String
       #     attribute :last_name, Shale::Type::String
       #     attribute :age, Shale::Type::Integer, default: -> { 1 }
@@ -200,7 +200,7 @@ module Shale
       # @param [Proc] block
       #
       # @example
-      #   calss Person < Shale::Mapper
+      #   class Person < Shale::Mapper
       #     attribute :first_name, Shale::Type::String
       #     attribute :last_name, Shale::Type::String
       #     attribute :age, Shale::Type::Integer
@@ -224,7 +224,7 @@ module Shale
       # @param [Proc] block
       #
       # @example
-      #   calss Person < Shale::Mapper
+      #   class Person < Shale::Mapper
       #     attribute :first_name, Shale::Type::String
       #     attribute :last_name, Shale::Type::String
       #     attribute :age, Shale::Type::Integer
@@ -248,7 +248,7 @@ module Shale
       # @param [Proc] block
       #
       # @example
-      #   calss Person < Shale::Mapper
+      #   class Person < Shale::Mapper
       #     attribute :first_name, Shale::Type::String
       #     attribute :last_name, Shale::Type::String
       #     attribute :age, Shale::Type::Integer
@@ -272,7 +272,7 @@ module Shale
       # @param [Proc] block
       #
       # @example
-      #   calss Person < Shale::Mapper
+      #   class Person < Shale::Mapper
       #     attribute :first_name, Shale::Type::String
       #     attribute :last_name, Shale::Type::String
       #     attribute :age, Shale::Type::Integer
@@ -296,7 +296,7 @@ module Shale
       # @param [Proc] block
       #
       # @example
-      #   calss Person < Shale::Mapper
+      #   class Person < Shale::Mapper
       #     attribute :first_name, Shale::Type::String
       #     attribute :last_name, Shale::Type::String
       #     attribute :age, Shale::Type::Integer
@@ -320,7 +320,7 @@ module Shale
       # @param [Proc] block
       #
       # @example
-      #   calss Person < Shale::Mapper
+      #   class Person < Shale::Mapper
       #     attribute :first_name, Shale::Type::String
       #     attribute :last_name, Shale::Type::String
       #     attribute :age, Shale::Type::Integer
