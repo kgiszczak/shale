@@ -92,11 +92,12 @@ module Shale
               json_klass = self.class.get_json_type(attribute.type)
 
               if attribute.default && !attribute.collection?
-                value = attribute.type.cast(attribute.default.call)
+                value = attribute.type.cast(attribute.default.is_a?(Proc) ? attribute.default.call : attribute.default)
                 default = attribute.type.as_json(value)
               end
 
-              json_type = json_klass.new(mapping.name, default: default)
+              json_type = json_klass.new(mapping.name, default: default, nullable: attribute.nullable,
+                properties: attribute.properties, required: attribute.required)
             end
 
             json_type = Collection.new(json_type) if attribute.collection?

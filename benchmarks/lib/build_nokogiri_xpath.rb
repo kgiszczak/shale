@@ -13,14 +13,14 @@ module BuildNokogiriXpath
         country_code: xml.at_xpath('country_code').text,
         time_zone: xml.at_xpath('time_zone').text,
         latitude: xml.at_xpath('latitude').text,
-        longitude: xml.at_xpath('longitude').text,
+        longitude: xml.at_xpath('longitude').text
       )
     end
 
     def build_contact(xml)
       Contact.new(
         type: xml.at_xpath('type').text,
-        contact: xml.at_xpath('contact').text,
+        contact: xml.at_xpath('contact').text
       )
     end
 
@@ -28,7 +28,7 @@ module BuildNokogiriXpath
       School.new(
         name: xml.at_xpath('name').text,
         address: build_address(xml.at_xpath('address')),
-        contacts: xml.xpath('contact').map { |e| build_contact(e) },
+        contacts: xml.xpath('contact').map { |e| build_contact(e) }
       )
     end
 
@@ -39,7 +39,7 @@ module BuildNokogiriXpath
         ein: xml.at_xpath('ein').text,
         type: xml.at_xpath('type').text,
         address: build_address(xml.at_xpath('address')),
-        contacts: xml.xpath('contact').map { |e| build_contact(e) },
+        contacts: xml.xpath('contact').map { |e| build_contact(e) }
       )
     end
 
@@ -47,7 +47,7 @@ module BuildNokogiriXpath
       BankAccount.new(
         number: xml.at_xpath('number').text,
         balance: xml.at_xpath('balance').text,
-        bank: build_company(xml.at_xpath('bank')),
+        bank: build_company(xml.at_xpath('bank'))
       )
     end
 
@@ -55,7 +55,7 @@ module BuildNokogiriXpath
       Car.new(
         model: xml.at_xpath('model').text,
         brand: xml.at_xpath('brand').text,
-        manufacturer: build_company(xml.at_xpath('manufacturer')),
+        manufacturer: build_company(xml.at_xpath('manufacturer'))
       )
     end
 
@@ -66,7 +66,7 @@ module BuildNokogiriXpath
         seniority: xml.at_xpath('seniority').text,
         position: xml.at_xpath('position').text,
         employment_type: xml.at_xpath('employment_type').text,
-        company: build_company(xml.at_xpath('company')),
+        company: build_company(xml.at_xpath('company'))
       )
     end
 
@@ -74,7 +74,7 @@ module BuildNokogiriXpath
       Animal.new(
         kind: xml.at_xpath('kind').text,
         breed: xml.at_xpath('breed').text,
-        name: xml.at_xpath('name').text,
+        name: xml.at_xpath('name').text
       )
     end
 
@@ -83,10 +83,10 @@ module BuildNokogiriXpath
         first_name: xml.at_xpath('first_name').text,
         last_name: xml.at_xpath('last_name').text,
         middle_name: xml.at_xpath('middle_name').text,
-        prefix:  xml.at_xpath('prefix').text,
+        prefix: xml.at_xpath('prefix').text,
         date_of_birth: xml.at_xpath('date_of_birth').text,
         place_of_birth: build_address(xml.at_xpath('place_of_birth')),
-        driving_license:  xml.at_xpath('driving_license').text,
+        driving_license: xml.at_xpath('driving_license').text,
         hobbies: xml.xpath('hobby').map(&:text),
         education: xml.xpath('school').map { |e| build_school(e) },
         current_address: build_address(xml.at_xpath('current_address')),
@@ -98,7 +98,7 @@ module BuildNokogiriXpath
         current_job: build_job(xml.at_xpath('current_job')),
         jobs: xml.xpath('job').map { |e| build_job(e) },
         pets: xml.xpath('pet').map { |e| build_animal(e) },
-        children: xml.xpath('child').map { |e| build_person(e) },
+        children: xml.xpath('child').map { |e| build_person(e) }
       )
     end
 

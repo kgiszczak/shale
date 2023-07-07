@@ -3,7 +3,7 @@ class Address
     :country, :country_code, :time_zone, :latitude, :longitude
 
   def initialize(city: nil, street: nil, zip: nil, state: nil, state_abbr: nil,
-    country: nil, country_code: nil, time_zone: nil, latitude: nil, longitude: nil)
+                 country: nil, country_code: nil, time_zone: nil, latitude: nil, longitude: nil)
     @city = city
     @street = street
     @zip = zip
@@ -99,9 +99,9 @@ class Person
     :jobs, :pets, :children
 
   def initialize(first_name: nil, last_name: nil, middle_name: nil, prefix: nil, date_of_birth: nil,
-    place_of_birth: nil, driving_license: nil, hobbies: nil, education: nil, current_address: nil,
-    past_addresses: nil, contacts: nil, bank_acocunt: nil, current_car: nil, cars: nil, current_job: nil,
-    jobs: nil, pets: nil, children: nil)
+                 place_of_birth: nil, driving_license: nil, hobbies: nil, education: nil, current_address: nil,
+                 past_addresses: nil, contacts: nil, bank_acocunt: nil, current_car: nil, cars: nil, current_job: nil,
+                 jobs: nil, pets: nil, children: nil)
     @first_name = first_name
     @last_name = last_name
     @middle_name = middle_name

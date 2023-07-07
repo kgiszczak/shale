@@ -13,14 +13,14 @@ module BuildOx
         country_code: xml.locate('country_code').first.text,
         time_zone: xml.locate('time_zone').first.text,
         latitude: xml.locate('latitude').first.text,
-        longitude: xml.locate('longitude').first.text,
+        longitude: xml.locate('longitude').first.text
       )
     end
 
     def build_contact(xml)
       Contact.new(
         type: xml.locate('type').first.text,
-        contact: xml.locate('contact').first.text,
+        contact: xml.locate('contact').first.text
       )
     end
 
@@ -28,7 +28,7 @@ module BuildOx
       School.new(
         name: xml.locate('name').first.text,
         address: build_address(xml.locate('address').first),
-        contacts: xml.locate('contact').map { |e| build_contact(e) },
+        contacts: xml.locate('contact').map { |e| build_contact(e) }
       )
     end
 
@@ -39,7 +39,7 @@ module BuildOx
         ein: xml.locate('ein').first.text,
         type: xml.locate('type').first.text,
         address: build_address(xml.locate('address').first),
-        contacts: xml.locate('contact').map { |e| build_contact(e) },
+        contacts: xml.locate('contact').map { |e| build_contact(e) }
       )
     end
 
@@ -47,7 +47,7 @@ module BuildOx
       BankAccount.new(
         number: xml.locate('number').first.text,
         balance: xml.locate('balance').first.text,
-        bank: build_company(xml.locate('bank').first),
+        bank: build_company(xml.locate('bank').first)
       )
     end
 
@@ -55,7 +55,7 @@ module BuildOx
       Car.new(
         model: xml.locate('model').first.text,
         brand: xml.locate('brand').first.text,
-        manufacturer: build_company(xml.locate('manufacturer').first),
+        manufacturer: build_company(xml.locate('manufacturer').first)
       )
     end
 
@@ -66,7 +66,7 @@ module BuildOx
         seniority: xml.locate('seniority').first.text,
         position: xml.locate('position').first.text,
         employment_type: xml.locate('employment_type').first.text,
-        company: build_company(xml.locate('company').first),
+        company: build_company(xml.locate('company').first)
       )
     end
 
@@ -74,7 +74,7 @@ module BuildOx
       Animal.new(
         kind: xml.locate('kind').first.text,
         breed: xml.locate('breed').first.text,
-        name: xml.locate('name').first.text,
+        name: xml.locate('name').first.text
       )
     end
 
@@ -83,10 +83,10 @@ module BuildOx
         first_name: xml.locate('first_name').first.text,
         last_name: xml.locate('last_name').first.text,
         middle_name: xml.locate('middle_name').first.text,
-        prefix:  xml.locate('prefix').first.text,
+        prefix: xml.locate('prefix').first.text,
         date_of_birth: xml.locate('date_of_birth').first.text,
         place_of_birth: build_address(xml.locate('place_of_birth').first),
-        driving_license:  xml.locate('driving_license').first.text,
+        driving_license: xml.locate('driving_license').first.text,
         hobbies: xml.locate('hobby').map(&:text),
         education: xml.locate('school').map { |e| build_school(e) },
         current_address: build_address(xml.locate('current_address').first),
@@ -98,7 +98,7 @@ module BuildOx
         current_job: build_job(xml.locate('current_job').first),
         jobs: xml.locate('job').map { |e| build_job(e) },
         pets: xml.locate('pet').map { |e| build_animal(e) },
-        children: xml.locate('child').map { |e| build_person(e) },
+        children: xml.locate('child').map { |e| build_person(e) }
       )
     end
 

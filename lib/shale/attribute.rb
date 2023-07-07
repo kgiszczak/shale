@@ -20,6 +20,21 @@ module Shale
     # @api private
     attr_reader :default
 
+    # Return nullable
+    #
+    # @api private
+    attr_reader :nullable
+
+    # Return properties
+    #
+    # @api public
+    attr_accessor :properties
+
+    # Return required
+    #
+    # @api public
+    attr_accessor :required
+
     # Return setter name
     #
     # @api private
@@ -33,12 +48,15 @@ module Shale
     # @param [Proc] default Default value
     #
     # @api private
-    def initialize(name, type, collection, default)
+    def initialize(name, type, collection, default, nullable, properties, required)
       @name = name
       @setter = "#{name}="
       @type = type
       @collection = collection
       @default = collection ? -> { [] } : default
+      @nullable = nullable
+      @properties = properties
+      @required = required
     end
 
     # Return wheter attribute is collection or not

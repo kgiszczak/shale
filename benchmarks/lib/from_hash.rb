@@ -13,14 +13,14 @@ module FromHash
         country_code: json['country_code'],
         time_zone: json['time_zone'],
         latitude: json['latitude'],
-        longitude: json['longitude'],
+        longitude: json['longitude']
       )
     end
 
     def build_contact(json)
       Contact.new(
         type: json['type'],
-        contact: json['contact'],
+        contact: json['contact']
       )
     end
 
@@ -28,7 +28,7 @@ module FromHash
       School.new(
         name: json['name'],
         address: build_address(json['address']),
-        contacts: json['contacts'].map { |e| build_contact(e) },
+        contacts: json['contacts'].map { |e| build_contact(e) }
       )
     end
 
@@ -39,7 +39,7 @@ module FromHash
         ein: json['ein'],
         type: json['type'],
         address: build_address(json['address']),
-        contacts: json['contacts'].map { |e| build_contact(e) },
+        contacts: json['contacts'].map { |e| build_contact(e) }
       )
     end
 
@@ -47,7 +47,7 @@ module FromHash
       BankAccount.new(
         number: json['number'],
         balance: json['balance'],
-        bank: build_company(json['bank']),
+        bank: build_company(json['bank'])
       )
     end
 
@@ -55,7 +55,7 @@ module FromHash
       Car.new(
         model: json['model'],
         brand: json['brand'],
-        manufacturer: build_company(json['manufacturer']),
+        manufacturer: build_company(json['manufacturer'])
       )
     end
 
@@ -66,7 +66,7 @@ module FromHash
         seniority: json['seniority'],
         position: json['position'],
         employment_type: json['employment_type'],
-        company: build_company(json['company']),
+        company: build_company(json['company'])
       )
     end
 
@@ -74,7 +74,7 @@ module FromHash
       Animal.new(
         kind: json['kind'],
         breed: json['breed'],
-        name: json['name'],
+        name: json['name']
       )
     end
 
@@ -83,10 +83,10 @@ module FromHash
         first_name: json['first_name'],
         last_name: json['last_name'],
         middle_name: json['middle_name'],
-        prefix:  json['prefix'],
+        prefix: json['prefix'],
         date_of_birth: json['date_of_birth'],
         place_of_birth: build_address(json['place_of_birth']),
-        driving_license:  json['driving_license'],
+        driving_license: json['driving_license'],
         hobbies: json['hobbies'],
         education: json['education'].map { |e| build_school(e) },
         current_address: build_address(json['current_address']),
@@ -98,7 +98,7 @@ module FromHash
         current_job: build_job(json['current_job']),
         jobs: json['jobs'].map { |e| build_job(e) },
         pets: json['pets'].map { |e| build_animal(e) },
-        children: json['children'].map { |e| build_person(e) },
+        children: json['children'].map { |e| build_person(e) }
       )
     end
 

@@ -13,14 +13,14 @@ module BuildNokogiriCss
         country_code: xml.at_css('> country_code').text,
         time_zone: xml.at_css('> time_zone').text,
         latitude: xml.at_css('> latitude').text,
-        longitude: xml.at_css('> longitude').text,
+        longitude: xml.at_css('> longitude').text
       )
     end
 
     def build_contact(xml)
       Contact.new(
         type: xml.at_css('> type').text,
-        contact: xml.at_css('> contact').text,
+        contact: xml.at_css('> contact').text
       )
     end
 
@@ -28,7 +28,7 @@ module BuildNokogiriCss
       School.new(
         name: xml.at_css('> name').text,
         address: build_address(xml.at_css('> address')),
-        contacts: xml.css('> contact').map { |e| build_contact(e) },
+        contacts: xml.css('> contact').map { |e| build_contact(e) }
       )
     end
 
@@ -39,7 +39,7 @@ module BuildNokogiriCss
         ein: xml.at_css('> ein').text,
         type: xml.at_css('> type').text,
         address: build_address(xml.at_css('> address')),
-        contacts: xml.css('> contact').map { |e| build_contact(e) },
+        contacts: xml.css('> contact').map { |e| build_contact(e) }
       )
     end
 
@@ -47,7 +47,7 @@ module BuildNokogiriCss
       BankAccount.new(
         number: xml.at_css('> number').text,
         balance: xml.at_css('> balance').text,
-        bank: build_company(xml.at_css('> bank')),
+        bank: build_company(xml.at_css('> bank'))
       )
     end
 
@@ -55,7 +55,7 @@ module BuildNokogiriCss
       Car.new(
         model: xml.at_css('model').text,
         brand: xml.at_css('brand').text,
-        manufacturer: build_company(xml.at_css('manufacturer')),
+        manufacturer: build_company(xml.at_css('manufacturer'))
       )
     end
 
@@ -66,7 +66,7 @@ module BuildNokogiriCss
         seniority: xml.at_css('> seniority').text,
         position: xml.at_css('> position').text,
         employment_type: xml.at_css('> employment_type').text,
-        company: build_company(xml.at_css('> company')),
+        company: build_company(xml.at_css('> company'))
       )
     end
 
@@ -74,7 +74,7 @@ module BuildNokogiriCss
       Animal.new(
         kind: xml.at_css('> kind').text,
         breed: xml.at_css('> breed').text,
-        name: xml.at_css('> name').text,
+        name: xml.at_css('> name').text
       )
     end
 
@@ -83,10 +83,10 @@ module BuildNokogiriCss
         first_name: xml.at_css('> first_name').text,
         last_name: xml.at_css('> last_name').text,
         middle_name: xml.at_css('> middle_name').text,
-        prefix:  xml.at_css('> prefix').text,
+        prefix: xml.at_css('> prefix').text,
         date_of_birth: xml.at_css('> date_of_birth').text,
         place_of_birth: build_address(xml.at_css('> place_of_birth')),
-        driving_license:  xml.at_css('> driving_license').text,
+        driving_license: xml.at_css('> driving_license').text,
         hobbies: xml.css('> hobby').map(&:text),
         education: xml.css('> school').map { |e| build_school(e) },
         current_address: build_address(xml.at_css('> current_address')),
@@ -98,7 +98,7 @@ module BuildNokogiriCss
         current_job: build_job(xml.at_css('> current_job')),
         jobs: xml.css('> job').map { |e| build_job(e) },
         pets: xml.css('> pet').map { |e| build_animal(e) },
-        children: xml.css('> child').map { |e| build_person(e) },
+        children: xml.css('> child').map { |e| build_person(e) }
       )
     end
 

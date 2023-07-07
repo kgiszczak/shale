@@ -170,14 +170,14 @@ module Shale
       #   person.hobbies # => ['Dancing']
       #
       # @api public
-      def attribute(name, type, collection: false, default: nil)
+      def attribute(name, type, collection: false, default: nil, nullable: false, properties: nil, required: false)
         name = name.to_sym
 
         unless default.nil? || default.respond_to?(:call)
           raise DefaultNotCallableError.new(to_s, name)
         end
 
-        @attributes[name] = Attribute.new(name, type, collection, default)
+        @attributes[name] = Attribute.new(name, type, collection, default, nullable, properties, required)
 
         @hash_mapping.map(name.to_s, to: name) unless @hash_mapping.finalized?
         @json_mapping.map(name.to_s, to: name) unless @json_mapping.finalized?

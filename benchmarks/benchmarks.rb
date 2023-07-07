@@ -107,14 +107,14 @@ Shale.xml_adapter = Shale::Adapter::Nokogiri
 
 Benchmark.ips do |x|
   x.report('By hand (CSS)') do
-    doc = ::Nokogiri::XML::Document.parse(xml) do |config|
+    doc = Nokogiri::XML::Document.parse(xml) do |config|
       config.noblanks
     end
     BuildNokogiriCss.build_report(doc)
   end
 
   x.report('By hand (xpath)') do
-    doc = ::Nokogiri::XML::Document.parse(xml) do |config|
+    doc = Nokogiri::XML::Document.parse(xml) do |config|
       config.noblanks
     end
     BuildNokogiriXpath.build_report(doc)
@@ -156,7 +156,7 @@ Shale.xml_adapter = Shale::Adapter::REXML
 
 Benchmark.ips do |x|
   x.report('By hand') do
-    doc = ::REXML::Document.new(xml, ignore_whitespace_nodes: :all)
+    doc = REXML::Document.new(xml, ignore_whitespace_nodes: :all)
     BuildRexml.build_report(doc)
   end
 

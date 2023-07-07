@@ -13,14 +13,14 @@ module BuildRexml
         country_code: xml.get_elements('country_code').first.text,
         time_zone: xml.get_elements('time_zone').first.text,
         latitude: xml.get_elements('latitude').first.text,
-        longitude: xml.get_elements('longitude').first.text,
+        longitude: xml.get_elements('longitude').first.text
       )
     end
 
     def build_contact(xml)
       Contact.new(
         type: xml.get_elements('type').first.text,
-        contact: xml.get_elements('contact').first.text,
+        contact: xml.get_elements('contact').first.text
       )
     end
 
@@ -28,7 +28,7 @@ module BuildRexml
       School.new(
         name: xml.get_elements('name').first.text,
         address: build_address(xml.get_elements('address').first),
-        contacts: xml.get_elements('contact').map { |e| build_contact(e) },
+        contacts: xml.get_elements('contact').map { |e| build_contact(e) }
       )
     end
 
@@ -39,7 +39,7 @@ module BuildRexml
         ein: xml.get_elements('ein').first.text,
         type: xml.get_elements('type').first.text,
         address: build_address(xml.get_elements('address').first),
-        contacts: xml.get_elements('contact').map { |e| build_contact(e) },
+        contacts: xml.get_elements('contact').map { |e| build_contact(e) }
       )
     end
 
@@ -47,7 +47,7 @@ module BuildRexml
       BankAccount.new(
         number: xml.get_elements('number').first.text,
         balance: xml.get_elements('balance').first.text,
-        bank: build_company(xml.get_elements('bank').first),
+        bank: build_company(xml.get_elements('bank').first)
       )
     end
 
@@ -55,7 +55,7 @@ module BuildRexml
       Car.new(
         model: xml.get_elements('model').first.text,
         brand: xml.get_elements('brand').first.text,
-        manufacturer: build_company(xml.get_elements('manufacturer').first),
+        manufacturer: build_company(xml.get_elements('manufacturer').first)
       )
     end
 
@@ -66,7 +66,7 @@ module BuildRexml
         seniority: xml.get_elements('seniority').first.text,
         position: xml.get_elements('position').first.text,
         employment_type: xml.get_elements('employment_type').first.text,
-        company: build_company(xml.get_elements('company').first),
+        company: build_company(xml.get_elements('company').first)
       )
     end
 
@@ -74,7 +74,7 @@ module BuildRexml
       Animal.new(
         kind: xml.get_elements('kind').first.text,
         breed: xml.get_elements('breed').first.text,
-        name: xml.get_elements('name').first.text,
+        name: xml.get_elements('name').first.text
       )
     end
 
@@ -83,10 +83,10 @@ module BuildRexml
         first_name: xml.get_elements('first_name').first.text,
         last_name: xml.get_elements('last_name').first.text,
         middle_name: xml.get_elements('middle_name').first.text,
-        prefix:  xml.get_elements('prefix').first.text,
+        prefix: xml.get_elements('prefix').first.text,
         date_of_birth: xml.get_elements('date_of_birth').first.text,
         place_of_birth: build_address(xml.get_elements('place_of_birth').first),
-        driving_license:  xml.get_elements('driving_license').first.text,
+        driving_license: xml.get_elements('driving_license').first.text,
         hobbies: xml.get_elements('hobby').map(&:text),
         education: xml.get_elements('school').map { |e| build_school(e) },
         current_address: build_address(xml.get_elements('current_address').first),
@@ -98,7 +98,7 @@ module BuildRexml
         current_job: build_job(xml.get_elements('current_job').first),
         jobs: xml.get_elements('job').map { |e| build_job(e) },
         pets: xml.get_elements('pet').map { |e| build_animal(e) },
-        children: xml.get_elements('child').map { |e| build_person(e) },
+        children: xml.get_elements('child').map { |e| build_person(e) }
       )
     end
 

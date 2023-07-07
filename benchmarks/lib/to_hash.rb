@@ -3,15 +3,15 @@ module ToHash
     def build_address(model)
       {
         'city' => model.city,
-        'street' =>  model.street,
-        'zip' =>  model.zip,
-        'state' =>  model.state,
-        'state_abbr' =>  model.state_abbr,
-        'country' =>  model.country,
-        'country_code' =>  model.country_code,
-        'time_zone' =>  model.time_zone,
-        'latitude' =>  model.latitude,
-        'longitude' =>  model.longitude,
+        'street' => model.street,
+        'zip' => model.zip,
+        'state' => model.state,
+        'state_abbr' => model.state_abbr,
+        'country' => model.country,
+        'country_code' => model.country_code,
+        'time_zone' => model.time_zone,
+        'latitude' => model.latitude,
+        'longitude' => model.longitude,
       }
     end
 
@@ -81,10 +81,10 @@ module ToHash
         'first_name' => model.first_name,
         'last_name' => model.last_name,
         'middle_name' => model.middle_name,
-        'prefix' =>  model.prefix,
+        'prefix' => model.prefix,
         'date_of_birth' => model.date_of_birth,
         'place_of_birth' => build_address(model.place_of_birth),
-        'driving_license' =>  model.driving_license,
+        'driving_license' => model.driving_license,
         'hobbies' => model.hobbies,
         'education' => model.education.map { |e| build_school(e) },
         'current_address' => build_address(model.current_address),
@@ -102,7 +102,7 @@ module ToHash
 
     def build_report(model)
       {
-        'people' => model.people.map { |e| build_person(e) }
+        'people' => model.people.map { |e| build_person(e) },
       }
     end
   end

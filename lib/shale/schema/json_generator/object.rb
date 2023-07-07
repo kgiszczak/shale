@@ -32,6 +32,7 @@ module Shale
           {
             'type' => 'object',
             'properties' => @properties.to_h { |el| [el.name, el.as_json] },
+            'required' => @properties.select(&:required).map(&:name),
           }
         end
       end
