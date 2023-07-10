@@ -6,7 +6,7 @@ require 'shale/error'
 
 module ShaleSchemaJSONGeneratorTesting
   class BranchOne < Shale::Mapper
-    attribute :one, Shale::Type::String
+    attribute :one, Shale::Type::String, nullable: true
 
     json do
       map 'One', to: :one
@@ -14,7 +14,7 @@ module ShaleSchemaJSONGeneratorTesting
   end
 
   class BranchTwo < Shale::Mapper
-    attribute :two, Shale::Type::String
+    attribute :two, Shale::Type::String, nullable: true
 
     json do
       map 'Two', to: :two
@@ -22,31 +22,31 @@ module ShaleSchemaJSONGeneratorTesting
   end
 
   class Root < Shale::Mapper
-    attribute :boolean, Shale::Type::Boolean
-    attribute :date, Shale::Type::Date
-    attribute :float, Shale::Type::Float
-    attribute :integer, Shale::Type::Integer
-    attribute :string, Shale::Type::String
-    attribute :time, Shale::Type::Time
-    attribute :value, Shale::Type::Value
+    attribute :boolean, Shale::Type::Boolean, nullable: true
+    attribute :date, Shale::Type::Date, nullable: true
+    attribute :float, Shale::Type::Float, nullable: true
+    attribute :integer, Shale::Type::Integer, nullable: true
+    attribute :string, Shale::Type::String, nullable: true
+    attribute :time, Shale::Type::Time, nullable: true
+    attribute :value, Shale::Type::Value, nullable: true
 
-    attribute :boolean_default, Shale::Type::Boolean, default: -> { true }
-    attribute :date_default, Shale::Type::Date, default: -> { Date.new(2021, 1, 1) }
-    attribute :float_default, Shale::Type::Float, default: -> { 1.0 }
-    attribute :integer_default, Shale::Type::Integer, default: -> { 1 }
-    attribute :string_default, Shale::Type::String, default: -> { 'string' }
+    attribute :boolean_default, Shale::Type::Boolean, default: -> { true }, nullable: true
+    attribute :date_default, Shale::Type::Date, default: -> { Date.new(2021, 1, 1) }, nullable: true
+    attribute :float_default, Shale::Type::Float, default: -> { 1.0 }, nullable: true
+    attribute :integer_default, Shale::Type::Integer, default: -> { 1 }, nullable: true
+    attribute :string_default, Shale::Type::String, default: -> { 'string' }, nullable: true
     attribute :time_default,
       Shale::Type::Time,
-      default: -> { Time.new(2021, 1, 1, 10, 10, 10, '+01:00') }
-    attribute :value_default, Shale::Type::Value, default: -> { 'value' }
+      default: -> { Time.new(2021, 1, 1, 10, 10, 10, '+01:00') }, nullable: true
+    attribute :value_default, Shale::Type::Value, default: -> { 'value' }, nullable: true
 
-    attribute :boolean_collection, Shale::Type::Boolean, collection: true
-    attribute :date_collection, Shale::Type::Date, collection: true
-    attribute :float_collection, Shale::Type::Float, collection: true
-    attribute :integer_collection, Shale::Type::Integer, collection: true
-    attribute :string_collection, Shale::Type::String, collection: true
-    attribute :time_collection, Shale::Type::Time, collection: true
-    attribute :value_collection, Shale::Type::Value, collection: true
+    attribute :boolean_collection, Shale::Type::Boolean, collection: true, nullable: true
+    attribute :date_collection, Shale::Type::Date, collection: true, nullable: true
+    attribute :float_collection, Shale::Type::Float, collection: true, nullable: true
+    attribute :integer_collection, Shale::Type::Integer, collection: true, nullable: true
+    attribute :string_collection, Shale::Type::String, collection: true, nullable: true
+    attribute :time_collection, Shale::Type::Time, collection: true, nullable: true
+    attribute :value_collection, Shale::Type::Value, collection: true, nullable: true
 
     attribute :branch_one, BranchOne
     attribute :branch_two, BranchTwo
@@ -74,14 +74,14 @@ module ShaleSchemaJSONGeneratorTesting
 
   class AddressMapper < Shale::Mapper
     model Address
-    attribute :street, Shale::Type::String
-    attribute :city, Shale::Type::String
+    attribute :street, Shale::Type::String, nullable: true
+    attribute :city, Shale::Type::String, nullable: true
   end
 
   class PersonMapper < Shale::Mapper
     model Person
-    attribute :first_name, Shale::Type::String
-    attribute :last_name, Shale::Type::String
+    attribute :first_name, Shale::Type::String, nullable: true
+    attribute :last_name, Shale::Type::String, nullable: true
     attribute :address, AddressMapper
   end
 end

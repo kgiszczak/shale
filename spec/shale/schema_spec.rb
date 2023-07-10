@@ -6,38 +6,71 @@ require 'shale/schema'
 
 module ShaleSchemaTesting
   class Root < Shale::Mapper
+    attribute :foo, Shale::Type::String, nullable: true
+  end
+
+  class RootNotNull < Shale::Mapper
     attribute :foo, Shale::Type::String
   end
 end
 
 RSpec.describe Shale::Schema do
   describe '.to_json' do
-    let(:expected_json_schema) do
-      <<~DATA.gsub(/\n\z/, '')
-        {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "$ref": "#/$defs/ShaleSchemaTesting_Root",
-          "$defs": {
-            "ShaleSchemaTesting_Root": {
-              "type": "object",
-              "properties": {
-                "foo": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
+    context 'with null allowed' do
+      let(:expected_json_schema) do
+        <<~DATA.gsub(/\n\z/, '')
+          {
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
+            "$ref": "#/$defs/ShaleSchemaTesting_Root",
+            "$defs": {
+              "ShaleSchemaTesting_Root": {
+                "type": "object",
+                "properties": {
+                  "foo": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  }
                 }
               }
             }
           }
-        }
-      DATA
+        DATA
+      end
+
+      it 'generates JSON schema with null' do
+        Shale.json_adapter = Shale::Adapter::JSON
+        schema = described_class.to_json(ShaleSchemaTesting::Root, pretty: true)
+        expect(schema).to eq(expected_json_schema)
+      end
     end
 
-    it 'generates JSON schema' do
-      Shale.json_adapter = Shale::Adapter::JSON
-      schema = described_class.to_json(ShaleSchemaTesting::Root, pretty: true)
-      expect(schema).to eq(expected_json_schema)
+    context 'with not null allowed' do
+      let(:expected_json_schema) do
+        <<~DATA.gsub(/\n\z/, '')
+          {
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
+            "$ref": "#/$defs/ShaleSchemaTesting_RootNotNull",
+            "$defs": {
+              "ShaleSchemaTesting_RootNotNull": {
+                "type": "object",
+                "properties": {
+                  "foo": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        DATA
+      end
+
+      it 'generates JSON schema without' do
+        Shale.json_adapter = Shale::Adapter::JSON
+        schema = described_class.to_json(ShaleSchemaTesting::RootNotNull, pretty: true)
+        expect(schema).to eq(expected_json_schema)
+      end
     end
   end
 

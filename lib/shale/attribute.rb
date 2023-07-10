@@ -28,7 +28,7 @@ module Shale
     # Return properties
     #
     # @api public
-    attr_accessor :properties
+    attr_accessor :validations
 
     # Return required
     #
@@ -48,14 +48,14 @@ module Shale
     # @param [Proc] default Default value
     #
     # @api private
-    def initialize(name, type, collection, default, nullable, properties, required)
+    def initialize(name, type, collection, default, nullable, validations, required)
       @name = name
       @setter = "#{name}="
       @type = type
       @collection = collection
       @default = collection ? -> { [] } : default
       @nullable = nullable
-      @properties = properties
+      @validations = validations
       @required = required
     end
 

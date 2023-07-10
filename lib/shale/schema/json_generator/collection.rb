@@ -6,23 +6,11 @@ module Shale
       # Class representing array type in JSON Schema
       #
       # @api private
-      class Collection
-        # Initialize Collection object
-        #
-        # @param [Shale::Schema::JSONGenerator::Base] type
-        #
-        # @api private
-        def initialize(type)
-          @type = type
-        end
+      class Collection < Base
 
-        # Delegate name to wrapped type object
-        #
-        # @return [String]
-        #
-        # @api private
-        def name
-          @type.name
+        def initialize(type, **kwargs)
+          super(type.name, **kwargs)
+          @type = type
         end
 
         # Return JSON Schema fragment as Ruby Hash

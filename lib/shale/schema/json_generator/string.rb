@@ -9,13 +9,15 @@ module Shale
       #
       # @api private
       class String < Base
+        VALIDATORS = %w(pattern minLength maxLength)
+
         # Return JSON Schema fragment as Ruby Hash
         #
         # @return [Hash]
         #
         # @api private
         def as_type
-          { 'type' => 'string' }
+          { 'type' => 'string' }.merge(validators)
         end
       end
     end

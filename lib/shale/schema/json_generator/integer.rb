@@ -9,13 +9,15 @@ module Shale
       #
       # @api private
       class Integer < Base
+        VALIDATORS = %w(exclusiveMaximum multipleOf exclusiveMinimum maximum minimum)
+
         # Return JSON Schema fragment as Ruby Hash
         #
         # @return [Hash]
         #
         # @api private
         def as_type
-          { 'type' => 'integer' }
+          { 'type' => 'integer' }.merge(validators)
         end
       end
     end
