@@ -1,4 +1,4 @@
-## [1.0.0] - [unreleased]
+## [1.0.0] - 2023-07-15
 
 ### Added
 - Support for Ruby 3.2
