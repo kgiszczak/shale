@@ -15,7 +15,13 @@ module Shale
         #
         # @api private
         def as_type
-          { 'type' => 'string' }
+          schema = mapping&.schema || {}
+
+          { 'type' => 'string',
+            'format' => schema[:format],
+            'minLength' => schema[:min_length],
+            'maxLength' => schema[:max_length],
+            'pattern' => schema[:pattern] }.compact
         end
       end
     end
