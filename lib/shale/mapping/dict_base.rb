@@ -39,7 +39,7 @@ module Shale
       # @raise [IncorrectMappingArgumentsError] when arguments are incorrect
       #
       # @api private
-      def map(key, to: nil, receiver: nil, using: nil, group: nil, render_nil: nil)
+      def map(key, to: nil, receiver: nil, using: nil, group: nil, render_nil: nil, schema: nil)
         Validator.validate_arguments(key, to, receiver, using)
 
         @keys[key] = Descriptor::Dict.new(
@@ -48,7 +48,8 @@ module Shale
           receiver: receiver,
           methods: using,
           group: group,
-          render_nil: render_nil.nil? ? @render_nil_default : render_nil
+          render_nil: render_nil.nil? ? @render_nil_default : render_nil,
+          schema: schema
         )
       end
 

@@ -12,14 +12,17 @@ module Shale
         # @api private
         attr_reader :name
 
+        attr_reader :mapping
+
         # Return nullable
         #
         # @api private
         attr_writer :nullable
 
-        def initialize(name, default: nil)
+        def initialize(name, default: nil, mapping: nil)
           @name = name.gsub('::', '_')
           @default = default
+          @mapping = mapping
           @nullable = true
         end
 
