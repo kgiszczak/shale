@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'shale/schema/json_generator/base'
+require 'shale/mapping/descriptor/dict'
 
 module ShaleSchemaJSONGeneratorBaseTesting
   class TypeNullable < Shale::Schema::JSONGenerator::Base
@@ -109,6 +110,23 @@ RSpec.describe Shale::Schema::JSONGenerator::Base do
         it 'returns JSON Schema fragment as Hash' do
           type = ShaleSchemaJSONGeneratorBaseTesting::TypeNotNullable.new('foo', default: 'foo')
           type.nullable = true
+
+          expect(type.as_json).to eq({ 'foo' => 'test-type', 'default' => 'foo' })
+        end
+      end
+
+      context 'when schema mapping has required set to true' do
+        it 'returns JSON Schema fragment as Hash' do
+          mapping = Shale::Mapping::Descriptor::Dict.new(
+            name: 'foo',
+            attribute: nil,
+            receiver: nil,
+            methods: nil,
+            group: nil,
+            render_nil: nil,
+            schema: { required: true }
+          )
+          type = ShaleSchemaJSONGeneratorBaseTesting::TypeNotNullable.new('foo', default: 'foo', mapping: mapping)
 
           expect(type.as_json).to eq({ 'foo' => 'test-type', 'default' => 'foo' })
         end
