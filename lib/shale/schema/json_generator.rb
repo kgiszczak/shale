@@ -103,7 +103,7 @@ module Shale
               )
             end
 
-            json_type = Collection.new(json_type) if attribute.collection?
+            json_type = Collection.new(json_type, mapping: mapping) if attribute.collection?
             properties << json_type
           end
 

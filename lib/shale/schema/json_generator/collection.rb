@@ -12,8 +12,9 @@ module Shale
         # @param [Shale::Schema::JSONGenerator::Base] type
         #
         # @api private
-        def initialize(type)
+        def initialize(type, mapping: nil)
           @type = type
+          @mapping = mapping
         end
 
         # Delegate name to wrapped type object
@@ -31,7 +32,15 @@ module Shale
         #
         # @api private
         def as_json
-          { 'type' => 'array', 'items' => @type.as_type }
+          schema = @mapping&.schema || {}
+
+          { 'type' => 'array',
+            'items' => @type.as_type,
+            'minItems' => schema[:min_items],
+            'maxItems' => schema[:max_items],
+            'uniqueItems' => schema[:unique],
+            'minContains' => schema[:min_contains],
+            'maxContains' => schema[:max_contains] }.compact
         end
       end
     end
