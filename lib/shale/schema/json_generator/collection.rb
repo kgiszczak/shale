@@ -7,6 +7,8 @@ module Shale
       #
       # @api private
       class Collection
+        attr_reader :schema
+
         # Initialize Collection object
         #
         # @param [Shale::Schema::JSONGenerator::Base] type
