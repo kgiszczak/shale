@@ -19,8 +19,9 @@ module Shale
         # ] properties
         #
         # @api private
-        def initialize(name, properties)
+        def initialize(name, properties, root)
           super(name)
+          @root = root
           @properties = properties
         end
 
@@ -38,6 +39,9 @@ module Shale
             'type' => 'object',
             'properties' => @properties.to_h { |el| [el.name, el.as_json] },
             'required' => required_props.empty? ? nil : required_props,
+            'minProperties' => @root[:min_properties],
+            'maxProperties' => @root[:max_properties],
+            'dependentRequired' => @root[:dependent_required],
           }.compact
         end
       end

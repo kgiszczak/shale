@@ -107,7 +107,7 @@ module Shale
             properties << json_type
           end
 
-          objects << Object.new(type.model.name, properties)
+          objects << Object.new(type.model.name, properties, type.json_mapping.root)
         end
 
         Schema.new(objects, id: id, title: title, description: description).as_json

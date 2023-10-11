@@ -17,7 +17,7 @@ RSpec.describe Shale::Schema::JSONGenerator::Object do
         },
       }
 
-      expect(described_class.new('foo', types).as_type).to eq(expected)
+      expect(described_class.new('foo', types, {}).as_type).to eq(expected)
     end
 
     context 'with schema' do
@@ -39,7 +39,29 @@ RSpec.describe Shale::Schema::JSONGenerator::Object do
           'required' => ['bar'],
         }
 
-        expect(described_class.new('foo', types_with_required).as_type).to eq(expected)
+        expect(described_class.new('foo', types_with_required, {}).as_type).to eq(expected)
+      end
+    end
+
+    context 'with root properties' do
+      it 'puts properties on the root object' do
+        expected = {
+          'type' => 'object',
+          'minProperties' => 1,
+          'maxProperties' => 5,
+          'dependentRequired' => { 'foo' => ['bar'] },
+          'properties' => {
+            'bar' => { 'type' => %w[boolean null] },
+          },
+        }
+
+        root = {
+          min_properties: 1,
+          max_properties: 5,
+          dependent_required: { 'foo' => ['bar'] },
+        }
+
+        expect(described_class.new('foo', types, root).as_type).to eq(expected)
       end
     end
   end
