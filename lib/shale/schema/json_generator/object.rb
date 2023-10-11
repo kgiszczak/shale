@@ -31,7 +31,7 @@ module Shale
         # @api private
         def as_type
           required_props = @properties.filter_map do |prop|
-            prop.name if !prop.is_a?(Collection) && prop.mapping&.schema&.[](:required)
+            prop.name if !prop.is_a?(Collection) && prop&.schema&.[](:required)
           end
 
           {

@@ -12,18 +12,18 @@ module Shale
         # @api private
         attr_reader :name
 
-        attr_reader :mapping
+        attr_reader :schema
 
         # Set nullable
         #
         # @api private
         attr_writer :nullable
 
-        def initialize(name, default: nil, mapping: nil)
+        def initialize(name, default: nil, schema: nil)
           @name = name.gsub('::', '_')
           @default = default
-          @mapping = mapping
-          @nullable = !mapping&.schema&.[](:required)
+          @schema = schema || {}
+          @nullable = !schema&.[](:required)
         end
 
         # Return JSON Schema fragment as Ruby Hash

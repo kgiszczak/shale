@@ -15,8 +15,6 @@ module Shale
         #
         # @api private
         def as_type
-          schema = mapping&.schema || {}
-
           { 'type' => 'integer',
             'exclusiveMinimum' => schema[:exclusive_minimum],
             'exclusiveMaximum' => schema[:exclusive_maximum],

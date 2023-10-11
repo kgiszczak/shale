@@ -15,8 +15,6 @@ module Shale
         #
         # @api private
         def as_type
-          schema = mapping&.schema || {}
-
           { 'type' => 'string',
             'format' => schema[:format],
             'minLength' => schema[:min_length],

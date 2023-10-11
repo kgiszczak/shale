@@ -12,9 +12,9 @@ module Shale
         # @param [Shale::Schema::JSONGenerator::Base] type
         #
         # @api private
-        def initialize(type, mapping: nil)
+        def initialize(type, schema: nil)
           @type = type
-          @mapping = mapping
+          @schema = schema
         end
 
         # Delegate name to wrapped type object
@@ -32,7 +32,7 @@ module Shale
         #
         # @api private
         def as_json
-          schema = @mapping&.schema || {}
+          schema = @schema || {}
 
           { 'type' => 'array',
             'items' => @type.as_type,
