@@ -7,11 +7,15 @@ module Shale
       #
       # @api private
       class Collection
+        # Return schema hash
+        #
+        # @api private
         attr_reader :schema
 
         # Initialize Collection object
         #
         # @param [Shale::Schema::JSONGenerator::Base] type
+        # @param [Hash] schema
         #
         # @api private
         def initialize(type, schema: nil)

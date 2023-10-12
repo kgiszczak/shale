@@ -64,6 +64,7 @@ module Shale
         # @param [Hash, nil] methods
         # @param [String, nil] group
         # @param [true, false] render_nil
+        # @param [Hash, nil] schema
         #
         # @api private
         def initialize(name:, attribute:, receiver:, methods:, group:, render_nil:, schema: nil)

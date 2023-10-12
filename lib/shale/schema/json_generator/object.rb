@@ -16,6 +16,7 @@ module Shale
         #   Array<Shale::Schema::JSONGenerator::Base,
         #   Shale::Schema::JSONGenerator::Collection>
         # ] properties
+        # @param [Hash] root
         #
         # @api private
         def initialize(name, properties, root)

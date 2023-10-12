@@ -12,6 +12,9 @@ module Shale
         # @api private
         attr_reader :name
 
+        # Return schema hash
+        #
+        # @api private
         attr_reader :schema
 
         # Set nullable

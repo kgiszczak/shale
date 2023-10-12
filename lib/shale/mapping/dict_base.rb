@@ -43,6 +43,7 @@ module Shale
       # @param [Hash, nil] using
       # @param [String, nil] group
       # @param [true, false, nil] render_nil
+      # @param [Hash, nil] schema
       #
       # @raise [IncorrectMappingArgumentsError] when arguments are incorrect
       #
@@ -66,6 +67,8 @@ module Shale
       # @param [Integer] min_properties
       # @param [Integer] max_properties
       # @param [Hash] dependent_required
+      #
+      # @api public
       def properties(min_properties: nil, max_properties: nil, dependent_required: nil)
         @root = {
           min_properties: min_properties,
