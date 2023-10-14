@@ -1288,6 +1288,75 @@ end
 Shale::Schema::JSONGenerator.register_json_type(MyEmailType, MyEmailJSONType)
 ```
 
+To add validation keywords to the schema, you can use a custom model and do this:
+
+```ruby
+require 'shale/schema'
+
+class PersonMapper < Shale::Mapper
+  model Person
+
+  attribute :first_name, Shale::Type::String
+  attribute :last_name, Shale::Type::String
+  attribute :address, Shale::Type::String
+  attribute :age, Shale::Type::Integer
+
+  json do
+    properties max_properties: 5
+
+    map "first_name", to: :first_name, schema: { required: true }
+    map "last_name", to: :last_name, schema: { required: true }
+    map "address", to: :age, schema: { max_length: 128 }
+    map "age", to: :age, schema: { minimum: 1, maximum: 150 }
+  end
+end
+
+Shale::Schema.to_json(
+  PersonMapper,
+  pretty: true
+)
+
+# =>
+#
+# {
+#   "$schema": "https://json-schema.org/draft/2020-12/schema",
+#   "description": "My description",
+#   "$ref": "#/$defs/Person",
+#   "$defs": {
+#     "Person": {
+#       "type": "object",
+#       "maxProperties": 5,
+#       "properties": {
+#         "first_name": {
+#           "type": "string"
+#         },
+#         "last_name": {
+#           "type": "string"
+#         },
+#         "age": {
+#           "type": [
+#             "integer",
+#             "null"
+#           ],
+#          "minimum": 1,
+#          "maximum": 150
+#        },
+#         "address": {
+#           "type": [
+#             "string",
+#             "null"
+#           ],
+#           "maxLength": 128
+#         }
+#       },
+#       "required": ["first_name", "last_name"]
+#     }
+#   }
+# }
+```
+
+Validation keywords are supported for all types, only the global `enum` and `const` types are not supported.
+
 ### Compiling JSON Schema into Shale model
 
 :warning: Only **[Draft 2020-12](https://json-schema.org/draft/2020-12/schema)** JSON Schema is supported
