@@ -34,51 +34,51 @@ module Shale
 
       # XML Schema "schema" element name
       # @api private
-      XS_SCHEMA = "#{XS_NAMESPACE_URI}:schema"
+      XS_SCHEMA = "#{XS_NAMESPACE_URI}:schema".freeze
 
       # XML Schema "element" element name
       # @api private
-      XS_ELEMENT = "#{XS_NAMESPACE_URI}:element"
+      XS_ELEMENT = "#{XS_NAMESPACE_URI}:element".freeze
 
       # XML Schema "attribute" element name
       # @api private
-      XS_ATTRIBUTE = "#{XS_NAMESPACE_URI}:attribute"
+      XS_ATTRIBUTE = "#{XS_NAMESPACE_URI}:attribute".freeze
 
       # XML Schema "attribute" element name
       # @api private
-      XS_SIMPLE_TYPE = "#{XS_NAMESPACE_URI}:simpleType"
+      XS_SIMPLE_TYPE = "#{XS_NAMESPACE_URI}:simpleType".freeze
 
       # XML Schema "simpleContent" element name
       # @api private
-      XS_SIMPLE_CONTENT = "#{XS_NAMESPACE_URI}:simpleContent"
+      XS_SIMPLE_CONTENT = "#{XS_NAMESPACE_URI}:simpleContent".freeze
 
       # XML Schema "restriction" element name
       # @api private
-      XS_RESTRICTION = "#{XS_NAMESPACE_URI}:restriction"
+      XS_RESTRICTION = "#{XS_NAMESPACE_URI}:restriction".freeze
 
       # XML Schema "group" element name
       # @api private
-      XS_GROUP = "#{XS_NAMESPACE_URI}:group"
+      XS_GROUP = "#{XS_NAMESPACE_URI}:group".freeze
 
       # XML Schema "attributeGroup" element name
       # @api private
-      XS_ATTRIBUTE_GROUP = "#{XS_NAMESPACE_URI}:attributeGroup"
+      XS_ATTRIBUTE_GROUP = "#{XS_NAMESPACE_URI}:attributeGroup".freeze
 
       # XML Schema "complexType" element name
       # @api private
-      XS_COMPLEX_TYPE = "#{XS_NAMESPACE_URI}:complexType"
+      XS_COMPLEX_TYPE = "#{XS_NAMESPACE_URI}:complexType".freeze
 
       # XML Schema "complexContent" element name
       # @api private
-      XS_COMPLEX_CONTENT = "#{XS_NAMESPACE_URI}:complexContent"
+      XS_COMPLEX_CONTENT = "#{XS_NAMESPACE_URI}:complexContent".freeze
 
       # XML Schema "extension" element name
       # @api private
-      XS_EXTENSION = "#{XS_NAMESPACE_URI}:extension"
+      XS_EXTENSION = "#{XS_NAMESPACE_URI}:extension".freeze
 
       # XML Schema "anyType" type
       # @api private
-      XS_TYPE_ANY = "#{XS_NAMESPACE_URI}:anyType"
+      XS_TYPE_ANY = "#{XS_NAMESPACE_URI}:anyType".freeze
 
       # XML Schema "date" types
       # @api private

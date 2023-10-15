@@ -3,6 +3,9 @@
 ### Added
 - [bkjohnson] Add support for JSON Schema validation keywords (#29)
 
+### Changed
+- Drop support for Ruby 2.6 and Ruby 2.7
+
 ## [1.0.0] - 2023-07-15
 
 ### Added
