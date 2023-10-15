@@ -113,6 +113,15 @@ RSpec.describe Shale::Schema::JSONGenerator::Base do
           expect(type.as_json).to eq({ 'foo' => 'test-type', 'default' => 'foo' })
         end
       end
+
+      context 'when schema has required set to true' do
+        it 'returns JSON Schema fragment as Hash' do
+          schema = { required: true }
+          type = ShaleSchemaJSONGeneratorBaseTesting::TypeNotNullable.new('foo', default: 'foo', schema: schema)
+
+          expect(type.as_json).to eq({ 'foo' => 'test-type', 'default' => 'foo' })
+        end
+      end
     end
   end
 end

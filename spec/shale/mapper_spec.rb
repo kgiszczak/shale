@@ -87,6 +87,8 @@ module ShaleMapperTesting
     attribute :foo, Shale::Type::String
 
     json do
+      properties min_properties: 1, max_properties: 4, dependent_required: { 'foo' => ['bar'] }
+
       map 'bar', to: :foo
       group from: :method_from, to: :method_to do
         map 'baz'
@@ -662,6 +664,14 @@ RSpec.describe Shale::Mapper do
       expect(mapping['qux'].method_from).to eq(:method_from)
       expect(mapping['qux'].method_to).to eq(:method_to)
       expect(mapping['qux'].group).to match('group_')
+    end
+
+    it 'allows root properties to be specified' do
+      root = ShaleMapperTesting::JsonMapping.json_mapping.root
+
+      expect(root[:min_properties]).to eq(1)
+      expect(root[:max_properties]).to eq(4)
+      expect(root[:dependent_required]).to eq({ 'foo' => ['bar'] })
     end
   end
 

@@ -7,13 +7,20 @@ module Shale
       #
       # @api private
       class Collection
+        # Return schema hash
+        #
+        # @api private
+        attr_reader :schema
+
         # Initialize Collection object
         #
         # @param [Shale::Schema::JSONGenerator::Base] type
+        # @param [Hash] schema
         #
         # @api private
-        def initialize(type)
+        def initialize(type, schema: nil)
           @type = type
+          @schema = schema
         end
 
         # Delegate name to wrapped type object
@@ -31,7 +38,15 @@ module Shale
         #
         # @api private
         def as_json
-          { 'type' => 'array', 'items' => @type.as_type }
+          schema = @schema || {}
+
+          { 'type' => 'array',
+            'items' => @type.as_type,
+            'minItems' => schema[:min_items],
+            'maxItems' => schema[:max_items],
+            'uniqueItems' => schema[:unique],
+            'minContains' => schema[:min_contains],
+            'maxContains' => schema[:max_contains] }.compact
         end
       end
     end

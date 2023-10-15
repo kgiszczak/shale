@@ -16,10 +16,12 @@ module Shale
         #   Array<Shale::Schema::JSONGenerator::Base,
         #   Shale::Schema::JSONGenerator::Collection>
         # ] properties
+        # @param [Hash] root
         #
         # @api private
-        def initialize(name, properties)
+        def initialize(name, properties, root)
           super(name)
+          @root = root
           @properties = properties
         end
 
@@ -29,10 +31,16 @@ module Shale
         #
         # @api private
         def as_type
+          required_props = @properties.filter_map { |prop| prop.name if prop&.schema&.[](:required) }
+
           {
             'type' => 'object',
             'properties' => @properties.to_h { |el| [el.name, el.as_json] },
-          }
+            'required' => required_props.empty? ? nil : required_props,
+            'minProperties' => @root[:min_properties],
+            'maxProperties' => @root[:max_properties],
+            'dependentRequired' => @root[:dependent_required],
+          }.compact
         end
       end
     end

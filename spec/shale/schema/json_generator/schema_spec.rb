@@ -22,8 +22,8 @@ RSpec.describe Shale::Schema::JSONGenerator::Schema do
     context 'when types are not empty' do
       it 'returns JSON Schema fragment as Hash' do
         types = [
-          Shale::Schema::JSONGenerator::Object.new('Foo', []),
-          Shale::Schema::JSONGenerator::Object.new('Bar', []),
+          Shale::Schema::JSONGenerator::Object.new('Foo', [], {}),
+          Shale::Schema::JSONGenerator::Object.new('Bar', [], {}),
         ]
 
         schema = described_class.new(types)

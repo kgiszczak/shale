@@ -33,6 +33,36 @@ RSpec.describe Shale::Mapping::Descriptor::Dict do
     end
   end
 
+  describe 'schema' do
+    context 'when schema is set' do
+      it 'returns schema' do
+        obj = described_class.new(
+          name: 'foo',
+          attribute: nil,
+          receiver: nil,
+          methods: nil,
+          group: nil,
+          render_nil: false,
+          schema: :bar
+        )
+        expect(obj.schema).to eq(:bar)
+      end
+    end
+
+    context 'when schema is not set' do
+      it 'returns nil' do
+        obj = described_class.new(
+          name: 'foo',
+          attribute: nil,
+          receiver: nil,
+          methods: nil,
+          group: nil,
+          render_nil: false
+        )
+        expect(obj.schema).to eq(nil)
+      end
+    end
+  end
   describe '#attribute' do
     context 'when attribute is set' do
       it 'returns attribute' do

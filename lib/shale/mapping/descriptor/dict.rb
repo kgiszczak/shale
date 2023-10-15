@@ -49,6 +49,13 @@ module Shale
         # @api private
         attr_reader :group
 
+        # Return schema hash
+        #
+        # @return [Hash]
+        #
+        # @api private
+        attr_reader :schema
+
         # Initialize instance
         #
         # @param [String] name
@@ -57,14 +64,16 @@ module Shale
         # @param [Hash, nil] methods
         # @param [String, nil] group
         # @param [true, false] render_nil
+        # @param [Hash, nil] schema
         #
         # @api private
-        def initialize(name:, attribute:, receiver:, methods:, group:, render_nil:)
+        def initialize(name:, attribute:, receiver:, methods:, group:, render_nil:, schema: nil)
           @name = name
           @attribute = attribute
           @receiver = receiver
           @group = group
           @render_nil = render_nil
+          @schema = schema
 
           if methods
             @method_from = methods[:from]

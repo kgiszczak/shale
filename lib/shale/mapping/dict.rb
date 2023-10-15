@@ -16,12 +16,13 @@ module Shale
       # @param [Symbol, nil] receiver
       # @param [Hash, nil] using
       # @param [true, false, nil] render_nil
+      # @param [Hash, nil] schema
       #
       # @raise [IncorrectMappingArgumentsError] when arguments are incorrect
       #
-      # @api private
-      def map(key, to: nil, receiver: nil, using: nil, render_nil: nil)
-        super(key, to: to, receiver: receiver, using: using, render_nil: render_nil)
+      # @api public
+      def map(key, to: nil, receiver: nil, using: nil, render_nil: nil, schema: nil)
+        super(key, to: to, receiver: receiver, using: using, render_nil: render_nil, schema: schema)
       end
 
       # Set render_nil default
