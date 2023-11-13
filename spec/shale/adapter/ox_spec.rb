@@ -12,6 +12,13 @@ RSpec.describe Shale::Adapter::Ox do
       end
     end
 
+    context 'with XML document containing declaration' do
+      it 'parses XML document' do
+        doc = described_class.load('<?xml version="1.0"?><foo></foo>')
+        expect(doc.name).to eq('foo')
+      end
+    end
+
     context 'with invalid XML document' do
       it 'raises an error' do
         expect do

@@ -22,7 +22,8 @@ module Shale
       #
       # @api private
       def self.load(xml)
-        Node.new(::Ox.parse(xml))
+        element = ::Ox.parse(xml)
+        Node.new(element.respond_to?(:root) ? element.root : element)
       rescue ::Ox::ParseError => e
         raise ParseError, "Document is invalid: #{e.message}"
       end

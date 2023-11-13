@@ -6,6 +6,9 @@
 ### Changed
 - Drop support for Ruby 2.6 and Ruby 2.7
 
+### Fixed
+- Fix Ox adapter incorrectly handling documents with XML declaration
+
 ## [1.0.0] - 2023-07-15
 
 ### Added
