@@ -373,6 +373,7 @@ module Shale
         #
         # @api public
         def from_csv(csv, only: nil, except: nil, context: nil, headers: false, **csv_options)
+          validate_csv_adapter
           data = Shale.csv_adapter.load(csv, **csv_options.merge(headers: csv_mapping.keys.keys))
 
           data.shift if headers
@@ -398,6 +399,7 @@ module Shale
         #
         # @api public
         def to_csv(instance, only: nil, except: nil, context: nil, headers: false, **csv_options)
+          validate_csv_adapter
           data = as_csv([*instance], only: only, except: except, context: context)
 
           cols = csv_mapping.keys.values
@@ -890,6 +892,15 @@ module Shale
         # @api private
         def validate_xml_adapter
           raise AdapterError, XML_ADAPTER_NOT_SET_MESSAGE unless Shale.xml_adapter
+        end
+
+        # Validate CSV adapter
+        #
+        # @raise [AdapterError]
+        #
+        # @api private
+        def validate_csv_adapter
+          raise AdapterError, CSV_ADAPTER_NOT_SET_MESSAGE unless Shale.csv_adapter
         end
 
         # Convert array with attributes to a hash

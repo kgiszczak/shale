@@ -38,6 +38,18 @@ module Shale
     Shale.xml_adapter = Shale::Adapter::Ox
   MSG
 
+  # Error message displayed when CSV adapter is not set
+  # @api private
+  CSV_ADAPTER_NOT_SET_MESSAGE = <<~MSG
+    CSV Adapter is not set.
+    To use Shale with CSV documents you have to install parser and set adapter.
+
+    # To use csv gem:
+    # Make sure csv is installed eg. execute: gem install csv
+    require 'shale/adapter/csv'
+    Shale.csv_adapter = Shale::Adapter::CSV
+  MSG
+
   # Error for assigning value to not existing attribute
   #
   # @api private

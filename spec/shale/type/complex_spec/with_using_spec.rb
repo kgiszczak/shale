@@ -2,6 +2,7 @@
 
 require 'shale'
 require 'shale/adapter/rexml'
+require 'shale/adapter/csv'
 require 'tomlib'
 
 module ComplexSpec__Using # rubocop:disable Naming/ClassAndModuleCamelCase

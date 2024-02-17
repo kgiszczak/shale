@@ -2,6 +2,7 @@
 
 require 'shale'
 require 'shale/adapter/rexml'
+require 'shale/adapter/csv'
 require 'tomlib'
 
 module ComplexSpec__XmlNamespaces # rubocop:disable Naming/ClassAndModuleCamelCase
@@ -113,7 +114,7 @@ RSpec.describe Shale::Type::Complex do
           let(:mapper) { ComplexSpec__XmlNamespaces::NoNsDeclaration }
 
           let(:xml) do
-            <<~DOC.gsub(/\n/, '').gsub(/\s+/, ' ').gsub('> <', '><')
+            <<~DOC.gsub("\n", '').gsub(/\s+/, ' ').gsub('> <', '><')
               <no_ns_declaration
                 attr_no_ns="attr_no_ns"
                 ns1:attr_ns1="attr_ns1"
@@ -146,7 +147,7 @@ RSpec.describe Shale::Type::Complex do
           let(:mapper) { ComplexSpec__XmlNamespaces::NsDeclaration }
 
           let(:xml) do
-            <<~DOC.gsub(/\n/, '').gsub(/\s+/, ' ').gsub('> <', '><')
+            <<~DOC.gsub("\n", '').gsub(/\s+/, ' ').gsub('> <', '><')
               <ns1:ns_declaration
                 attr_no_ns="attr_no_ns"
                 ns1:attr_ns1="attr_ns1"

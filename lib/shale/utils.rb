@@ -31,7 +31,7 @@ module Shale
     # @api private
     def self.classify(str)
       # names may include a period, which will need to be stripped out
-      str = str.to_s.gsub(/\./, '')
+      str = str.to_s.gsub('.', '')
 
       str = str.sub(/^[a-z\d]*/) { |match| upcase_first(match) || match }
 

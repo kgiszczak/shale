@@ -50,7 +50,7 @@ RSpec.describe Shale::Schema::XMLGenerator::ComplexType do
 
         result = Shale.xml_adapter.dump(el)
 
-        expected = <<~XML.gsub(/\n/, '').gsub(/\s{2,}/, '')
+        expected = <<~XML.gsub("\n", '').gsub(/\s{2,}/, '')
           <xs:complexType name="foo">
             <xs:sequence>
               <xs:element minOccurs="0" name="foo" type="string"/>

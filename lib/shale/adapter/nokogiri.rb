@@ -61,7 +61,7 @@ module Shale
         result = doc.to_xml(save_with: save_with)
 
         unless pretty
-          result = result.sub(/\n/, '')
+          result = result.sub("\n", '')
         end
 
         result

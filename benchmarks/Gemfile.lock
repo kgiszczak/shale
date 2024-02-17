@@ -2,14 +2,18 @@ PATH
   remote: ..
   specs:
     shale (1.0.0)
+      bigdecimal
 
 GEM
   remote: https://rubygems.org/
   specs:
     benchmark-ips (2.10.0)
+    bigdecimal (3.1.6)
     declarative (0.0.20)
+    mini_portile2 (2.8.5)
     multi_json (1.15.0)
-    nokogiri (1.14.0-arm64-darwin)
+    nokogiri (1.14.0)
+      mini_portile2 (~> 2.8.0)
       racc (~> 1.4)
     ox (2.14.12)
     racc (1.6.2)
@@ -24,6 +28,7 @@ GEM
 PLATFORMS
   arm64-darwin-21
   arm64-darwin-22
+  arm64-darwin-23
 
 DEPENDENCIES
   benchmark-ips
@@ -35,4 +40,4 @@ DEPENDENCIES
   shale!
 
 BUNDLED WITH
-   2.4.3
+   2.5.6

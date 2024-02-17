@@ -353,6 +353,25 @@ person.to_xml
 
 ### Converting CSV to object
 
+To use CSV with Shale you have to set adapter.
+Shale comes with adapter for [csv](https://github.com/ruby/csv).
+For details see [Adapters](#adapters) section.
+
+To set it, first make sure CSV gem is installed:
+
+```
+$ gem install csv
+```
+
+then setup adapter:
+
+```ruby
+require 'shale/adapter/csv'
+Shale.csv_adapter = Shale::Adapter::CSV
+```
+
+Now you can use CSV with Shale.
+
 CSV represents a flat data structure, so you can't map properties to complex types directly,
 but you can use methods to map properties to complex types
 (see [Using methods to extract and generate data](#using-methods-to-extract-and-generate-data)
@@ -1155,7 +1174,7 @@ end
 ### Adapters
 
 Shale uses adapters for parsing and generating documents.
-By default Ruby's standard JSON, YAML, CSV parsers are used for handling JSON YAML, CSV documents.
+By default Ruby's standard JSON and YAML parsers are used for handling JSON and YAML documents.
 
 You can change it by providing your own adapter. For JSON, YAML, TOML and CSV adapter must
 implement `.load` and `.dump` class methods.
@@ -1181,6 +1200,14 @@ Shale.toml_adapter = Tomlib
 # if you want to use toml-rb
 require 'shale/adapter/toml_rb'
 Shale.toml_adapter = Shale::Adapter::TomlRB
+```
+
+To handle CSV documents you have to set CSV adapter. Shale provides adapter for `csv` parser:
+
+```ruby
+require 'shale'
+require 'shale/adapter/csv'
+Shale.csv_adapter = Shale::Adapter::CSV
 ```
 
 To handle XML documents you have to explicitly set XML adapter.

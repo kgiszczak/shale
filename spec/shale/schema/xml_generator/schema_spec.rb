@@ -48,7 +48,7 @@ RSpec.describe Shale::Schema::XMLGenerator::Schema do
 
       result = Shale.xml_adapter.dump(schema.as_xml)
 
-      expected = <<~XML.gsub(/\n/, '').gsub(/\s{2,}/, '')
+      expected = <<~XML.gsub("\n", '').gsub(/\s{2,}/, '')
         <xs:schema attributeFormDefault="qualified" xmlns:bar="http://bar.com" elementFormDefault="qualified" targetNamespace="http://foo.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
           <xs:import namespace="http://ban.com" schemaLocation="location2.xsd"/>
           <xs:import namespace="http://baz.com" schemaLocation="location1.xsd"/>
