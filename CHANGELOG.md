@@ -1,4 +1,4 @@
-## [1.1.0] - [unreleased]
+## [1.1.0] - 2024-02-17
 
 ### Added
 - [bkjohnson] Add support for JSON Schema validation keywords (#29)
