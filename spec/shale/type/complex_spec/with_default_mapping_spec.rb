@@ -313,7 +313,7 @@ RSpec.describe Shale::Type::Complex do
         end
 
         it 'accepts extra options' do
-          instance = mapper.from_yaml(yaml, aliases: true)
+          instance = mapper.from_yaml(yaml, fallback: false)
           expect(instance.one).to eq('foo')
         end
       end
@@ -341,7 +341,7 @@ RSpec.describe Shale::Type::Complex do
 
         it 'accepts extra options' do
           instance = mapper.new(one: 'foo', two: nil)
-          expect(instance.to_yaml(aliases: true)).to eq("---\none: foo\n")
+          expect(instance.to_yaml(indentation: 2)).to eq("---\none: foo\n")
         end
       end
     end
