@@ -80,16 +80,17 @@ module Shale
     # @api public
     attr_writer :yaml_adapter
 
-    # TOML adapter accessor.
+    # TOML adapter accessor. Available adapters are Shale::Adapter::Tomlib
+    # and Shale::Adapter::TomRB
     #
-    # @param [@see Shale::Adapter::TomlRB] adapter
+    # @param [@see Shale::Adapter::Tomlib] adapter
     #
     # @example setting adapter
-    #   Shale.toml_adapter = Shale::Adapter::TomlRB
+    #   Shale.toml_adapter = Shale::Adapter::Tomlib
     #
     # @example getting adapter
     #   Shale.toml_adapter
-    #   # => Shale::Adapter::TomlRB
+    #   # => Shale::Adapter::Tomlib
     #
     # @api public
     attr_accessor :toml_adapter

@@ -208,8 +208,8 @@ person.to_yaml
 ### Converting TOML to object
 
 To use TOML with Shale you have to set adapter you want to use.
-Out of the box Shale suports [Tomlib](https://github.com/kgiszczak/tomlib).
-It also comes with adapter for [toml-rb](https://github.com/emancu/toml-rb) if you prefer that.
+It comes with adapters for [Tomlib](https://github.com/kgiszczak/tomlib) and
+[toml-rb](https://github.com/emancu/toml-rb).
 For details see [Adapters](#adapters) section.
 
 To set it, first make sure Tomlib gem is installed:
@@ -221,8 +221,8 @@ $ gem install tomlib
 then setup adapter:
 
 ```ruby
-require 'tomlib'
-Shale.toml_adapter = Tomlib
+require 'sahle/adapter/tomlib'
+Shale.toml_adapter = Shale::Adapter::Tomlib
 
 # Alternatively if you'd like to use toml-rb, use:
 require 'shale/adapter/toml_rb'
@@ -1083,6 +1083,29 @@ Person.to_csv(people, headers: true, col_sep: '|')
 # first_name|last_name
 # John|Doe
 # James|Sixpack
+```
+
+Most adapters accept options specific to them. Eg. if you want to be able to work
+with NaN values in JSON:
+
+```ruby
+class Person
+  attribute :age, Shale::Type::Float
+end
+
+person = Person.from_jsom('{"age": NaN}', allow_nan: true)
+
+# =>
+#
+# #<Person:0x0000000113d7a488 @age=Float::NAN>
+
+Person.to_json(person, allow_nan: true)
+
+# =>
+#
+# {
+#   "age": NaN
+# }
 ```
 
 ### Using custom models

@@ -8,6 +8,11 @@ RSpec.describe Shale::Adapter::JSON do
       doc = described_class.load('{"foo": "bar"}')
       expect(doc).to eq({ 'foo' => 'bar' })
     end
+
+    it 'accepts extra options' do
+      doc = described_class.load('{"foo": NaN}', allow_nan: true)
+      expect(doc['foo'].nan?).to eq(true)
+    end
   end
 
   describe '.dump' do
@@ -29,6 +34,11 @@ RSpec.describe Shale::Adapter::JSON do
 
         expect(json).to eq(expected)
       end
+    end
+
+    it 'accepts extra options' do
+      json = described_class.dump({ 'foo' => Float::NAN }, allow_nan: true)
+      expect(json).to eq('{"foo":NaN}')
     end
   end
 end

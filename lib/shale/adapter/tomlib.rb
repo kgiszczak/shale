@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
-require 'toml-rb'
+require 'tomlib'
 
 module Shale
   module Adapter
-    # TomlRB adapter
+    # Tomlib adapter
     #
     # @api public
-    class TomlRB
+    class Tomlib
       # Parse TOML into Hash
       #
       # @param [String] toml TOML document
@@ -17,7 +17,7 @@ module Shale
       #
       # @api private
       def self.load(toml, **_options)
-        ::TomlRB.parse(toml)
+        ::Tomlib.load(toml)
       end
 
       # Serialize Hash into TOML
@@ -28,8 +28,8 @@ module Shale
       # @return [String]
       #
       # @api private
-      def self.dump(obj, **_options)
-        ::TomlRB.dump(obj)
+      def self.dump(obj, **options)
+        ::Tomlib.dump(obj, **options)
       end
     end
   end

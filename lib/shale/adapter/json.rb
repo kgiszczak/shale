@@ -11,27 +11,30 @@ module Shale
       # Parse JSON into Hash
       #
       # @param [String] json JSON document
+      # @param [Hash] options
       #
       # @return [Hash]
       #
       # @api private
-      def self.load(json)
-        ::JSON.parse(json)
+      def self.load(json, **options)
+        ::JSON.parse(json, **options)
       end
 
       # Serialize Hash into JSON
       #
       # @param [Hash] obj Hash object
-      # @param [true, false] pretty
+      # @param [Hash] options
       #
       # @return [String]
       #
       # @api private
-      def self.dump(obj, pretty: false)
-        if pretty
-          ::JSON.pretty_generate(obj)
+      def self.dump(obj, **options)
+        json_options = options.except(:pretty)
+
+        if options[:pretty]
+          ::JSON.pretty_generate(obj, **json_options)
         else
-          ::JSON.generate(obj)
+          ::JSON.generate(obj, **json_options)
         end
       end
     end

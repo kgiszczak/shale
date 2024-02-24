@@ -1,3 +1,8 @@
+## [1.2.0] - [unreleased]
+
+### Added
+- Allow to pass adapter specific options
+
 ## [1.1.0] - 2024-02-17
 
 ### Added

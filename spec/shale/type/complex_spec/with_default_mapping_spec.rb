@@ -3,7 +3,7 @@
 require 'shale'
 require 'shale/adapter/rexml'
 require 'shale/adapter/csv'
-require 'tomlib'
+require 'shale/adapter/tomlib'
 
 module ComplexSpec__DefaultMapping # rubocop:disable Naming/ClassAndModuleCamelCase
   class Child < Shale::Mapper
@@ -27,7 +27,7 @@ RSpec.describe Shale::Type::Complex do
   before(:each) do
     Shale.json_adapter = Shale::Adapter::JSON
     Shale.yaml_adapter = YAML
-    Shale.toml_adapter = Tomlib
+    Shale.toml_adapter = Shale::Adapter::Tomlib
     Shale.csv_adapter = Shale::Adapter::CSV
     Shale.xml_adapter = Shale::Adapter::REXML
   end
@@ -178,6 +178,17 @@ RSpec.describe Shale::Type::Complex do
             expect(instance[i].child.two).to eq(%w[foo bar baz])
           end
         end
+
+        context 'with params' do
+          let(:json) do
+            '{ "one": NaN }'
+          end
+
+          it 'maps json to object' do
+            instance = mapper.from_json(json, allow_nan: true)
+            expect(instance.one).to eq('NaN')
+          end
+        end
       end
 
       describe '.to_json' do
@@ -222,6 +233,13 @@ RSpec.describe Shale::Type::Complex do
             )
 
             expect(mapper.to_json([instance, instance], pretty: true)).to eq(json_collection)
+          end
+        end
+
+        context 'with other params' do
+          it 'converts objects to json' do
+            instance = mapper.new(one: 'foo', two: nil)
+            expect(instance.to_json(allow_nan: true)).to eq('{"one":"foo"}')
           end
         end
       end
@@ -293,6 +311,11 @@ RSpec.describe Shale::Type::Complex do
             expect(instance[i].child.two).to eq(%w[foo bar baz])
           end
         end
+
+        it 'accepts extra options' do
+          instance = mapper.from_yaml(yaml, aliases: true)
+          expect(instance.one).to eq('foo')
+        end
       end
 
       describe '.to_yaml' do
@@ -314,6 +337,11 @@ RSpec.describe Shale::Type::Complex do
           )
 
           expect(mapper.to_yaml([instance, instance])).to eq(yaml_collection)
+        end
+
+        it 'accepts extra options' do
+          instance = mapper.new(one: 'foo', two: nil)
+          expect(instance.to_yaml(aliases: true)).to eq("---\none: foo\n")
         end
       end
     end
@@ -350,6 +378,11 @@ RSpec.describe Shale::Type::Complex do
             expect(instance.child.one).to eq('foo')
             expect(instance.child.two).to eq(%w[foo bar baz])
           end
+
+          it 'accepts extra options' do
+            instance = mapper.from_toml(toml, foo: :bar)
+            expect(instance.one).to eq('foo')
+          end
         end
       end
 
@@ -374,6 +407,16 @@ RSpec.describe Shale::Type::Complex do
 
             expect(instance.to_toml).to eq(toml)
           end
+
+          it 'accepts extra options' do
+            instance = mapper.new(
+              one: 'foo',
+              two: %w[foo bar baz],
+              child: child_class.new(one: 'foo', two: %w[foo bar baz])
+            )
+
+            expect(instance.to_toml(indent: false)).to eq(toml)
+          end
         end
       end
     end
@@ -382,6 +425,22 @@ RSpec.describe Shale::Type::Complex do
       let(:mapper) { ComplexSpec__DefaultMapping::ParentCsv }
 
       describe '.from_csv' do
+        context 'when adapter is not set' do
+          let(:csv) do
+            <<~DOC
+              foo,bar
+            DOC
+          end
+
+          it 'raises an error' do
+            Shale.csv_adapter = nil
+
+            expect do
+              mapper.from_csv(csv)
+            end.to raise_error(Shale::AdapterError, /CSV Adapter is not set/)
+          end
+        end
+
         context 'without params' do
           let(:csv) do
             <<~DOC
@@ -481,6 +540,22 @@ RSpec.describe Shale::Type::Complex do
       end
 
       describe '.to_csv' do
+        context 'when adapter is not set' do
+          let(:csv) do
+            <<~DOC
+              foo,bar
+            DOC
+          end
+
+          it 'raises an error' do
+            Shale.csv_adapter = nil
+
+            expect do
+              mapper.to_csv(csv)
+            end.to raise_error(Shale::AdapterError, /CSV Adapter is not set/)
+          end
+        end
+
         context 'without params' do
           let(:csv) do
             <<~DOC

@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require 'shale/adapter/toml_rb'
+require 'shale/adapter/tomlib'
 
-RSpec.describe Shale::Adapter::TomlRB do
+RSpec.describe Shale::Adapter::Tomlib do
   describe '.load' do
     it 'parses TOML document' do
       doc = described_class.load('foo = "bar"')
@@ -22,7 +22,7 @@ RSpec.describe Shale::Adapter::TomlRB do
     end
 
     it 'accepts extra options' do
-      toml = described_class.dump({ 'foo' => 'bar' }, foo: 'bar')
+      toml = described_class.dump({ 'foo' => 'bar' }, indent: false)
       expect(toml).to eq("foo = \"bar\"\n")
     end
   end

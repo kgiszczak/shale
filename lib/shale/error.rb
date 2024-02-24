@@ -9,7 +9,8 @@ module Shale
 
     # To use Tomlib:
     # Make sure tomlib is installed eg. execute: gem install tomlib
-    Shale.toml_adapter = Tomlib
+    require 'shale/adapter/tomlib'
+    Shale.toml_adapter = Shale::Adapter::Tomlib
 
     # To use toml-rb:
     # Make sure toml-rb is installed eg. execute: gem install toml-rb
