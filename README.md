@@ -65,6 +65,7 @@ $ gem install shale
 * [Using methods to extract and generate data](#using-methods-to-extract-and-generate-data)
 * [Delegating fields to child attributes](#delegating-fields-to-child-attributes)
 * [Additional options](#additional-options)
+* [Overriding attribute methods](#overriding-attribute-methods)
 * [Using custom models](#using-custom-models)
 * [Supported types](#supported-types)
 * [Writing your own type](#writing-your-own-type)
@@ -1107,6 +1108,40 @@ Person.to_json(person, allow_nan: true)
 #   "age": NaN
 # }
 ```
+
+### Overriding attribute methods
+
+It's possible to override an attribute method to change its output:
+
+```ruby
+class Person < Shale::Mapper
+  attribute :gender, Shale::Type::String
+
+  def gender
+    if super == 'm'
+      'male'
+    else
+      'female'
+    end
+  end
+end
+
+puts Person.from_json('{"gender":"m"}')
+
+# =>
+#
+# #<Person:0x00007f9bc3086d60
+#  @gender="male">
+```
+
+Be conscious that the original attribute value will be lost after its transformation though:
+
+```ruby
+puts User.from_json('{"gender":"m"}').to_json
+# => {"gender":"male"}
+```
+
+It'll no longer return gender `m`.
 
 ### Using custom models
 
