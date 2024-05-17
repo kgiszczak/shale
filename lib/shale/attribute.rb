@@ -30,7 +30,7 @@ module Shale
     # @param [Symbol] name Name of the attribute
     # @param [Shale::Type::Value] type Type of the attribute
     # @param [Boolean] collection Is this attribute a collection
-    # @param [Proc] default Default value
+    # @param [Proc, nil] default Default value
     #
     # @api private
     def initialize(name, type, collection, default)
@@ -38,10 +38,10 @@ module Shale
       @setter = "#{name}="
       @type = type
       @collection = collection
-      @default = collection ? -> { [] } : default
+      @default = default || (collection && -> { [] }) || nil
     end
 
-    # Return wheter attribute is collection or not
+    # Return whether the attribute is a collection or not
     #
     # @return [Boolean]
     #
