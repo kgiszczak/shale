@@ -54,12 +54,12 @@ RSpec.describe Shale::Adapter::Nokogiri::Document do
 
   describe '#add_namespace' do
     context 'when prefix is nil' do
-      it 'does not add namespace to root element' do
+      it 'add namespace with default prefix to root element' do
         el = doc.create_element('foo')
         doc.add_element(doc.doc, el)
         doc.add_namespace(nil, 'http://foo.com')
 
-        expect(doc.doc.root.namespaces).to eq({})
+        expect(doc.doc.root.namespaces).to eq({ "xmlns" => "http://foo.com" })
       end
     end
 

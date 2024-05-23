@@ -24,7 +24,11 @@ module Shale
         def doc
           if @doc.root
             @namespaces.each do |prefix, namespace|
-              @doc.root.add_namespace(prefix, namespace)
+              if prefix
+                @doc.root.add_namespace(prefix, namespace)
+              else
+                @doc.root.add_namespace(namespace)
+              end
             end
           end
 
@@ -59,7 +63,7 @@ module Shale
         #
         # @api private
         def add_namespace(prefix, namespace)
-          @namespaces[prefix] = namespace if prefix && namespace
+          @namespaces[prefix] = namespace if namespace
         end
 
         # Add attribute to REXML element

@@ -63,7 +63,7 @@ module Shale
         #
         # @api private
         def add_namespace(prefix, namespace)
-          @namespaces[prefix] = namespace if prefix && namespace
+          @namespaces[prefix] = namespace if namespace
         end
 
         # Add attribute to Nokogiri element

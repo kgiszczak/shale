@@ -52,7 +52,7 @@ RSpec.describe Shale::Adapter::REXML::Document do
         doc.add_element(doc.doc, el)
         doc.add_namespace(nil, 'http://foo.com')
 
-        expect(doc.doc.root.namespaces).to eq({})
+        expect(doc.doc.root.namespaces).to eq({ "xmlns" => "http://foo.com" })
       end
     end
 

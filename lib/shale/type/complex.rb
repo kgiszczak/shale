@@ -533,8 +533,12 @@ module Shale
             end
           end
 
+          default_namespace = xml_mapping.default_namespace
+
           element.children.each do |node|
-            mapping = xml_mapping.elements[node.name]
+            name_with_default_namespace = [default_namespace&.name, node.name].compact.join(":")
+
+            mapping = xml_mapping.elements[node.name] || xml_mapping.elements[name_with_default_namespace]
             next unless mapping
 
             if mapping.group

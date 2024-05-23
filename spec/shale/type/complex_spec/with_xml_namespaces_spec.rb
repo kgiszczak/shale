@@ -48,6 +48,20 @@ module ComplexSpec__XmlNamespaces # rubocop:disable Naming/ClassAndModuleCamelCa
       map_element 'el_ns2', to: :el_ns2, namespace: 'http://ns2.com', prefix: 'ns2'
     end
   end
+
+  class NsNoPrefixDeclaration < Shale::Mapper
+    attribute :attr_no_ns, Shale::Type::String
+    attribute :el_ns1, Shale::Type::String
+
+    xml do
+      root 'ns_declaration'
+      namespace 'http://ns1.com', nil
+
+      # map_attribute 'attr_no_ns', to: :attr_no_ns
+
+      map_element 'el_ns1', to: :el_ns1
+    end
+  end
 end
 
 RSpec.describe Shale::Type::Complex do
@@ -144,35 +158,59 @@ RSpec.describe Shale::Type::Complex do
         end
 
         context 'with ns declaration' do
-          let(:mapper) { ComplexSpec__XmlNamespaces::NsDeclaration }
+          context 'with prefix' do
+            let(:mapper) { ComplexSpec__XmlNamespaces::NsDeclaration }
 
-          let(:xml) do
-            <<~DOC.gsub("\n", '').gsub(/\s+/, ' ').gsub('> <', '><')
-              <ns1:ns_declaration
-                attr_no_ns="attr_no_ns"
-                ns1:attr_ns1="attr_ns1"
-                ns2:attr_ns2="attr_ns2"
-                xmlns:ns1="http://ns1.com"
-                xmlns:ns2="http://ns2.com"
-              >
-                <el_no_ns>el_no_ns</el_no_ns>
-                <ns1:el_ns1>el_ns1</ns1:el_ns1>
-                <ns2:el_ns2>el_ns2</ns2:el_ns2>
-              </ns1:ns_declaration>
-            DOC
+            let(:xml) do
+              <<~DOC.gsub("\n", '').gsub(/\s+/, ' ').gsub('> <', '><')
+                <ns1:ns_declaration
+                  attr_no_ns="attr_no_ns"
+                  ns1:attr_ns1="attr_ns1"
+                  ns2:attr_ns2="attr_ns2"
+                  xmlns:ns1="http://ns1.com"
+                  xmlns:ns2="http://ns2.com"
+                >
+                  <el_no_ns>el_no_ns</el_no_ns>
+                  <ns1:el_ns1>el_ns1</ns1:el_ns1>
+                  <ns2:el_ns2>el_ns2</ns2:el_ns2>
+                </ns1:ns_declaration>
+              DOC
+            end
+
+            it 'converts objects to xml' do
+              instance = mapper.new(
+                attr_no_ns: 'attr_no_ns',
+                attr_ns1: 'attr_ns1',
+                attr_ns2: 'attr_ns2',
+                el_no_ns: 'el_no_ns',
+                el_ns1: 'el_ns1',
+                el_ns2: 'el_ns2'
+              )
+
+              expect(instance.to_xml).to eq(xml)
+            end
           end
 
-          it 'converts objects to xml' do
-            instance = mapper.new(
-              attr_no_ns: 'attr_no_ns',
-              attr_ns1: 'attr_ns1',
-              attr_ns2: 'attr_ns2',
-              el_no_ns: 'el_no_ns',
-              el_ns1: 'el_ns1',
-              el_ns2: 'el_ns2'
-            )
+          context 'without prefix' do
+            let(:mapper) { ComplexSpec__XmlNamespaces::NsNoPrefixDeclaration }
 
-            expect(instance.to_xml).to eq(xml)
+            let(:xml) do
+              <<~DOC.gsub("\n", '').gsub(/\s+/, ' ').gsub('> <', '><')
+                <ns_declaration
+                  xmlns="http://ns1.com"
+                >
+                  <el_ns1>el_ns1</el_ns1>
+                </ns_declaration>
+              DOC
+            end
+
+            it 'converts objects to xml' do
+              instance = mapper.new(
+                el_ns1: 'el_ns1',
+              )
+
+              expect(instance.to_xml).to eq(xml)
+            end
           end
         end
       end
