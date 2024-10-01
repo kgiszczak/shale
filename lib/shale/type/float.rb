@@ -25,5 +25,7 @@ module Shale
         end
       end
     end
+
+    register(:float, Float)
   end
 end

@@ -69,5 +69,7 @@ module Shale
         value&.iso8601
       end
     end
+
+    register(:time, Time)
   end
 end

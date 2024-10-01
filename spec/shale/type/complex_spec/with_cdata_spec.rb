@@ -7,7 +7,7 @@ require 'tomlib'
 
 module ComplexSpec__CDATA # rubocop:disable Naming/ClassAndModuleCamelCase
   class Child < Shale::Mapper
-    attribute :element1, Shale::Type::String
+    attribute :element1, :string
 
     xml do
       root 'child'
@@ -16,8 +16,8 @@ module ComplexSpec__CDATA # rubocop:disable Naming/ClassAndModuleCamelCase
   end
 
   class Parent < Shale::Mapper
-    attribute :element1, Shale::Type::String
-    attribute :element2, Shale::Type::String, collection: true
+    attribute :element1, :string
+    attribute :element2, :string, collection: true
     attribute :child, Child
 
     xml do

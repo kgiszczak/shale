@@ -17,5 +17,7 @@ module Shale
         value&.to_s
       end
     end
+
+    register(:string, String)
   end
 end

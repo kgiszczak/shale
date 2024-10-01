@@ -56,6 +56,22 @@ RSpec.describe Shale::NotAShaleMapperError do
   end
 end
 
+RSpec.describe Shale::NotATypeValueError do
+  describe 'inheritance' do
+    it 'inherits from Shale::ShaleError' do
+      expect(Shale::NotATypeValueError < Shale::ShaleError).to eq(true)
+    end
+  end 
+end
+
+RSpec.describe Shale::UnknownTypeError do
+  describe 'inheritance' do
+    it 'inherits from Shale::ShaleError' do
+      expect(Shale::UnknownTypeError < Shale::ShaleError).to eq(true)
+    end
+  end
+end
+
 RSpec.describe Shale::AttributeNotDefinedError do
   describe 'inheritance' do
     it 'inherits from Shale::ShaleError' do

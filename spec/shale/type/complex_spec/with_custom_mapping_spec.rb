@@ -7,8 +7,8 @@ require 'tomlib'
 
 module ComplexSpec__CustomMapping # rubocop:disable Naming/ClassAndModuleCamelCase
   class Child < Shale::Mapper
-    attribute :one, Shale::Type::String
-    attribute :two, Shale::Type::String, collection: true
+    attribute :one, :string
+    attribute :two, :string, collection: true
 
     hsh do
       map 'One', to: :one
@@ -32,8 +32,8 @@ module ComplexSpec__CustomMapping # rubocop:disable Naming/ClassAndModuleCamelCa
   end
 
   class Parent < Shale::Mapper
-    attribute :one, Shale::Type::String
-    attribute :two, Shale::Type::String, collection: true
+    attribute :one, :string
+    attribute :two, :string, collection: true
     attribute :child, Child
 
     hsh do
@@ -62,8 +62,8 @@ module ComplexSpec__CustomMapping # rubocop:disable Naming/ClassAndModuleCamelCa
   end
 
   class ParentCsv < Shale::Mapper
-    attribute :one, Shale::Type::String
-    attribute :two, Shale::Type::String
+    attribute :one, :string
+    attribute :two, :string
 
     csv do
       map 'One', to: :one
@@ -72,9 +72,9 @@ module ComplexSpec__CustomMapping # rubocop:disable Naming/ClassAndModuleCamelCa
   end
 
   class ChildXml < Shale::Mapper
-    attribute :content, Shale::Type::String
-    attribute :one, Shale::Type::String
-    attribute :two, Shale::Type::String
+    attribute :content, :string
+    attribute :one, :string
+    attribute :two, :string
 
     xml do
       map_content to: :content
@@ -84,11 +84,11 @@ module ComplexSpec__CustomMapping # rubocop:disable Naming/ClassAndModuleCamelCa
   end
 
   class ParentXml < Shale::Mapper
-    attribute :content, Shale::Type::String
-    attribute :one, Shale::Type::String
-    attribute :one_collection, Shale::Type::String, collection: true
-    attribute :two, Shale::Type::String
-    attribute :two_collection, Shale::Type::String, collection: true
+    attribute :content, :string
+    attribute :one, :string
+    attribute :one_collection, :string, collection: true
+    attribute :two, :string
+    attribute :two_collection, :string, collection: true
     attribute :child, ChildXml
 
     xml do

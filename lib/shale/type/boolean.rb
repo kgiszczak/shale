@@ -29,5 +29,7 @@ module Shale
         !FALSE_VALUES.include?(value) unless value.nil?
       end
     end
+
+    register(:boolean, Boolean)
   end
 end

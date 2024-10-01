@@ -32,4 +32,8 @@ RSpec.describe Shale::Type::Boolean do
       end
     end
   end
+
+  it 'is a registered type' do
+    expect(Shale::Type.lookup(:boolean)).to eq(described_class)
+  end
 end
