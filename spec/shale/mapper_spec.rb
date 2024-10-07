@@ -8,7 +8,7 @@ module ShaleMapperTesting
   BAR_DEFAULT_PROC = -> { 'bar' }
 
   class Parent < Shale::Mapper
-    attribute :foo, :string
+    attribute :foo, Shale::Type::String
     attribute :bar, :string, default: BAR_DEFAULT_PROC
     attribute :baz, :string, collection: true
     attribute :foo_int, :integer

@@ -1215,6 +1215,15 @@ Shale supports these types out of the box:
 - `:string` (`Shale::Type::String`)
 - `:time` (`Shale::Type::Time`)
 
+The symbol type alias and the type class are interchangeable:
+
+```ruby
+class Person < Shale::Mapper
+  attribute :age, Shale::Type::Integer
+  # attribute :age, :integer
+end
+```
+
 ### Writing your own type
 
 To add your own type extend it from `Shale::Type::Value` and implement `.cast` class method.
@@ -1229,13 +1238,29 @@ class MyIntegerType < Shale::Type::Value
 end
 ```
 
-You can register your own type with a symbol alias if you
+Then you can use it in your model:
+
+```ruby
+class Person < Shale::Mapper
+  attribute :age, MyIntegerType
+end
+```
+
+You can also register your own type with a symbol alias if you
 intend to use it often.
 
 ```ruby
 require 'shale/type'
 
 Shale::Type.register(:my_integer, MyIntegerType)
+```
+
+Then you can use it like this:
+
+```ruby
+class Person < Shale::Mapper
+  attribute :age, :my_integer
+end
 ```
 
 ### Adapters
