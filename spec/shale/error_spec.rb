@@ -61,7 +61,7 @@ RSpec.describe Shale::NotATypeValueError do
     it 'inherits from Shale::ShaleError' do
       expect(Shale::NotATypeValueError < Shale::ShaleError).to eq(true)
     end
-  end 
+  end
 end
 
 RSpec.describe Shale::UnknownTypeError do

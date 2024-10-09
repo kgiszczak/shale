@@ -9,7 +9,7 @@ module ShaleTypeTesting
   class ReplacementValidType < Shale::Type::Value
   end
 
-  class InvalidType
+  class InvalidType # rubocop:disable Lint/EmptyClass
   end
 end
 
