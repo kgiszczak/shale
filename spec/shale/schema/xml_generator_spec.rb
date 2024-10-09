@@ -6,8 +6,8 @@ require 'shale/error'
 
 module ShaleSchemaXMLGeneratorTesting
   class BaseNameTesting < Shale::Mapper
-    attribute :foo, Shale::Type::String
-    attribute :bar, Shale::Type::String
+    attribute :foo, :string
+    attribute :bar, :string
 
     xml do
       map_element 'foo', to: :foo
@@ -16,7 +16,7 @@ module ShaleSchemaXMLGeneratorTesting
   end
 
   class BranchOne < Shale::Mapper
-    attribute :one, Shale::Type::String
+    attribute :one, :string
 
     xml do
       root 'branch_two'
@@ -25,7 +25,7 @@ module ShaleSchemaXMLGeneratorTesting
   end
 
   class BranchTwo < Shale::Mapper
-    attribute :two, Shale::Type::String
+    attribute :two, :string
 
     xml do
       root 'branch_two'
@@ -35,39 +35,39 @@ module ShaleSchemaXMLGeneratorTesting
   end
 
   class Root < Shale::Mapper
-    attribute :boolean, Shale::Type::Boolean
-    attribute :date, Shale::Type::Date
-    attribute :float, Shale::Type::Float
-    attribute :integer, Shale::Type::Integer
-    attribute :string, Shale::Type::String
-    attribute :time, Shale::Type::Time
+    attribute :boolean, :boolean
+    attribute :date, :date
+    attribute :float, :float
+    attribute :integer, :integer
+    attribute :string, :string
+    attribute :time, :time
     attribute :value, Shale::Type::Value
 
-    attribute :boolean_default, Shale::Type::Boolean, default: -> { true }
-    attribute :date_default, Shale::Type::Date, default: -> { Date.new(2021, 1, 1) }
-    attribute :float_default, Shale::Type::Float, default: -> { 1.0 }
-    attribute :integer_default, Shale::Type::Integer, default: -> { 1 }
-    attribute :string_default, Shale::Type::String, default: -> { 'string' }
+    attribute :boolean_default, :boolean, default: -> { true }
+    attribute :date_default, :date, default: -> { Date.new(2021, 1, 1) }
+    attribute :float_default, :float, default: -> { 1.0 }
+    attribute :integer_default, :integer, default: -> { 1 }
+    attribute :string_default, :string, default: -> { 'string' }
     attribute :time_default,
-      Shale::Type::Time,
+      :time,
       default: -> { Time.new(2021, 1, 1, 10, 10, 10, '+01:00') }
     attribute :value_default, Shale::Type::Value, default: -> { 'value' }
 
-    attribute :boolean_collection, Shale::Type::Boolean, collection: true
-    attribute :date_collection, Shale::Type::Date, collection: true
-    attribute :float_collection, Shale::Type::Float, collection: true
-    attribute :integer_collection, Shale::Type::Integer, collection: true
-    attribute :string_collection, Shale::Type::String, collection: true
-    attribute :time_collection, Shale::Type::Time, collection: true
+    attribute :boolean_collection, :boolean, collection: true
+    attribute :date_collection, :date, collection: true
+    attribute :float_collection, :float, collection: true
+    attribute :integer_collection, :integer, collection: true
+    attribute :string_collection, :string, collection: true
+    attribute :time_collection, :time, collection: true
     attribute :value_collection, Shale::Type::Value, collection: true
 
     attribute :branch_one, BranchOne
     attribute :branch_two, BranchTwo
     attribute :circular_dependency, Root
 
-    attribute :attribute_one, Shale::Type::String
-    attribute :attribute_two, Shale::Type::String
-    attribute :content, Shale::Type::String
+    attribute :attribute_one, :string
+    attribute :attribute_two, :string
+    attribute :content, :string
 
     xml do
       root 'root'
@@ -126,8 +126,8 @@ module ShaleSchemaXMLGeneratorTesting
 
   class AddressMapper < Shale::Mapper
     model Address
-    attribute :street, Shale::Type::String
-    attribute :city, Shale::Type::String
+    attribute :street, :string
+    attribute :city, :string
 
     xml do
       root 'Bar'
@@ -139,8 +139,8 @@ module ShaleSchemaXMLGeneratorTesting
 
   class PersonMapper < Shale::Mapper
     model Person
-    attribute :first_name, Shale::Type::String
-    attribute :last_name, Shale::Type::String
+    attribute :first_name, :string
+    attribute :last_name, :string
     attribute :address, AddressMapper
 
     xml do

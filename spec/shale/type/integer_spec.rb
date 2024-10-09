@@ -16,4 +16,8 @@ RSpec.describe Shale::Type::Integer do
       end
     end
   end
+
+  it 'is a registered type' do
+    expect(Shale::Type.lookup(:integer)).to eq(described_class)
+  end
 end

@@ -5,6 +5,7 @@ require_relative 'error'
 require_relative 'utils'
 require_relative 'mapping/dict'
 require_relative 'mapping/xml'
+require_relative 'type'
 require_relative 'type/complex'
 
 module Shale
@@ -12,16 +13,16 @@ module Shale
   #
   # @example
   #   class Address < Shale::Mapper
-  #     attribute :city, Shale::Type::String
-  #     attribute :street, Shale::Type::String
-  #     attribute :state, Shale::Type::Integer
-  #     attribute :zip, Shale::Type::String
+  #     attribute :city, :string
+  #     attribute :street, :string
+  #     attribute :state, :string
+  #     attribute :zip, :string
   #   end
   #
   #   class Person < Shale::Mapper
-  #     attribute :first_name, Shale::Type::String
-  #     attribute :last_name, Shale::Type::String
-  #     attribute :age, Shale::Type::Integer
+  #     attribute :first_name, :string
+  #     attribute :last_name, :string
+  #     attribute :age, :integer
   #     attribute :address, Address
   #   end
   #
@@ -144,18 +145,19 @@ module Shale
       # Define attribute on class
       #
       # @param [Symbol] name Name of the attribute
-      # @param [Class<Shale::Type::Value>] type Type of the attribute
+      # @param [Symbol, Class<Shale::Type::Value>] type Type of the attribute
       # @param [Boolean] collection Is the attribute a collection
       # @param [Proc] default Default value for the attribute
       #
       # @raise [DefaultNotCallableError] when attribute's default is not callable
+      # @raise [UnknownTypeError] when type is a symbol and not found in the registry
       #
       # @example
       #   class Person < Shale::Mapper
-      #     attribute :first_name, Shale::Type::String
-      #     attribute :last_name, Shale::Type::String
-      #     attribute :age, Shale::Type::Integer, default: -> { 1 }
-      #     attribute :hobbies, Shale::Type::String, collection: true
+      #     attribute :first_name, :string
+      #     attribute :last_name, :string
+      #     attribute :age, :integer, default: -> { 1 }
+      #     attribute :hobbies, :string, collection: true
       #   end
       #
       #   person = Person.new
@@ -175,6 +177,10 @@ module Shale
 
         unless default.nil? || default.respond_to?(:call)
           raise DefaultNotCallableError.new(to_s, name)
+        end
+
+        if type.is_a?(Symbol)
+          type = Type.lookup(type)
         end
 
         @attributes[name] = Attribute.new(name, type, collection, default)
@@ -201,9 +207,9 @@ module Shale
       #
       # @example
       #   class Person < Shale::Mapper
-      #     attribute :first_name, Shale::Type::String
-      #     attribute :last_name, Shale::Type::String
-      #     attribute :age, Shale::Type::Integer
+      #     attribute :first_name, :string
+      #     attribute :last_name, :string
+      #     attribute :age, :integer
       #
       #     hsh do
       #       map 'firstName', to: :first_name
@@ -225,9 +231,9 @@ module Shale
       #
       # @example
       #   class Person < Shale::Mapper
-      #     attribute :first_name, Shale::Type::String
-      #     attribute :last_name, Shale::Type::String
-      #     attribute :age, Shale::Type::Integer
+      #     attribute :first_name, :string
+      #     attribute :last_name, :string
+      #     attribute :age, :integer
       #
       #     json do
       #       map 'firstName', to: :first_name
@@ -249,9 +255,9 @@ module Shale
       #
       # @example
       #   class Person < Shale::Mapper
-      #     attribute :first_name, Shale::Type::String
-      #     attribute :last_name, Shale::Type::String
-      #     attribute :age, Shale::Type::Integer
+      #     attribute :first_name, :string
+      #     attribute :last_name, :string
+      #     attribute :age, :integer
       #
       #     yaml do
       #       map 'first_name', to: :first_name
@@ -273,9 +279,9 @@ module Shale
       #
       # @example
       #   class Person < Shale::Mapper
-      #     attribute :first_name, Shale::Type::String
-      #     attribute :last_name, Shale::Type::String
-      #     attribute :age, Shale::Type::Integer
+      #     attribute :first_name, :string
+      #     attribute :last_name, :string
+      #     attribute :age, :integer
       #
       #     toml do
       #       map 'first_name', to: :first_name
@@ -297,9 +303,9 @@ module Shale
       #
       # @example
       #   class Person < Shale::Mapper
-      #     attribute :first_name, Shale::Type::String
-      #     attribute :last_name, Shale::Type::String
-      #     attribute :age, Shale::Type::Integer
+      #     attribute :first_name, :string
+      #     attribute :last_name, :string
+      #     attribute :age, :integer
       #
       #     csv do
       #       map 'first_name', to: :first_name
@@ -321,9 +327,9 @@ module Shale
       #
       # @example
       #   class Person < Shale::Mapper
-      #     attribute :first_name, Shale::Type::String
-      #     attribute :last_name, Shale::Type::String
-      #     attribute :age, Shale::Type::Integer
+      #     attribute :first_name, :string
+      #     attribute :last_name, :string
+      #     attribute :age, :integer
       #
       #     xml do
       #       root 'Person'

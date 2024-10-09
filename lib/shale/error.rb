@@ -105,6 +105,18 @@ module Shale
   class NotAShaleMapperError < ShaleError
   end
 
+  # Error for registering class that is not a valid Type::Value
+  #
+  # @api private
+  class NotATypeValueError < ShaleError
+  end
+
+  # Error for using unknown symbol type
+  #
+  # @api private
+  class UnknownTypeError < ShaleError
+  end
+
   # Raised when receiver attribute is not defined
   #
   # @api private

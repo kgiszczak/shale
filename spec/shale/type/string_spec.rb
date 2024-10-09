@@ -16,4 +16,8 @@ RSpec.describe Shale::Type::String do
       end
     end
   end
+
+  it 'is a registered type' do
+    expect(Shale::Type.lookup(:string)).to eq(described_class)
+  end
 end

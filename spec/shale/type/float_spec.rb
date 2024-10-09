@@ -40,4 +40,8 @@ RSpec.describe Shale::Type::Float do
       end
     end
   end
+
+  it 'is a registered type' do
+    expect(Shale::Type.lookup(:float)).to eq(described_class)
+  end
 end

@@ -83,17 +83,17 @@ $ gem install shale
 require 'shale'
 
 class Address < Shale::Mapper
-  attribute :city, Shale::Type::String
-  attribute :street, Shale::Type::String
-  attribute :zip, Shale::Type::String
+  attribute :city, :string
+  attribute :street, :string
+  attribute :zip, :string
 end
 
 class Person < Shale::Mapper
-  attribute :first_name, Shale::Type::String
-  attribute :last_name, Shale::Type::String
-  attribute :age, Shale::Type::Integer
-  attribute :married, Shale::Type::Boolean, default: -> { false }
-  attribute :hobbies, Shale::Type::String, collection: true
+  attribute :first_name, :string
+  attribute :last_name, :string
+  attribute :age, :integer
+  attribute :married, :boolean, default: -> { false }
+  attribute :hobbies, :string, collection: true
   attribute :address, Address
 end
 ```
@@ -443,8 +443,8 @@ By default keys are named the same as attributes. To use custom keys use:
 
 ```ruby
 class Person < Shale::Mapper
-  attribute :first_name, Shale::Type::String
-  attribute :last_name, Shale::Type::String
+  attribute :first_name, :string
+  attribute :last_name, :string
 
   json do
     map 'firstName', to: :first_name
@@ -457,8 +457,8 @@ end
 
 ```ruby
 class Person < Shale::Mapper
-  attribute :first_name, Shale::Type::String
-  attribute :last_name, Shale::Type::String
+  attribute :first_name, :string
+  attribute :last_name, :string
 
   yaml do
     map 'firstName', to: :first_name
@@ -471,8 +471,8 @@ end
 
 ```ruby
 class Person < Shale::Mapper
-  attribute :first_name, Shale::Type::String
-  attribute :last_name, Shale::Type::String
+  attribute :first_name, :string
+  attribute :last_name, :string
 
   toml do
     map 'firstName', to: :first_name
@@ -489,8 +489,8 @@ to `:first_name` attribute and the second column to `:last_name`.
 
 ```ruby
 class Person < Shale::Mapper
-  attribute :first_name, Shale::Type::String
-  attribute :last_name, Shale::Type::String
+  attribute :first_name, :string
+  attribute :last_name, :string
 
   csv do
     map 'firstName', to: :first_name
@@ -503,8 +503,8 @@ end
 
 ```ruby
 class Person < Shale::Mapper
-  attribute :first_name, Shale::Type::String
-  attribute :last_name, Shale::Type::String
+  attribute :first_name, :string
+  attribute :last_name, :string
 
   hsh do
     map 'firstName', to: :first_name
@@ -519,9 +519,9 @@ XML is more complicated format than JSON or YAML. To map elements, attributes an
 
 ```ruby
 class Address < Shale::Mapper
-  attribute :street, Shale::Type::String
-  attribute :city, Shale::Type::String
-  attribute :zip, Shale::Type::String
+  attribute :street, :string
+  attribute :city, :string
+  attribute :zip, :string
 
   xml do
     map_content to: :street
@@ -531,10 +531,10 @@ class Address < Shale::Mapper
 end
 
 class Person < Shale::Mapper
-  attribute :first_name, Shale::Type::String
-  attribute :last_name, Shale::Type::String
-  attribute :age, Shale::Type::Integer
-  attribute :hobbies, Shale::Type::String, collection: true
+  attribute :first_name, :string
+  attribute :last_name, :string
+  attribute :age, :integer
+  attribute :hobbies, :string, collection: true
   attribute :address, Address
 
   xml do
@@ -573,7 +573,7 @@ You can use `cdata: true` option on `map_element` and `map_content` to handle CD
 
 ```ruby
 class Address < Shale::Mapper
-  attribute :content, Shale::Type::String
+  attribute :content, :string
 
   xml do
     map_content to: :content, cdata: true
@@ -581,7 +581,7 @@ class Address < Shale::Mapper
 end
 
 class Person < Shale::Mapper
-  attribute :first_name, Shale::Type::String
+  attribute :first_name, :string
   attribute :address, Address
 
   xml do
@@ -607,9 +607,9 @@ To map namespaced elements and attributes use `namespace` and `prefix` propertie
 
 ```ruby
 class Person < Shale::Mapper
-  attribute :first_name, Shale::Type::String
-  attribute :last_name, Shale::Type::String
-  attribute :age, Shale::Type::Integer
+  attribute :first_name, :string
+  attribute :last_name, :string
+  attribute :age, :integer
 
   xml do
     root 'person'
@@ -634,11 +634,11 @@ explicitly declare it on `map_attribute`).
 
 ```ruby
 class Person < Shale::Mapper
-  attribute :first_name, Shale::Type::String
-  attribute :middle_name, Shale::Type::String
-  attribute :last_name, Shale::Type::String
-  attribute :age, Shale::Type::Integer
-  attribute :hobby, Shale::Type::String
+  attribute :first_name, :string
+  attribute :middle_name, :string
+  attribute :last_name, :string
+  attribute :age, :integer
+  attribute :hobby, :string
 
   xml do
     root 'person'
@@ -674,9 +674,9 @@ For CSV the default is to render `nil` elements.
 
 ```ruby
 class Person < Shale::Mapper
-  attribute :first_name, Shale::Type::String
-  attribute :last_name, Shale::Type::String
-  attribute :age, Shale::Type::Integer
+  attribute :first_name, :string
+  attribute :last_name, :string
+  attribute :age, :integer
 
   json do
     map 'first_name', to: :first_name, render_nil: true
@@ -724,9 +724,9 @@ class Base < Shale::Mapper
 end
 
 class Person < Base
-  attribute :first_name, Shale::Type::String
-  attribute :last_name, Shale::Type::String
-  attribute :age, Shale::Type::Integer
+  attribute :first_name, :string
+  attribute :last_name, :string
+  attribute :age, :integer
 
   json do
     # override default from Base class
@@ -743,8 +743,8 @@ end
 
 ```ruby
 class Person < Base
-  attribute :first_name, Shale::Type::String
-  attribute :last_name, Shale::Type::String
+  attribute :first_name, :string
+  attribute :last_name, :string
 
   json do
     render_nil false
@@ -763,9 +763,9 @@ you can use methods to do so:
 
 ```ruby
 class Person < Shale::Mapper
-  attribute :hobbies, Shale::Type::String, collection: true
-  attribute :street, Shale::Type::String
-  attribute :city, Shale::Type::String
+  attribute :hobbies, :string, collection: true
+  attribute :street, :string
+  attribute :city, :string
 
   json do
     map 'hobbies', using: { from: :hobbies_from_json, to: :hobbies_to_json }
@@ -854,7 +854,7 @@ You can also pass a `context` object that will be available in extractor/generat
 
 ```ruby
 class Person < Shale::Mapper
-  attribute :password, Shale::Type::String
+  attribute :password, :string
 
   json do
     map 'password', using: { from: :password_from_json, to: :password_to_json }
@@ -884,7 +884,7 @@ If you want to work on multiple elements at a time you can group them using `gro
 
 ```ruby
 class Person < Shale::Mapper
-  attribute :name, Shale::Type::String
+  attribute :name, :string
 
   json do
     group from: :name_from_json, to: :name_to_json do
@@ -935,12 +935,12 @@ To delegate fields to child complex types you can use `receiver: :child` declara
 
 ```ruby
 class Address < Shale::Mapper
-  attribute :city, Shale::Type::String
-  attribute :street, Shale::Type::String
+  attribute :city, :string
+  attribute :street, :string
 end
 
 class Person < Shale::Mapper
-  attribute :name, Shale::Type::String
+  attribute :name, :string
   attribute :address, Address
 
   json do
@@ -1060,8 +1060,8 @@ names and shouldn't be included in the returned collection. It also accepts all 
 
 ```ruby
 class Person
-  attribute :first_name, Shale::Type::String
-  attribute :last_name, Shale::Type::String
+  attribute :first_name, :string
+  attribute :last_name, :string
 end
 
 people = Person.from_csv(<<~DATA, headers: true, col_sep: '|')
@@ -1091,10 +1091,10 @@ with NaN values in JSON:
 
 ```ruby
 class Person
-  attribute :age, Shale::Type::Float
+  attribute :age, :float
 end
 
-person = Person.from_jsom('{"age": NaN}', allow_nan: true)
+person = Person.from_json('{"age": NaN}', allow_nan: true)
 
 # =>
 #
@@ -1115,7 +1115,7 @@ It's possible to override an attribute method to change its output:
 
 ```ruby
 class Person < Shale::Mapper
-  attribute :gender, Shale::Type::String
+  attribute :gender, :string
 
   def gender
     if super == 'm'
@@ -1160,15 +1160,15 @@ end
 class AddressMapper < Shale::Mapper
   model Address
 
-  attribute :street, Shale::Type::String
-  attribute :city, Shale::Type::String
+  attribute :street, :string
+  attribute :city, :string
 end
 
 class PersonMapper < Shale::Mapper
   model Person
 
-  attribute :first_name, Shale::Type::String
-  attribute :last_name, Shale::Type::String
+  attribute :first_name, :string
+  attribute :last_name, :string
   attribute :address, AddressMapper
 end
 
@@ -1208,12 +1208,21 @@ PersonMapper.to_json(person, pretty: true)
 
 Shale supports these types out of the box:
 
-- `Shale::Type::Boolean`
-- `Shale::Type::Date`
-- `Shale::Type::Float`
-- `Shale::Type::Integer`
-- `Shale::Type::String`
-- `Shale::Type::Time`
+- `:boolean` (`Shale::Type::Boolean`)
+- `:date` (`Shale::Type::Date`)
+- `:float` (`Shale::Type::Float`)
+- `:integer` (`Shale::Type::Integer`)
+- `:string` (`Shale::Type::String`)
+- `:time` (`Shale::Type::Time`)
+
+The symbol type alias and the type class are interchangeable:
+
+```ruby
+class Person < Shale::Mapper
+  attribute :age, Shale::Type::Integer
+  # attribute :age, :integer
+end
+```
 
 ### Writing your own type
 
@@ -1226,6 +1235,31 @@ class MyIntegerType < Shale::Type::Value
   def self.cast(value)
     value.to_i
   end
+end
+```
+
+Then you can use it in your model:
+
+```ruby
+class Person < Shale::Mapper
+  attribute :age, MyIntegerType
+end
+```
+
+You can also register your own type with a symbol alias if you
+intend to use it often.
+
+```ruby
+require 'shale/type'
+
+Shale::Type.register(:my_integer, MyIntegerType)
+```
+
+Then you can use it like this:
+
+```ruby
+class Person < Shale::Mapper
+  attribute :age, :my_integer
 end
 ```
 
@@ -1381,10 +1415,10 @@ require 'shale/schema'
 class PersonMapper < Shale::Mapper
   model Person
 
-  attribute :first_name, Shale::Type::String
-  attribute :last_name, Shale::Type::String
-  attribute :address, Shale::Type::String
-  attribute :age, Shale::Type::Integer
+  attribute :first_name, :string
+  attribute :last_name, :string
+  attribute :address, :string
+  attribute :age, :integer
 
   json do
     properties max_properties: 5

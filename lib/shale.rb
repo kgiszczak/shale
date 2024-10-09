@@ -4,6 +4,7 @@ require 'yaml'
 
 require_relative 'shale/mapper'
 require_relative 'shale/adapter/json'
+require_relative 'shale/type'
 require_relative 'shale/type/boolean'
 require_relative 'shale/type/date'
 require_relative 'shale/type/float'

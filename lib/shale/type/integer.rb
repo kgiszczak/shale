@@ -17,5 +17,7 @@ module Shale
         value&.to_i
       end
     end
+
+    register(:integer, Integer)
   end
 end

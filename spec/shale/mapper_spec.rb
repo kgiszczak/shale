@@ -9,13 +9,13 @@ module ShaleMapperTesting
 
   class Parent < Shale::Mapper
     attribute :foo, Shale::Type::String
-    attribute :bar, Shale::Type::String, default: BAR_DEFAULT_PROC
-    attribute :baz, Shale::Type::String, collection: true
-    attribute :foo_int, Shale::Type::Integer
+    attribute :bar, :string, default: BAR_DEFAULT_PROC
+    attribute :baz, :string, collection: true
+    attribute :foo_int, :integer
   end
 
   class Child1 < Parent
-    attribute :child1_foo, Shale::Type::String
+    attribute :child1_foo, :string
 
     # rubocop:disable Lint/EmptyBlock
     hsh do
@@ -39,11 +39,11 @@ module ShaleMapperTesting
   end
 
   class Child2 < Child1
-    attribute :child2_foo, Shale::Type::String
+    attribute :child2_foo, :string
   end
 
   class Child3 < Child2
-    attribute :child3_foo, Shale::Type::String
+    attribute :child3_foo, :string
 
     hsh do
       map 'child3_bar', to: :child3_foo
@@ -72,7 +72,7 @@ module ShaleMapperTesting
   end
 
   class HashMapping < Shale::Mapper
-    attribute :foo, Shale::Type::String
+    attribute :foo, :string
 
     hsh do
       map 'bar', to: :foo
@@ -84,7 +84,7 @@ module ShaleMapperTesting
   end
 
   class JsonMapping < Shale::Mapper
-    attribute :foo, Shale::Type::String
+    attribute :foo, :string
 
     json do
       properties min_properties: 1, max_properties: 4, dependent_required: { 'foo' => ['bar'] }
@@ -98,7 +98,7 @@ module ShaleMapperTesting
   end
 
   class YamlMapping < Shale::Mapper
-    attribute :foo, Shale::Type::String
+    attribute :foo, :string
 
     yaml do
       map 'bar', to: :foo
@@ -110,7 +110,7 @@ module ShaleMapperTesting
   end
 
   class TomlMapping < Shale::Mapper
-    attribute :foo, Shale::Type::String
+    attribute :foo, :string
 
     toml do
       map 'bar', to: :foo
@@ -122,7 +122,7 @@ module ShaleMapperTesting
   end
 
   class CsvMapping < Shale::Mapper
-    attribute :foo, Shale::Type::String
+    attribute :foo, :string
 
     csv do
       map 'bar', to: :foo
@@ -134,10 +134,10 @@ module ShaleMapperTesting
   end
 
   class XmlMapping < Shale::Mapper
-    attribute :foo_element, Shale::Type::String
-    attribute :ns2_element, Shale::Type::String
-    attribute :foo_attribute, Shale::Type::String
-    attribute :foo_content, Shale::Type::String
+    attribute :foo_element, :string
+    attribute :ns2_element, :string
+    attribute :foo_attribute, :string
+    attribute :foo_content, :string
 
     xml do
       root 'foobar'
@@ -167,7 +167,7 @@ module ShaleMapperTesting
 
   # rubocop:disable Lint/EmptyBlock
   class FinalizedParent1 < Shale::Mapper
-    attribute :one, Shale::Type::String
+    attribute :one, :string
 
     hsh do
     end
@@ -207,20 +207,20 @@ module ShaleMapperTesting
     xml do
     end
 
-    attribute :one, Shale::Type::String
+    attribute :one, :string
   end
   # rubocop:enable Lint/EmptyBlock
 
   class FinalizedChild1 < FinalizedParent1
-    attribute :two, Shale::Type::String
+    attribute :two, :string
   end
 
   class FinalizedChild2 < FinalizedParent2
-    attribute :two, Shale::Type::String
+    attribute :two, :string
   end
 
   class AttributesModuleParent < Shale::Mapper
-    attribute :parent, Shale::Type::String
+    attribute :parent, :string
 
     def parent
       "#{super}!"
@@ -232,7 +232,7 @@ module ShaleMapperTesting
   end
 
   class AttributesModuleChild < AttributesModuleParent
-    attribute :child, Shale::Type::String
+    attribute :child, :string
 
     def parent
       "#{super}?"
@@ -505,10 +505,22 @@ RSpec.describe Shale::Mapper do
         expect do
           # rubocop:disable Lint/ConstantDefinitionInBlock
           class FooBarBaz < described_class
-            attribute :foo, Shale::Type::String, default: ''
+            attribute :foo, :string, default: ''
           end
           # rubocop:enable Lint/ConstantDefinitionInBlock
         end.to raise_error(Shale::DefaultNotCallableError)
+      end
+    end
+
+    context 'when type is not registered' do
+      it 'raises an error' do
+        expect do
+          # rubocop:disable Lint/ConstantDefinitionInBlock
+          class FooBarBaz < described_class
+            attribute :foo, :unknown
+          end
+          # rubocop:enable Lint/ConstantDefinitionInBlock
+        end.to raise_error(Shale::UnknownTypeError)
       end
     end
 

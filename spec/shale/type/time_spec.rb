@@ -138,4 +138,8 @@ RSpec.describe Shale::Type::Time do
       end
     end
   end
+
+  it 'is a registered type' do
+    expect(Shale::Type.lookup(:time)).to eq(described_class)
+  end
 end

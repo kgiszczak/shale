@@ -136,4 +136,8 @@ RSpec.describe Shale::Type::Date do
       end
     end
   end
+
+  it 'is a registered type' do
+    expect(Shale::Type.lookup(:date)).to eq(described_class)
+  end
 end
