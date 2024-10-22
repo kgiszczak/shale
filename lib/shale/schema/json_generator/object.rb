@@ -40,6 +40,8 @@ module Shale
             'minProperties' => @root[:min_properties],
             'maxProperties' => @root[:max_properties],
             'dependentRequired' => @root[:dependent_required],
+            'description' => @root[:description],
+            'additionalProperties' => @root[:additional_properties],
           }.compact
         end
       end

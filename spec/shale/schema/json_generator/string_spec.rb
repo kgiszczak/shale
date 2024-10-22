@@ -15,6 +15,7 @@ RSpec.describe Shale::Schema::JSONGenerator::String do
           min_length: 5,
           max_length: 10,
           pattern: 'foo-bar',
+          description: 'Attribute description',
         }
         expected = {
           'type' => 'string',
@@ -22,6 +23,7 @@ RSpec.describe Shale::Schema::JSONGenerator::String do
           'minLength' => 5,
           'maxLength' => 10,
           'pattern' => 'foo-bar',
+          'description' => 'Attribute description',
         }
         expect(described_class.new('foo', schema: schema).as_type).to eq(expected)
       end

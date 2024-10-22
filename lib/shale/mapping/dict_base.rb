@@ -67,13 +67,15 @@ module Shale
       # @param [Integer] min_properties
       # @param [Integer] max_properties
       # @param [Hash] dependent_required
+      # @param [Boolean] additional_properties
       #
       # @api public
-      def properties(min_properties: nil, max_properties: nil, dependent_required: nil)
+      def properties(min_properties: nil, max_properties: nil, dependent_required: nil, additional_properties: nil)
         @root = {
           min_properties: min_properties,
           max_properties: max_properties,
           dependent_required: dependent_required,
+          additional_properties: additional_properties,
         }
       end
 

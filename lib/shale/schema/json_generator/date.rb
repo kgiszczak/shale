@@ -15,7 +15,9 @@ module Shale
         #
         # @api private
         def as_type
-          { 'type' => 'string', 'format' => 'date' }
+          { 'type' => 'string',
+            'format' => 'date',
+            'description' => schema[:description] }.compact
         end
       end
     end

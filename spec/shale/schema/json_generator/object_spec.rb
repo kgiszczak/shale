@@ -53,12 +53,16 @@ RSpec.describe Shale::Schema::JSONGenerator::Object do
           'properties' => {
             'bar' => { 'type' => %w[boolean null] },
           },
+          'description' => 'Attribute description',
+          'additionalProperties' => false,
         }
 
         root = {
           min_properties: 1,
           max_properties: 5,
           dependent_required: { 'foo' => ['bar'] },
+          description: 'Attribute description',
+          additional_properties: false,
         }
 
         expect(described_class.new('foo', types, root).as_type).to eq(expected)
