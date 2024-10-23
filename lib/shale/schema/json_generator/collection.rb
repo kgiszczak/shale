@@ -46,7 +46,8 @@ module Shale
             'maxItems' => schema[:max_items],
             'uniqueItems' => schema[:unique],
             'minContains' => schema[:min_contains],
-            'maxContains' => schema[:max_contains] }.compact
+            'maxContains' => schema[:max_contains],
+            'description' => schema[:description] }.compact
         end
       end
     end

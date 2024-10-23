@@ -15,7 +15,8 @@ module Shale
         #
         # @api private
         def as_type
-          { 'type' => %w[boolean integer number object string] }
+          { 'type' => %w[boolean integer number object string],
+            'description' => schema[:description] }.compact
         end
       end
     end

@@ -17,6 +17,7 @@ RSpec.describe Shale::Schema::JSONGenerator::Float do
           minimum: 0,
           maximum: 100,
           multiple_of: 4,
+          description: 'Attribute description',
         }
         expected = {
           'type' => 'number',
@@ -25,6 +26,7 @@ RSpec.describe Shale::Schema::JSONGenerator::Float do
           'minimum' => 0,
           'maximum' => 100,
           'multipleOf' => 4,
+          'description' => 'Attribute description',
         }
         expect(described_class.new('foo', schema: schema).as_type).to eq(expected)
       end

@@ -15,7 +15,8 @@ module Shale
         #
         # @api private
         def as_type
-          { 'type' => 'boolean' }
+          { 'type' => 'boolean',
+            'description' => schema[:description] }.compact
         end
       end
     end

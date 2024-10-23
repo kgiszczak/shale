@@ -19,7 +19,8 @@ module Shale
             'format' => schema[:format],
             'minLength' => schema[:min_length],
             'maxLength' => schema[:max_length],
-            'pattern' => schema[:pattern] }.compact
+            'pattern' => schema[:pattern],
+            'description' => schema[:description] }.compact
         end
       end
     end

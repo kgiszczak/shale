@@ -20,7 +20,8 @@ module Shale
             'exclusiveMaximum' => schema[:exclusive_maximum],
             'minimum' => schema[:minimum],
             'maximum' => schema[:maximum],
-            'multipleOf' => schema[:multiple_of] }.compact
+            'multipleOf' => schema[:multiple_of],
+            'description' => schema[:description] }.compact
         end
       end
     end

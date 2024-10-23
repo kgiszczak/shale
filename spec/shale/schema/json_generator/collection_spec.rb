@@ -26,6 +26,7 @@ RSpec.describe Shale::Schema::JSONGenerator::Collection do
           unique: true,
           min_contains: 5,
           max_contains: 10,
+          description: 'Attribute description',
         }
         expected = {
           'type' => 'array',
@@ -35,7 +36,7 @@ RSpec.describe Shale::Schema::JSONGenerator::Collection do
           'uniqueItems' => true,
           'minContains' => 5,
           'maxContains' => 10,
-
+          'description' => 'Attribute description',
         }
         expect(described_class.new(type, schema: schema).as_json).to eq(expected)
       end
