@@ -1421,12 +1421,12 @@ class PersonMapper < Shale::Mapper
   attribute :age, :integer
 
   json do
-    properties max_properties: 5
+    properties max_properties: 5, additional_properties: false
 
     map "first_name", to: :first_name, schema: { required: true }
     map "last_name", to: :last_name, schema: { required: true }
-    map "address", to: :age, schema: { max_length: 128 }
-    map "age", to: :age, schema: { minimum: 1, maximum: 150 }
+    map "address", to: :address, schema: { max_length: 128, description: "Street, home number, city and country" }
+    map "age", to: :age, schema: { minimum: 1, maximum: 150, description: "Person age" }
   end
 end
 
@@ -1444,7 +1444,6 @@ Shale::Schema.to_json(
 #   "$defs": {
 #     "Person": {
 #       "type": "object",
-#       "maxProperties": 5,
 #       "properties": {
 #         "first_name": {
 #           "type": "string"
@@ -1452,23 +1451,30 @@ Shale::Schema.to_json(
 #         "last_name": {
 #           "type": "string"
 #         },
-#         "age": {
-#           "type": [
-#             "integer",
-#             "null"
-#           ],
-#          "minimum": 1,
-#          "maximum": 150
-#        },
 #         "address": {
 #           "type": [
 #             "string",
 #             "null"
 #           ],
-#           "maxLength": 128
+#           "maxLength": 128,
+#           "description": "Street, home number, city and country"
+#         },
+#         "age": {
+#           "type": [
+#             "integer",
+#             "null"
+#           ],
+#           "minimum": 1,
+#           "maximum": 150,
+#           "description": "Person age"
 #         }
 #       },
-#       "required": ["first_name", "last_name"]
+#       "required": [
+#         "first_name",
+#         "last_name"
+#       ],
+#       "maxProperties": 5,
+#       "additionalProperties": false
 #     }
 #   }
 # }
