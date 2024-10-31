@@ -1,7 +1,10 @@
-## [1.2.0] - [unreleased]
+## [1.2.0] - 2024-10-31
 
 ### Added
 - Allow to pass adapter specific options
+- Allow to pass `additional_properties` option to JSON Schema generator
+- Allow to pass `description` option to JSON Schema generator
+- Support for symbol type aliases in attribute mappings
 
 ## [1.1.0] - 2024-02-17
 
