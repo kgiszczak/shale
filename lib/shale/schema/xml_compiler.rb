@@ -422,7 +422,7 @@ module Shale
       # @api private
       def replace_ns_prefixes(type, namespaces)
         namespaces.each do |prefix, name|
-          type = type.sub(/^#{prefix}/, name)
+          type = type.sub(/^#{prefix}:/, "#{name}:")
         end
 
         if namespaces.key?('xmlns') && !type.include?(':')
