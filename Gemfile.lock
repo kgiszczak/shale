@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    shale (1.2.0)
+    shale (1.2.1)
       bigdecimal
 
 GEM

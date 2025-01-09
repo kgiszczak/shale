@@ -1,3 +1,8 @@
+## [1.2.1] - 2025-01-09
+
+### Fixed
+- [kjeldahl] Fixes issue where multiples namespace prefixes like ns1 and ns10 are replaced wrongly
+
 ## [1.2.0] - 2024-10-31
 
 ### Added
