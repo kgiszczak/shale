@@ -4,6 +4,7 @@ require 'shale/adapter/ox'
 require 'shale/adapter/rexml'
 require 'shale/schema/compiler/boolean'
 require 'shale/schema/compiler/date'
+require 'shale/schema/compiler/decimal'
 require 'shale/schema/compiler/float'
 require 'shale/schema/compiler/integer'
 require 'shale/schema/compiler/string'
@@ -812,6 +813,7 @@ RSpec.describe Shale::Schema::XMLCompiler do
           <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
             <xs:element name="complex1" type="complex1" />
             <xs:element name="complex2" type="complex2" />
+            <xs:element name="complex3" type="complex3" />
 
             <xs:simpleType name="customInt">
               <xs:restriction base="xs:integer">
@@ -840,6 +842,22 @@ RSpec.describe Shale::Schema::XMLCompiler do
                 </xs:simpleContent>
               </xs:complexType>
             </xs:element>
+
+            <xs:simpleType name="decimal125">
+              <xs:restriction base="xs:decimal">
+                <xs:fractionDigits value="5"/>
+                <xs:maxExclusive value="10000000"/>
+                <xs:minInclusive value="0"/>
+                <xs:totalDigits value="12"/>
+              </xs:restriction>
+            </xs:simpleType>
+            
+            <xs:complexType name="complex3">
+              <xs:simpleContent>
+                <xs:extension base="decimal125">
+                </xs:extension>
+              </xs:simpleContent>
+            </xs:complexType>
           </xs:schema>
         SCHEMA
       end
@@ -847,7 +865,7 @@ RSpec.describe Shale::Schema::XMLCompiler do
       it 'generates models' do
         models = described_class.new.as_models([schema])
 
-        expect(models.length).to eq(3)
+        expect(models.length).to eq(4)
 
         expect(models[0].id).to eq('shoesize')
         expect(models[0].name).to eq('Shoesize')
@@ -866,33 +884,44 @@ RSpec.describe Shale::Schema::XMLCompiler do
         expect(models[0].properties[1].prefix).to eq(nil)
         expect(models[0].properties[1].namespace).to eq(nil)
 
-        expect(models[1].id).to eq('complex2')
-        expect(models[1].name).to eq('Complex2')
-        expect(models[1].root).to eq('complex2')
-        expect(models[1].properties.length).to eq(2)
+        expect(models[1].id).to eq('complex3')
+        expect(models[1].name).to eq('Complex3')
+        expect(models[1].root).to eq('complex3')
+        expect(models[1].properties.length).to eq(1)
         expect(models[1].properties[0].mapping_name).to eq('content')
-        expect(models[1].properties[0].type).to be_a(Shale::Schema::Compiler::String)
+        expect(models[1].properties[0].type).to be_a(Shale::Schema::Compiler::Decimal)
         expect(models[1].properties[0].collection?).to eq(false)
         expect(models[1].properties[0].default).to eq(nil)
         expect(models[1].properties[0].prefix).to eq(nil)
         expect(models[1].properties[0].namespace).to eq(nil)
-        expect(models[1].properties[1].mapping_name).to eq('el1')
-        expect(models[1].properties[1].type).to be_a(Shale::Schema::Compiler::Integer)
-        expect(models[1].properties[1].collection?).to eq(false)
-        expect(models[1].properties[1].default).to eq(nil)
-        expect(models[1].properties[1].prefix).to eq(nil)
-        expect(models[1].properties[1].namespace).to eq(nil)
 
-        expect(models[2].id).to eq('complex1')
-        expect(models[2].name).to eq('Complex1')
-        expect(models[2].root).to eq('complex1')
-        expect(models[2].properties.length).to eq(1)
+        expect(models[2].id).to eq('complex2')
+        expect(models[2].name).to eq('Complex2')
+        expect(models[2].root).to eq('complex2')
+        expect(models[2].properties.length).to eq(2)
         expect(models[2].properties[0].mapping_name).to eq('content')
-        expect(models[2].properties[0].type).to be_a(Shale::Schema::Compiler::Integer)
+        expect(models[2].properties[0].type).to be_a(Shale::Schema::Compiler::String)
         expect(models[2].properties[0].collection?).to eq(false)
         expect(models[2].properties[0].default).to eq(nil)
         expect(models[2].properties[0].prefix).to eq(nil)
         expect(models[2].properties[0].namespace).to eq(nil)
+        expect(models[2].properties[1].mapping_name).to eq('el1')
+        expect(models[2].properties[1].type).to be_a(Shale::Schema::Compiler::Integer)
+        expect(models[2].properties[1].collection?).to eq(false)
+        expect(models[2].properties[1].default).to eq(nil)
+        expect(models[2].properties[1].prefix).to eq(nil)
+        expect(models[2].properties[1].namespace).to eq(nil)
+
+        expect(models[3].id).to eq('complex1')
+        expect(models[3].name).to eq('Complex1')
+        expect(models[3].root).to eq('complex1')
+        expect(models[3].properties.length).to eq(1)
+        expect(models[3].properties[0].mapping_name).to eq('content')
+        expect(models[3].properties[0].type).to be_a(Shale::Schema::Compiler::Integer)
+        expect(models[3].properties[0].collection?).to eq(false)
+        expect(models[3].properties[0].default).to eq(nil)
+        expect(models[3].properties[0].prefix).to eq(nil)
+        expect(models[3].properties[0].namespace).to eq(nil)
       end
     end
 
