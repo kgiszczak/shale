@@ -37,6 +37,7 @@ module ShaleSchemaXMLGeneratorTesting
   class Root < Shale::Mapper
     attribute :boolean, :boolean
     attribute :date, :date
+    attribute :decimal, :decimal
     attribute :float, :float
     attribute :integer, :integer
     attribute :string, :string
@@ -45,6 +46,7 @@ module ShaleSchemaXMLGeneratorTesting
 
     attribute :boolean_default, :boolean, default: -> { true }
     attribute :date_default, :date, default: -> { Date.new(2021, 1, 1) }
+    attribute :decimal_default, :decimal, default: -> { BigDecimal('1.0') }
     attribute :float_default, :float, default: -> { 1.0 }
     attribute :integer_default, :integer, default: -> { 1 }
     attribute :string_default, :string, default: -> { 'string' }
@@ -55,6 +57,7 @@ module ShaleSchemaXMLGeneratorTesting
 
     attribute :boolean_collection, :boolean, collection: true
     attribute :date_collection, :date, collection: true
+    attribute :decimal_collection, :decimal, collection: true
     attribute :float_collection, :float, collection: true
     attribute :integer_collection, :integer, collection: true
     attribute :string_collection, :string, collection: true
@@ -77,6 +80,7 @@ module ShaleSchemaXMLGeneratorTesting
 
       map_element 'boolean', to: :boolean
       map_element 'date', to: :date
+      map_element 'decimal', to: :decimal
       map_element 'float', to: :float
       map_element 'integer', to: :integer
       map_element 'string', to: :string
@@ -85,6 +89,7 @@ module ShaleSchemaXMLGeneratorTesting
 
       map_element 'boolean_default', to: :boolean_default
       map_element 'date_default', to: :date_default
+      map_element 'decimal_default', to: :decimal_default
       map_element 'float_default', to: :float_default
       map_element 'integer_default', to: :integer_default
       map_element 'string_default', to: :string_default
@@ -93,6 +98,7 @@ module ShaleSchemaXMLGeneratorTesting
 
       map_element 'boolean_collection', to: :boolean_collection
       map_element 'date_collection', to: :date_collection
+      map_element 'decimal_collection', to: :decimal_collection
       map_element 'float_collection', to: :float_collection
       map_element 'integer_collection', to: :integer_collection
       map_element 'string_collection', to: :string_collection
@@ -172,6 +178,7 @@ RSpec.describe Shale::Schema::XMLGenerator do
           <xs:sequence>
             <xs:element name="boolean" type="xs:boolean" minOccurs="0"/>
             <xs:element name="date" type="xs:date" minOccurs="0"/>
+            <xs:element name="decimal" type="xs:decimal" minOccurs="0"/>
             <xs:element name="float" type="xs:decimal" minOccurs="0"/>
             <xs:element name="integer" type="xs:integer" minOccurs="0"/>
             <xs:element name="string" type="xs:string" minOccurs="0"/>
@@ -179,6 +186,7 @@ RSpec.describe Shale::Schema::XMLGenerator do
             <xs:element name="value" type="xs:anyType" minOccurs="0"/>
             <xs:element name="boolean_default" type="xs:boolean" minOccurs="0" default="true"/>
             <xs:element name="date_default" type="xs:date" minOccurs="0" default="2021-01-01"/>
+            <xs:element name="decimal_default" type="xs:decimal" minOccurs="0" default="1.0"/>
             <xs:element name="float_default" type="xs:decimal" minOccurs="0" default="1.0"/>
             <xs:element name="integer_default" type="xs:integer" minOccurs="0" default="1"/>
             <xs:element name="string_default" type="xs:string" minOccurs="0" default="string"/>
@@ -186,6 +194,7 @@ RSpec.describe Shale::Schema::XMLGenerator do
             <xs:element name="value_default" type="xs:anyType" minOccurs="0" default="value"/>
             <xs:element name="boolean_collection" type="xs:boolean" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="date_collection" type="xs:date" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="decimal_collection" type="xs:decimal" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="float_collection" type="xs:decimal" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="integer_collection" type="xs:integer" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="string_collection" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>

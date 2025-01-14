@@ -6,6 +6,7 @@ require_relative '../../shale'
 require_relative '../error'
 require_relative 'compiler/boolean'
 require_relative 'compiler/date'
+require_relative 'compiler/decimal'
 require_relative 'compiler/float'
 require_relative 'compiler/integer'
 require_relative 'compiler/string'
@@ -103,9 +104,14 @@ module Shale
       # XML Schema "float" types
       # @api private
       XS_TYPE_FLOAT = [
-        "#{XS_NAMESPACE_URI}:decimal",
         "#{XS_NAMESPACE_URI}:float",
         "#{XS_NAMESPACE_URI}:double",
+      ].freeze
+
+      # XML Schema "decimal" types
+      # @api private
+      XS_TYPE_DECIMAL = [
+        "#{XS_NAMESPACE_URI}:decimal"
       ].freeze
 
       # XML Schema "integer" types
@@ -612,6 +618,8 @@ module Shale
           Compiler::Time.new
         elsif XS_TYPE_STRING.include?(type)
           Compiler::String.new
+        elsif XS_TYPE_DECIMAL.include?(type)
+          Compiler::Decimal.new
         elsif XS_TYPE_FLOAT.include?(type)
           Compiler::Float.new
         elsif XS_TYPE_INTEGER.include?(type)

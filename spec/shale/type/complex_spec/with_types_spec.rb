@@ -9,6 +9,7 @@ module ComplexSpec__Types # rubocop:disable Naming/ClassAndModuleCamelCase
   class Child < Shale::Mapper
     attribute :type_boolean, Shale::Type::Boolean
     attribute :type_date, Shale::Type::Date
+    attribute :type_decimal, Shale::Type::Decimal
     attribute :type_float, Shale::Type::Float
     attribute :type_integer, Shale::Type::Integer
     attribute :type_string, Shale::Type::String
@@ -19,6 +20,7 @@ module ComplexSpec__Types # rubocop:disable Naming/ClassAndModuleCamelCase
   class Root < Shale::Mapper
     attribute :type_boolean, Shale::Type::Boolean
     attribute :type_date, Shale::Type::Date
+    attribute :type_decimal, Shale::Type::Decimal
     attribute :type_float, Shale::Type::Float
     attribute :type_integer, Shale::Type::Integer
     attribute :type_string, Shale::Type::String
@@ -28,6 +30,7 @@ module ComplexSpec__Types # rubocop:disable Naming/ClassAndModuleCamelCase
 
     attribute :type_boolean_collection, Shale::Type::Boolean, collection: true
     attribute :type_date_collection, Shale::Type::Date, collection: true
+    attribute :type_decimal_collection, Shale::Type::Decimal, collection: true
     attribute :type_float_collection, Shale::Type::Float, collection: true
     attribute :type_integer_collection, Shale::Type::Integer, collection: true
     attribute :type_string_collection, Shale::Type::String, collection: true
@@ -38,6 +41,7 @@ module ComplexSpec__Types # rubocop:disable Naming/ClassAndModuleCamelCase
     csv do
       map 'type_boolean', to: :type_boolean
       map 'type_date', to: :type_date
+      map 'type_decimal', to: :type_decimal
       map 'type_float', to: :type_float
       map 'type_integer', to: :type_integer
       map 'type_string', to: :type_string
@@ -59,11 +63,76 @@ RSpec.describe Shale::Type::Complex do
   let(:mapper) { ComplexSpec__Types::Root }
 
   context 'with types' do
+    shared_examples 'maps to object' do
+      it 'maps to object' do
+        expect(instance.type_boolean).to eq(true)
+        expect(instance.type_date).to eq(Date.new(2022, 1, 1))
+        expect(instance.type_decimal).to eq(BigDecimal('1.1'))
+        expect(instance.type_float).to eq(1.1)
+        expect(instance.type_integer).to eq(1)
+        expect(instance.type_string).to eq('foo')
+        expect(instance.type_time).to eq(Time.new(2021, 1, 1, 10, 10, 10, '+01:00'))
+        expect(instance.type_value).to eq('foo')
+
+        expect(instance.child.type_boolean).to eq(true)
+        expect(instance.child.type_date).to eq(Date.new(2022, 1, 1))
+        expect(instance.child.type_decimal).to eq(BigDecimal('1.1'))
+        expect(instance.child.type_float).to eq(1.1)
+        expect(instance.child.type_integer).to eq(1)
+        expect(instance.child.type_string).to eq('foo')
+        expect(instance.child.type_time).to eq(Time.new(2021, 1, 1, 10, 10, 10, '+01:00'))
+        expect(instance.child.type_value).to eq('foo')
+
+        expect(instance.type_boolean_collection).to eq([true, false])
+        expect(instance.type_date_collection).to eq([
+                                                      Date.new(2022, 1, 1),
+                                                      Date.new(2022, 1, 2),
+                                                    ])
+        expect(instance.type_decimal_collection).to eq([BigDecimal('1.1'), BigDecimal('2.2')])
+        expect(instance.type_float_collection).to eq([1.1, 2.2])
+        expect(instance.type_integer_collection).to eq([1, 2])
+        expect(instance.type_string_collection).to eq(%w[foo bar])
+        expect(instance.type_time_collection).to eq([
+                                                      Time.new(2021, 1, 1, 10, 10, 10, '+01:00'),
+                                                      Time.new(2021, 1, 2, 10, 10, 10, '+01:00'),
+                                                    ])
+        # expect(instance.type_value_collection).to eq(['foo', 1, true])
+
+        expect(instance.child_collection[0].type_boolean).to eq(true)
+        expect(instance.child_collection[0].type_date).to eq(Date.new(2022, 1, 1))
+        expect(instance.child_collection[0].type_decimal).to eq(BigDecimal('1.1'))
+        expect(instance.child_collection[0].type_float).to eq(1.1)
+        expect(instance.child_collection[0].type_integer).to eq(1)
+        expect(instance.child_collection[0].type_string).to eq('foo')
+        expect(instance.child_collection[0].type_time).to eq(
+                                                            Time.new(2021, 1, 1, 10, 10, 10, '+01:00')
+                                                          )
+        expect(instance.child_collection[0].type_value).to eq('foo')
+
+        expect(instance.child_collection[1].type_boolean).to eq(true)
+        expect(instance.child_collection[1].type_date).to eq(Date.new(2022, 1, 1))
+        expect(instance.child_collection[1].type_decimal).to eq(BigDecimal('1.1'))
+        expect(instance.child_collection[1].type_float).to eq(1.1)
+        expect(instance.child_collection[1].type_integer).to eq(1)
+        expect(instance.child_collection[1].type_string).to eq('foo')
+        expect(instance.child_collection[1].type_time).to eq(
+                                                            Time.new(2021, 1, 1, 10, 10, 10, '+01:00')
+                                                          )
+        expect(instance.child_collection[1].type_value).to eq('foo')
+      end
+    end
+    shared_examples 'maps value collection to object' do
+      it 'maps value collection to object' do
+        expect(instance.type_value_collection).to eq(['foo', 1, true])
+      end
+    end
+
     context 'with hash mapping' do
       let(:hash) do
         {
           'type_boolean' => true,
           'type_date' => Date.new(2022, 1, 1),
+          'type_decimal' => BigDecimal('1.1'),
           'type_float' => 1.1,
           'type_integer' => 1,
           'type_string' => 'foo',
@@ -72,6 +141,7 @@ RSpec.describe Shale::Type::Complex do
           'child' => {
             'type_boolean' => true,
             'type_date' => Date.new(2022, 1, 1),
+            'type_decimal' => BigDecimal('1.1'),
             'type_float' => 1.1,
             'type_integer' => 1,
             'type_string' => 'foo',
@@ -80,6 +150,7 @@ RSpec.describe Shale::Type::Complex do
           },
           'type_boolean_collection' => [true, false],
           'type_date_collection' => [Date.new(2022, 1, 1), Date.new(2022, 1, 2)],
+          'type_decimal_collection' => [BigDecimal('1.1'), BigDecimal('2.2')],
           'type_float_collection' => [1.1, 2.2],
           'type_integer_collection' => [1, 2],
           'type_string_collection' => %w[foo bar],
@@ -92,6 +163,7 @@ RSpec.describe Shale::Type::Complex do
             {
               'type_boolean' => true,
               'type_date' => Date.new(2022, 1, 1),
+              'type_decimal' => BigDecimal('1.1'),
               'type_float' => 1.1,
               'type_integer' => 1,
               'type_string' => 'foo',
@@ -101,6 +173,7 @@ RSpec.describe Shale::Type::Complex do
             {
               'type_boolean' => true,
               'type_date' => Date.new(2022, 1, 1),
+              'type_decimal' => BigDecimal('1.1'),
               'type_float' => 1.1,
               'type_integer' => 1,
               'type_string' => 'foo',
@@ -110,67 +183,14 @@ RSpec.describe Shale::Type::Complex do
           ],
         }
       end
+      let(:instance) { mapper.from_hash(hash) }
 
       describe '.from_hash' do
-        it 'maps hash to object' do
-          instance = mapper.from_hash(hash)
-
-          expect(instance.type_boolean).to eq(true)
-          expect(instance.type_date).to eq(Date.new(2022, 1, 1))
-          expect(instance.type_float).to eq(1.1)
-          expect(instance.type_integer).to eq(1)
-          expect(instance.type_string).to eq('foo')
-          expect(instance.type_time).to eq(Time.new(2021, 1, 1, 10, 10, 10, '+01:00'))
-          expect(instance.type_value).to eq('foo')
-
-          expect(instance.child.type_boolean).to eq(true)
-          expect(instance.child.type_date).to eq(Date.new(2022, 1, 1))
-          expect(instance.child.type_float).to eq(1.1)
-          expect(instance.child.type_integer).to eq(1)
-          expect(instance.child.type_string).to eq('foo')
-          expect(instance.child.type_time).to eq(Time.new(2021, 1, 1, 10, 10, 10, '+01:00'))
-          expect(instance.child.type_value).to eq('foo')
-
-          expect(instance.type_boolean_collection).to eq([true, false])
-          expect(instance.type_date_collection).to eq([
-            Date.new(2022, 1, 1),
-            Date.new(2022, 1, 2),
-          ])
-          expect(instance.type_float_collection).to eq([1.1, 2.2])
-          expect(instance.type_integer_collection).to eq([1, 2])
-          expect(instance.type_string_collection).to eq(%w[foo bar])
-          expect(instance.type_time_collection).to eq([
-            Time.new(2021, 1, 1, 10, 10, 10, '+01:00'),
-            Time.new(2021, 1, 2, 10, 10, 10, '+01:00'),
-          ])
-          expect(instance.type_value_collection).to eq(['foo', 1, true])
-
-          expect(instance.child_collection[0].type_boolean).to eq(true)
-          expect(instance.child_collection[0].type_date).to eq(Date.new(2022, 1, 1))
-          expect(instance.child_collection[0].type_float).to eq(1.1)
-          expect(instance.child_collection[0].type_integer).to eq(1)
-          expect(instance.child_collection[0].type_string).to eq('foo')
-          expect(instance.child_collection[0].type_time).to eq(
-            Time.new(2021, 1, 1, 10, 10, 10, '+01:00')
-          )
-          expect(instance.child_collection[0].type_value).to eq('foo')
-
-          expect(instance.child_collection[1].type_boolean).to eq(true)
-          expect(instance.child_collection[1].type_date).to eq(Date.new(2022, 1, 1))
-          expect(instance.child_collection[1].type_float).to eq(1.1)
-          expect(instance.child_collection[1].type_integer).to eq(1)
-          expect(instance.child_collection[1].type_string).to eq('foo')
-          expect(instance.child_collection[1].type_time).to eq(
-            Time.new(2021, 1, 1, 10, 10, 10, '+01:00')
-          )
-          expect(instance.child_collection[1].type_value).to eq('foo')
-        end
+        include_examples 'maps to object'
       end
 
       describe '.to_hash' do
         it 'converts objects to hash' do
-          instance = mapper.from_hash(hash)
-
           result = instance.to_hash
           expect(result).to eq(hash)
         end
@@ -183,6 +203,7 @@ RSpec.describe Shale::Type::Complex do
           {
             "type_boolean": true,
             "type_date": "2022-01-01",
+            "type_decimal": 1.1,
             "type_float": 1.1,
             "type_integer": 1,
             "type_string": "foo",
@@ -191,6 +212,7 @@ RSpec.describe Shale::Type::Complex do
             "child": {
               "type_boolean": true,
               "type_date": "2022-01-01",
+              "type_decimal": 1.1,
               "type_float": 1.1,
               "type_integer": 1,
               "type_string": "foo",
@@ -204,6 +226,10 @@ RSpec.describe Shale::Type::Complex do
             "type_date_collection": [
               "2022-01-01",
               "2022-01-02"
+            ],
+            "type_decimal_collection": [
+              1.1,
+              2.2
             ],
             "type_float_collection": [
               1.1,
@@ -230,6 +256,7 @@ RSpec.describe Shale::Type::Complex do
               {
                 "type_boolean": true,
                 "type_date": "2022-01-01",
+                "type_decimal": 1.1,
                 "type_float": 1.1,
                 "type_integer": 1,
                 "type_string": "foo",
@@ -239,6 +266,7 @@ RSpec.describe Shale::Type::Complex do
               {
                 "type_boolean": true,
                 "type_date": "2022-01-01",
+                "type_decimal": 1.1,
                 "type_float": 1.1,
                 "type_integer": 1,
                 "type_string": "foo",
@@ -249,67 +277,15 @@ RSpec.describe Shale::Type::Complex do
           }
         DOC
       end
+      let(:instance) { mapper.from_json(json) }
 
       describe '.from_json' do
-        it 'maps JSON to object' do
-          instance = mapper.from_json(json)
-
-          expect(instance.type_boolean).to eq(true)
-          expect(instance.type_date).to eq(Date.new(2022, 1, 1))
-          expect(instance.type_float).to eq(1.1)
-          expect(instance.type_integer).to eq(1)
-          expect(instance.type_string).to eq('foo')
-          expect(instance.type_time).to eq(Time.new(2021, 1, 1, 10, 10, 10, '+01:00'))
-          expect(instance.type_value).to eq('foo')
-
-          expect(instance.child.type_boolean).to eq(true)
-          expect(instance.child.type_date).to eq(Date.new(2022, 1, 1))
-          expect(instance.child.type_float).to eq(1.1)
-          expect(instance.child.type_integer).to eq(1)
-          expect(instance.child.type_string).to eq('foo')
-          expect(instance.child.type_time).to eq(Time.new(2021, 1, 1, 10, 10, 10, '+01:00'))
-          expect(instance.child.type_value).to eq('foo')
-
-          expect(instance.type_boolean_collection).to eq([true, false])
-          expect(instance.type_date_collection).to eq([
-            Date.new(2022, 1, 1),
-            Date.new(2022, 1, 2),
-          ])
-          expect(instance.type_float_collection).to eq([1.1, 2.2])
-          expect(instance.type_integer_collection).to eq([1, 2])
-          expect(instance.type_string_collection).to eq(%w[foo bar])
-          expect(instance.type_time_collection).to eq([
-            Time.new(2021, 1, 1, 10, 10, 10, '+01:00'),
-            Time.new(2021, 1, 2, 10, 10, 10, '+01:00'),
-          ])
-          expect(instance.type_value_collection).to eq(['foo', 1, true])
-
-          expect(instance.child_collection[0].type_boolean).to eq(true)
-          expect(instance.child_collection[0].type_date).to eq(Date.new(2022, 1, 1))
-          expect(instance.child_collection[0].type_float).to eq(1.1)
-          expect(instance.child_collection[0].type_integer).to eq(1)
-          expect(instance.child_collection[0].type_string).to eq('foo')
-          expect(instance.child_collection[0].type_time).to eq(
-            Time.new(2021, 1, 1, 10, 10, 10, '+01:00')
-          )
-          expect(instance.child_collection[0].type_value).to eq('foo')
-
-          expect(instance.child_collection[1].type_boolean).to eq(true)
-          expect(instance.child_collection[1].type_date).to eq(Date.new(2022, 1, 1))
-          expect(instance.child_collection[1].type_float).to eq(1.1)
-          expect(instance.child_collection[1].type_integer).to eq(1)
-          expect(instance.child_collection[1].type_string).to eq('foo')
-          expect(instance.child_collection[1].type_time).to eq(
-            Time.new(2021, 1, 1, 10, 10, 10, '+01:00')
-          )
-          expect(instance.child_collection[1].type_value).to eq('foo')
-        end
+        include_examples 'maps to object'
+        include_examples 'maps value collection to object'
       end
 
       describe '.to_json' do
         it 'converts objects to JSON' do
-          instance = mapper.from_json(json)
-
           result = instance.to_json(pretty: true)
           expect(result).to eq(json.gsub(/\n\z/, ''))
         end
@@ -322,6 +298,7 @@ RSpec.describe Shale::Type::Complex do
           ---
           type_boolean: true
           type_date: '2022-01-01'
+          type_decimal: 1.1
           type_float: 1.1
           type_integer: 1
           type_string: foo
@@ -330,6 +307,7 @@ RSpec.describe Shale::Type::Complex do
           child:
             type_boolean: true
             type_date: '2022-01-01'
+            type_decimal: 1.1
             type_float: 1.1
             type_integer: 1
             type_string: foo
@@ -341,6 +319,9 @@ RSpec.describe Shale::Type::Complex do
           type_date_collection:
           - '2022-01-01'
           - '2022-01-02'
+          type_decimal_collection:
+          - 1.1
+          - 2.2
           type_float_collection:
           - 1.1
           - 2.2
@@ -360,6 +341,7 @@ RSpec.describe Shale::Type::Complex do
           child_collection:
           - type_boolean: true
             type_date: '2022-01-01'
+            type_decimal: 1.1
             type_float: 1.1
             type_integer: 1
             type_string: foo
@@ -367,6 +349,7 @@ RSpec.describe Shale::Type::Complex do
             type_value: foo
           - type_boolean: true
             type_date: '2022-01-01'
+            type_decimal: 1.1
             type_float: 1.1
             type_integer: 1
             type_string: foo
@@ -374,67 +357,15 @@ RSpec.describe Shale::Type::Complex do
             type_value: foo
         DOC
       end
+      let(:instance) { mapper.from_yaml(yaml) }
 
       describe '.from_yaml' do
-        it 'maps YAML to object' do
-          instance = mapper.from_yaml(yaml)
-
-          expect(instance.type_boolean).to eq(true)
-          expect(instance.type_date).to eq(Date.new(2022, 1, 1))
-          expect(instance.type_float).to eq(1.1)
-          expect(instance.type_integer).to eq(1)
-          expect(instance.type_string).to eq('foo')
-          expect(instance.type_time).to eq(Time.new(2021, 1, 1, 10, 10, 10, '+01:00'))
-          expect(instance.type_value).to eq('foo')
-
-          expect(instance.child.type_boolean).to eq(true)
-          expect(instance.child.type_date).to eq(Date.new(2022, 1, 1))
-          expect(instance.child.type_float).to eq(1.1)
-          expect(instance.child.type_integer).to eq(1)
-          expect(instance.child.type_string).to eq('foo')
-          expect(instance.child.type_time).to eq(Time.new(2021, 1, 1, 10, 10, 10, '+01:00'))
-          expect(instance.child.type_value).to eq('foo')
-
-          expect(instance.type_boolean_collection).to eq([true, false])
-          expect(instance.type_date_collection).to eq([
-            Date.new(2022, 1, 1),
-            Date.new(2022, 1, 2),
-          ])
-          expect(instance.type_float_collection).to eq([1.1, 2.2])
-          expect(instance.type_integer_collection).to eq([1, 2])
-          expect(instance.type_string_collection).to eq(%w[foo bar])
-          expect(instance.type_time_collection).to eq([
-            Time.new(2021, 1, 1, 10, 10, 10, '+01:00'),
-            Time.new(2021, 1, 2, 10, 10, 10, '+01:00'),
-          ])
-          expect(instance.type_value_collection).to eq(['foo', 1, true])
-
-          expect(instance.child_collection[0].type_boolean).to eq(true)
-          expect(instance.child_collection[0].type_date).to eq(Date.new(2022, 1, 1))
-          expect(instance.child_collection[0].type_float).to eq(1.1)
-          expect(instance.child_collection[0].type_integer).to eq(1)
-          expect(instance.child_collection[0].type_string).to eq('foo')
-          expect(instance.child_collection[0].type_time).to eq(
-            Time.new(2021, 1, 1, 10, 10, 10, '+01:00')
-          )
-          expect(instance.child_collection[0].type_value).to eq('foo')
-
-          expect(instance.child_collection[1].type_boolean).to eq(true)
-          expect(instance.child_collection[1].type_date).to eq(Date.new(2022, 1, 1))
-          expect(instance.child_collection[1].type_float).to eq(1.1)
-          expect(instance.child_collection[1].type_integer).to eq(1)
-          expect(instance.child_collection[1].type_string).to eq('foo')
-          expect(instance.child_collection[1].type_time).to eq(
-            Time.new(2021, 1, 1, 10, 10, 10, '+01:00')
-          )
-          expect(instance.child_collection[1].type_value).to eq('foo')
-        end
+        include_examples 'maps to object'
+        include_examples 'maps value collection to object'
       end
 
       describe '.to_yaml' do
         it 'converts objects to YAML' do
-          instance = mapper.from_yaml(yaml)
-
           result = instance.to_yaml
           expect(result).to eq(yaml)
         end
@@ -446,6 +377,7 @@ RSpec.describe Shale::Type::Complex do
         <<~DOC
           type_boolean = true
           type_date = 2022-01-01
+          type_decimal = 1.1
           type_float = 1.1
           type_integer = 1
           type_string = "foo"
@@ -453,6 +385,7 @@ RSpec.describe Shale::Type::Complex do
           type_value = "foo"
           type_boolean_collection = [ true, false ]
           type_date_collection = [ 2022-01-01, 2022-01-02 ]
+          type_decimal_collection = [ 1.1, 2.2 ]
           type_float_collection = [ 1.1, 2.2 ]
           type_integer_collection = [ 1, 2 ]
           type_string_collection = [ "foo", "bar" ]
@@ -462,6 +395,7 @@ RSpec.describe Shale::Type::Complex do
           [child]
           type_boolean = true
           type_date = 2022-01-01
+          type_decimal = 1.1
           type_float = 1.1
           type_integer = 1
           type_string = "foo"
@@ -471,6 +405,7 @@ RSpec.describe Shale::Type::Complex do
           [[child_collection]]
           type_boolean = true
           type_date = 2022-01-01
+          type_decimal = 1.1
           type_float = 1.1
           type_integer = 1
           type_string = "foo"
@@ -480,6 +415,7 @@ RSpec.describe Shale::Type::Complex do
           [[child_collection]]
           type_boolean = true
           type_date = 2022-01-01
+          type_decimal = 1.1
           type_float = 1.1
           type_integer = 1
           type_string = "foo"
@@ -487,67 +423,15 @@ RSpec.describe Shale::Type::Complex do
           type_value = "foo"
         DOC
       end
+      let(:instance) { mapper.from_toml(toml) }
 
       describe '.from_toml' do
-        it 'maps TOML to object' do
-          instance = mapper.from_toml(toml)
-
-          expect(instance.type_boolean).to eq(true)
-          expect(instance.type_date).to eq(Date.new(2022, 1, 1))
-          expect(instance.type_float).to eq(1.1)
-          expect(instance.type_integer).to eq(1)
-          expect(instance.type_string).to eq('foo')
-          expect(instance.type_time).to eq(Time.new(2021, 1, 1, 10, 10, 10, '+01:00'))
-          expect(instance.type_value).to eq('foo')
-
-          expect(instance.child.type_boolean).to eq(true)
-          expect(instance.child.type_date).to eq(Date.new(2022, 1, 1))
-          expect(instance.child.type_float).to eq(1.1)
-          expect(instance.child.type_integer).to eq(1)
-          expect(instance.child.type_string).to eq('foo')
-          expect(instance.child.type_time).to eq(Time.new(2021, 1, 1, 10, 10, 10, '+01:00'))
-          expect(instance.child.type_value).to eq('foo')
-
-          expect(instance.type_boolean_collection).to eq([true, false])
-          expect(instance.type_date_collection).to eq([
-            Date.new(2022, 1, 1),
-            Date.new(2022, 1, 2),
-          ])
-          expect(instance.type_float_collection).to eq([1.1, 2.2])
-          expect(instance.type_integer_collection).to eq([1, 2])
-          expect(instance.type_string_collection).to eq(%w[foo bar])
-          expect(instance.type_time_collection).to eq([
-            Time.new(2021, 1, 1, 10, 10, 10, '+01:00'),
-            Time.new(2021, 1, 2, 10, 10, 10, '+01:00'),
-          ])
-          expect(instance.type_value_collection).to eq(['foo', 1, true])
-
-          expect(instance.child_collection[0].type_boolean).to eq(true)
-          expect(instance.child_collection[0].type_date).to eq(Date.new(2022, 1, 1))
-          expect(instance.child_collection[0].type_float).to eq(1.1)
-          expect(instance.child_collection[0].type_integer).to eq(1)
-          expect(instance.child_collection[0].type_string).to eq('foo')
-          expect(instance.child_collection[0].type_time).to eq(
-            Time.new(2021, 1, 1, 10, 10, 10, '+01:00')
-          )
-          expect(instance.child_collection[0].type_value).to eq('foo')
-
-          expect(instance.child_collection[1].type_boolean).to eq(true)
-          expect(instance.child_collection[1].type_date).to eq(Date.new(2022, 1, 1))
-          expect(instance.child_collection[1].type_float).to eq(1.1)
-          expect(instance.child_collection[1].type_integer).to eq(1)
-          expect(instance.child_collection[1].type_string).to eq('foo')
-          expect(instance.child_collection[1].type_time).to eq(
-            Time.new(2021, 1, 1, 10, 10, 10, '+01:00')
-          )
-          expect(instance.child_collection[1].type_value).to eq('foo')
-        end
+        include_examples 'maps to object'
+        include_examples 'maps value collection to object'
       end
 
       describe '.to_toml' do
         it 'converts objects to TOML' do
-          instance = mapper.from_toml(toml)
-
           result = instance.to_toml
           expect(result).to eq(toml)
         end
@@ -557,7 +441,7 @@ RSpec.describe Shale::Type::Complex do
     context 'with CSV mapping' do
       let(:csv) do
         <<~DOC
-          true,2022-01-01,1.1,1,foo,2021-01-01T10:10:10+01:00,foo
+          true,2022-01-01,1.1,1.1,1,foo,2021-01-01T10:10:10+01:00,foo
         DOC
       end
 
@@ -567,6 +451,7 @@ RSpec.describe Shale::Type::Complex do
 
           expect(instance.type_boolean).to eq(true)
           expect(instance.type_date).to eq(Date.new(2022, 1, 1))
+          expect(instance.type_decimal).to eq(BigDecimal('1.1'))
           expect(instance.type_float).to eq(1.1)
           expect(instance.type_integer).to eq(1)
           expect(instance.type_string).to eq('foo')
@@ -591,6 +476,7 @@ RSpec.describe Shale::Type::Complex do
           <root>
             <type_boolean>true</type_boolean>
             <type_date>2022-01-01</type_date>
+            <type_decimal>1.1</type_decimal>
             <type_float>1.1</type_float>
             <type_integer>1</type_integer>
             <type_string>foo</type_string>
@@ -599,6 +485,7 @@ RSpec.describe Shale::Type::Complex do
             <child>
               <type_boolean>true</type_boolean>
               <type_date>2022-01-01</type_date>
+              <type_decimal>1.1</type_decimal>
               <type_float>1.1</type_float>
               <type_integer>1</type_integer>
               <type_string>foo</type_string>
@@ -609,6 +496,8 @@ RSpec.describe Shale::Type::Complex do
             <type_boolean_collection>false</type_boolean_collection>
             <type_date_collection>2022-01-01</type_date_collection>
             <type_date_collection>2022-01-02</type_date_collection>
+            <type_decimal_collection>1.1</type_decimal_collection>
+            <type_decimal_collection>2.2</type_decimal_collection>
             <type_float_collection>1.1</type_float_collection>
             <type_float_collection>2.2</type_float_collection>
             <type_integer_collection>1</type_integer_collection>
@@ -623,6 +512,7 @@ RSpec.describe Shale::Type::Complex do
             <child_collection>
               <type_boolean>true</type_boolean>
               <type_date>2022-01-01</type_date>
+              <type_decimal>1.1</type_decimal>
               <type_float>1.1</type_float>
               <type_integer>1</type_integer>
               <type_string>foo</type_string>
@@ -632,6 +522,7 @@ RSpec.describe Shale::Type::Complex do
             <child_collection>
               <type_boolean>true</type_boolean>
               <type_date>2022-01-01</type_date>
+              <type_decimal>1.1</type_decimal>
               <type_float>1.1</type_float>
               <type_integer>1</type_integer>
               <type_string>foo</type_string>
@@ -641,67 +532,18 @@ RSpec.describe Shale::Type::Complex do
           </root>
         DOC
       end
+      let(:instance) { mapper.from_xml(xml) }
 
       describe '.from_xml' do
-        it 'maps XML to object' do
-          instance = mapper.from_xml(xml)
+        include_examples 'maps to object'
 
-          expect(instance.type_boolean).to eq(true)
-          expect(instance.type_date).to eq(Date.new(2022, 1, 1))
-          expect(instance.type_float).to eq(1.1)
-          expect(instance.type_integer).to eq(1)
-          expect(instance.type_string).to eq('foo')
-          expect(instance.type_time).to eq(Time.new(2021, 1, 1, 10, 10, 10, '+01:00'))
-          expect(instance.type_value).to eq('foo')
-
-          expect(instance.child.type_boolean).to eq(true)
-          expect(instance.child.type_date).to eq(Date.new(2022, 1, 1))
-          expect(instance.child.type_float).to eq(1.1)
-          expect(instance.child.type_integer).to eq(1)
-          expect(instance.child.type_string).to eq('foo')
-          expect(instance.child.type_time).to eq(Time.new(2021, 1, 1, 10, 10, 10, '+01:00'))
-          expect(instance.child.type_value).to eq('foo')
-
-          expect(instance.type_boolean_collection).to eq([true, false])
-          expect(instance.type_date_collection).to eq([
-            Date.new(2022, 1, 1),
-            Date.new(2022, 1, 2),
-          ])
-          expect(instance.type_float_collection).to eq([1.1, 2.2])
-          expect(instance.type_integer_collection).to eq([1, 2])
-          expect(instance.type_string_collection).to eq(%w[foo bar])
-          expect(instance.type_time_collection).to eq([
-            Time.new(2021, 1, 1, 10, 10, 10, '+01:00'),
-            Time.new(2021, 1, 2, 10, 10, 10, '+01:00'),
-          ])
+        it 'maps value collection to object as strings' do
           expect(instance.type_value_collection).to eq(%w[foo 1 true])
-
-          expect(instance.child_collection[0].type_boolean).to eq(true)
-          expect(instance.child_collection[0].type_date).to eq(Date.new(2022, 1, 1))
-          expect(instance.child_collection[0].type_float).to eq(1.1)
-          expect(instance.child_collection[0].type_integer).to eq(1)
-          expect(instance.child_collection[0].type_string).to eq('foo')
-          expect(instance.child_collection[0].type_time).to eq(
-            Time.new(2021, 1, 1, 10, 10, 10, '+01:00')
-          )
-          expect(instance.child_collection[0].type_value).to eq('foo')
-
-          expect(instance.child_collection[1].type_boolean).to eq(true)
-          expect(instance.child_collection[1].type_date).to eq(Date.new(2022, 1, 1))
-          expect(instance.child_collection[1].type_float).to eq(1.1)
-          expect(instance.child_collection[1].type_integer).to eq(1)
-          expect(instance.child_collection[1].type_string).to eq('foo')
-          expect(instance.child_collection[1].type_time).to eq(
-            Time.new(2021, 1, 1, 10, 10, 10, '+01:00')
-          )
-          expect(instance.child_collection[1].type_value).to eq('foo')
         end
       end
 
       describe '.to_xml' do
         it 'converts objects to XML' do
-          instance = mapper.from_xml(xml)
-
           result = instance.to_xml(pretty: true)
           expect(result).to eq(xml.gsub(/\n\z/, ''))
         end

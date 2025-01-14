@@ -52,6 +52,7 @@ module Shale
       register_xml_type(Shale::Type::Boolean, 'boolean')
       register_xml_type(Shale::Type::Date, 'date')
       register_xml_type(Shale::Type::Float, 'decimal')
+      register_xml_type(Shale::Type::Decimal, 'decimal')
       register_xml_type(Shale::Type::Integer, 'integer')
       register_xml_type(Shale::Type::Time, 'dateTime')
       register_xml_type(Shale::Type::Value, 'anyType')
