@@ -851,7 +851,7 @@ RSpec.describe Shale::Schema::XMLCompiler do
                 <xs:totalDigits value="12"/>
               </xs:restriction>
             </xs:simpleType>
-            
+
             <xs:complexType name="complex3">
               <xs:simpleContent>
                 <xs:extension base="decimal125">

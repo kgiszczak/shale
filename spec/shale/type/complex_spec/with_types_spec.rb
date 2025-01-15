@@ -85,17 +85,17 @@ RSpec.describe Shale::Type::Complex do
 
         expect(instance.type_boolean_collection).to eq([true, false])
         expect(instance.type_date_collection).to eq([
-                                                      Date.new(2022, 1, 1),
-                                                      Date.new(2022, 1, 2),
-                                                    ])
+          Date.new(2022, 1, 1),
+          Date.new(2022, 1, 2),
+        ])
         expect(instance.type_decimal_collection).to eq([BigDecimal('1.1'), BigDecimal('2.2')])
         expect(instance.type_float_collection).to eq([1.1, 2.2])
         expect(instance.type_integer_collection).to eq([1, 2])
         expect(instance.type_string_collection).to eq(%w[foo bar])
         expect(instance.type_time_collection).to eq([
-                                                      Time.new(2021, 1, 1, 10, 10, 10, '+01:00'),
-                                                      Time.new(2021, 1, 2, 10, 10, 10, '+01:00'),
-                                                    ])
+          Time.new(2021, 1, 1, 10, 10, 10, '+01:00'),
+          Time.new(2021, 1, 2, 10, 10, 10, '+01:00'),
+        ])
         # expect(instance.type_value_collection).to eq(['foo', 1, true])
 
         expect(instance.child_collection[0].type_boolean).to eq(true)
