@@ -111,7 +111,7 @@ module Shale
       # XML Schema "decimal" types
       # @api private
       XS_TYPE_DECIMAL = [
-        "#{XS_NAMESPACE_URI}:decimal"
+        "#{XS_NAMESPACE_URI}:decimal",
       ].freeze
 
       # XML Schema "integer" types

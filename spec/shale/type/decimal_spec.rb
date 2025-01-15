@@ -12,8 +12,8 @@ RSpec.describe Shale::Type::Decimal do
 
     context 'when value is float' do
       it 'returns BigDecimal number' do
-        expect(described_class.cast(123.123)).to eq(BigDecimal("123.123"))
-        expect(described_class.cast(123.33)).to eq(BigDecimal("123.33"))
+        expect(described_class.cast(123.123)).to eq(BigDecimal('123.123'))
+        expect(described_class.cast(123.33)).to eq(BigDecimal('123.33'))
       end
     end
 
@@ -37,7 +37,7 @@ RSpec.describe Shale::Type::Decimal do
 
     context 'when value is anything other' do
       it 'returns BigDecimal value' do
-        expect(described_class.cast('123.123')).to eq(BigDecimal("123.123"))
+        expect(described_class.cast('123.123')).to eq(BigDecimal('123.123'))
       end
     end
   end
