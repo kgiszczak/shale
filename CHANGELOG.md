@@ -1,3 +1,8 @@
+## [unreleased]
+
+### Fixed
+- [ollietulloch] Allow `Shale::Mapper` attributes to define a `schema`
+
 ## [1.2.1] - 2025-01-09
 
 ### Fixed
