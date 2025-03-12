@@ -87,7 +87,7 @@ module Shale
             next unless attribute
 
             if mapper_type?(attribute.type)
-              json_type = Ref.new(mapping.name, attribute.type.model.name)
+              json_type = Ref.new(mapping.name, attribute.type.model.name, schema: mapping.schema)
             else
               json_klass = self.class.get_json_type(attribute.type)
 

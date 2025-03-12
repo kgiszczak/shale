@@ -83,6 +83,12 @@ module ShaleSchemaJSONGeneratorTesting
     attribute :first_name, :string
     attribute :last_name, :string
     attribute :address, AddressMapper
+
+    json do
+      map 'first_name', to: :first_name
+      map 'last_name', to: :last_name
+      map 'address', to: :address, schema: { required: true }
+    end
   end
 end
 
@@ -319,6 +325,7 @@ RSpec.describe Shale::Schema::JSONGenerator do
                 'last_name' => { 'type' => %w[string null] },
                 'address' => { '$ref' => '#/$defs/ShaleSchemaJSONGeneratorTesting_Address' },
               },
+              'required' => ['address'],
             },
           },
         }
