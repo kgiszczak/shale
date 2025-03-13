@@ -1,4 +1,7 @@
-## [unreleased]
+## [1.2.2] - 2025-03-13
+
+### Added
+- [kjeldahl] Adds BigDecimal mapper
 
 ### Fixed
 - [ollietulloch] Allow `Shale::Mapper` attributes to define a `schema`
