@@ -9,8 +9,8 @@ module Shale
       #
       # @api private
       class Ref < Base
-        def initialize(name, type)
-          super(name)
+        def initialize(name, type, schema: nil)
+          super(name, schema: schema)
           @type = type.gsub('::', '_')
         end
 
