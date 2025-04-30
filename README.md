@@ -1211,6 +1211,7 @@ Shale supports these types out of the box:
 - `:boolean` (`Shale::Type::Boolean`)
 - `:date` (`Shale::Type::Date`)
 - `:float` (`Shale::Type::Float`)
+- `:decimal` (`Shale::Type::Decimal`)
 - `:integer` (`Shale::Type::Integer`)
 - `:string` (`Shale::Type::String`)
 - `:time` (`Shale::Type::Time`)
