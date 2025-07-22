@@ -378,7 +378,7 @@ but you can use methods to map properties to complex types
 (see [Using methods to extract and generate data](#using-methods-to-extract-and-generate-data)
 section).
 
-`.from_csv` method allways returns an array of records.
+`.from_csv` method always returns an array of records.
 
 ```ruby
 people = Person.from_csv(<<~DATA)
@@ -758,7 +758,7 @@ end
 
 ### Using methods to extract and generate data
 
-If you need full controll over extracting and generating data from/to document,
+If you need full control over extracting and generating data from/to document,
 you can use methods to do so:
 
 ```ruby
@@ -1041,7 +1041,7 @@ person.to_json(pretty: true)
 ```
 
 You can also add an XML declaration by passing `declaration: true` and `encoding: true`
-or if you want to spcify version: `declaration: '1.1'` and `encoding: 'ASCII'` to `#to_xml`
+or if you want to specify version: `declaration: '1.1'` and `encoding: 'ASCII'` to `#to_xml`
 
 ```ruby
 person.to_xml(pretty: true, declaration: true, encoding: true)
