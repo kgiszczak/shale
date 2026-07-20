@@ -1,18 +1,18 @@
 # Shale
 
-Shale is a Ruby object mapper and serializer for JSON, YAML, TOML, CSV and XML.
-It allows you to parse JSON, YAML, TOML, CSV and XML data and convert it into Ruby data structures,
-as well as serialize data structures into JSON, YAML, TOML, CSV or XML.
+Shale is a Ruby object mapper and serializer for JSON, YAML, TOML, CSV, XML and x-www-form-urlencoded.
+It allows you to parse JSON, YAML, TOML, CSV, XML and x-www-form-urlencoded data and convert it into Ruby data structures,
+as well as serialize data structures into JSON, YAML, TOML, CSV, XML or x-www-form-urlencoded.
 
 Documentation with interactive examples is available at [Shale website](https://www.shalerb.org)
 
 ## Features
 
-* Convert JSON, YAML, TOML, CSV and XML to Ruby data model
-* Convert Ruby data model to JSON, YAML, TOML, CSV and XML
+* Convert JSON, YAML, TOML, CSV, XML and x-www-form-urlencoded to Ruby data model
+* Convert Ruby data model to JSON, YAML, TOML, CSV, XML and x-www-form-urlencoded
 * Generate JSON and XML Schema from Ruby models
 * Compile JSON and XML Schema into Ruby models
-* Out of the box support for JSON, YAML, Tomlib, toml-rb, CSV, Nokogiri, REXML and Ox parsers
+* Out of the box support for JSON, YAML, Tomlib, toml-rb, CSV, Nokogiri, REXML, Ox, Rack x-www-form-urlencoded parsers
 * Support for custom adapters
 
 ## Installation
@@ -53,10 +53,13 @@ $ gem install shale
 * [Converting object to XML](#converting-object-to-xml)
 * [Converting CSV to object](#converting-csv-to-object)
 * [Converting object to CSV](#converting-object-to-csv)
+* [Converting urlencoded to object](#converting-urlencoded-to-object)
+* [Converting object to urlencoded](#converting-object-to-urlencoded)
 * [Converting collections](#converting-collections)
 * [Mapping JSON keys to object attributes](#mapping-json-keys-to-object-attributes)
 * [Mapping YAML keys to object attributes](#mapping-yaml-keys-to-object-attributes)
 * [Mapping TOML keys to object attributes](#mapping-toml-keys-to-object-attributes)
+* [Mapping urlencoded keys to object attributes](#mapping-urlencoded-keys-to-object-attributes)
 * [Mapping CSV columns to object attributes](#mapping-csv-columns-to-object-attributes)
 * [Mapping Hash keys to object attributes](#mapping-hash-keys-to-object-attributes)
 * [Mapping XML elements and attributes to object attributes](#mapping-xml-elements-and-attributes-to-object-attributes)
@@ -396,6 +399,41 @@ people[0].to_csv # or Person.to_csv(people) if you want to convert a collection
 # John,Doe,50,false
 ```
 
+### Converting urlencoded to object
+
+To use x-www-form-urlencoded with Shale you have to set an adapter.
+Shale comes with adapter for [rack/utils](https://github.com/rack/rack).
+For details see [Adapters](#adapters) section.
+
+To set it, first make sure the `rack` gem is installed:
+
+```
+$ gem install rack
+```
+
+then setup the adapter:
+
+```ruby
+require 'shale/adapter/rack_url_encoded'
+Shale.urlencoded_adapter = Shale::Adapter::RackURLEncoded
+```
+
+Now you can use x-www-form-urlencoded data with Shale.
+
+`.from_urlencoded` method always returns an array of records.
+
+```ruby
+person = Person.from_urlencoded("first_name=John&last_name=Doe&age=50&married=false")
+```
+
+### Converting object to urlencoded
+
+```ruby
+person.to_urlencoded
+
+# => "first_name=John&last_name=Doe&age=50&married=false"
+```
+
 ### Converting collections
 
 Shale allows converting collections for formats that support it (JSON, YAML and CSV).
@@ -475,6 +513,24 @@ class Person < Shale::Mapper
   attribute :last_name, :string
 
   toml do
+    map 'firstName', to: :first_name
+    map 'lastName', to: :last_name
+  end
+end
+```
+
+### Mapping urlencoded keys to object attributes
+
+By default keys are named the same as attributes. To use custom keys use:
+
+:warning: **Declaring custom mapping removes default mapping for given format!**
+
+```ruby
+class Person < Shale::Mapper
+  attribute :first_name, :string
+  attribute :last_name, :string
+
+  urlencoded do
     map 'firstName', to: :first_name
     map 'lastName', to: :last_name
   end
@@ -1325,6 +1381,14 @@ Shale.xml_adapter = Shale::Adapter::Nokogiri
 
 require 'shale/adapter/ox'
 Shale.xml_adapter = Shale::Adapter::Ox
+```
+
+To handle x-www-form-urlencoded documents you have to set the urlencoded adapter. Shale provides an adapter for the `rack/utils` parser:
+
+```ruby
+require 'shale'
+require 'shale/adapter/rack_url_encoded'
+Shale.urlencoded_adapter = Shale::Adapter::RackURLEncoded
 ```
 
 ### Generating JSON Schema

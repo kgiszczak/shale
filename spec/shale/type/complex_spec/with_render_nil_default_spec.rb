@@ -3,6 +3,7 @@
 require 'shale'
 require 'shale/adapter/rexml'
 require 'shale/adapter/csv'
+require 'shale/adapter/rack_url_encoded'
 require 'tomlib'
 
 module ComplexSpec__RenderNilDefault # rubocop:disable Naming/ClassAndModuleCamelCase
@@ -10,6 +11,11 @@ module ComplexSpec__RenderNilDefault # rubocop:disable Naming/ClassAndModuleCame
     attribute :base, Shale::Type::String
 
     hsh do
+      render_nil true
+      map 'base', to: :base
+    end
+
+    urlencoded do
       render_nil true
       map 'base', to: :base
     end
@@ -40,6 +46,11 @@ module ComplexSpec__RenderNilDefault # rubocop:disable Naming/ClassAndModuleCame
     attribute :bar, Shale::Type::String
 
     hsh do
+      map 'foo', to: :foo
+      map 'bar', to: :bar
+    end
+
+    urlencoded do
       map 'foo', to: :foo
       map 'bar', to: :bar
     end
@@ -75,6 +86,12 @@ module ComplexSpec__RenderNilDefault # rubocop:disable Naming/ClassAndModuleCame
       map 'bar', to: :bar
     end
 
+    urlencoded do
+      render_nil false
+      map 'foo', to: :foo
+      map 'bar', to: :bar
+    end
+
     json do
       render_nil false
       map 'foo', to: :foo
@@ -105,6 +122,11 @@ module ComplexSpec__RenderNilDefault # rubocop:disable Naming/ClassAndModuleCame
     attribute :bar, Shale::Type::String
 
     hsh do
+      map 'foo', to: :foo
+      map 'bar', to: :bar, render_nil: false
+    end
+
+    urlencoded do
       map 'foo', to: :foo
       map 'bar', to: :bar, render_nil: false
     end
@@ -200,6 +222,7 @@ RSpec.describe Shale::Type::Complex do
     Shale.toml_adapter = Tomlib
     Shale.csv_adapter = Shale::Adapter::CSV
     Shale.xml_adapter = Shale::Adapter::REXML
+    Shale.urlencoded_adapter = Shale::Adapter::RackURLEncoded
   end
 
   context 'with render_nil default' do
@@ -209,6 +232,13 @@ RSpec.describe Shale::Type::Complex do
       it 'converts objects to format' do
         instance = mapper.new(foo: 'foo')
         expect(instance.to_hash).to eq({ 'base' => nil, 'foo' => 'foo', 'bar' => nil })
+      end
+    end
+
+    describe '.to_urlencoded' do
+      it 'converts objects to format' do
+        instance = mapper.new(foo: 'foo')
+        expect(instance.to_urlencoded).to eq('base&foo=foo&bar')
       end
     end
 
@@ -262,6 +292,13 @@ RSpec.describe Shale::Type::Complex do
       it 'converts objects to format' do
         instance = mapper.new(foo: 'foo')
         expect(instance.to_hash).to eq({ 'base' => nil, 'foo' => 'foo' })
+      end
+    end
+
+    describe '.to_urlencoded' do
+      it 'converts objects to format' do
+        instance = mapper.new(foo: 'foo')
+        expect(instance.to_urlencoded).to eq('base&foo=foo')
       end
     end
 
@@ -321,6 +358,13 @@ RSpec.describe Shale::Type::Complex do
       it 'converts objects to format' do
         instance = mapper.new(foo: 'foo')
         expect(instance.to_json).to eq('{"base":null,"foo":"foo"}')
+      end
+    end
+
+    describe '.to_urlencoded' do
+      it 'converts objects to format' do
+        instance = mapper.new(foo: 'foo')
+        expect(instance.to_urlencoded).to eq('base&foo=foo')
       end
     end
 

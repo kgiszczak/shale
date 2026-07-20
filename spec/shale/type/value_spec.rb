@@ -23,6 +23,18 @@ RSpec.describe Shale::Type::Value do
     end
   end
 
+  describe '.of_urlencoded' do
+    it 'returns value' do
+      expect(described_class.of_urlencoded(123)).to eq(123)
+    end
+  end
+
+  describe '.as_urlencoded' do
+    it 'returns string value' do
+      expect(described_class.as_urlencoded(123)).to eq('123')
+    end
+  end
+
   describe '.of_json' do
     it 'returns value' do
       expect(described_class.of_json(123)).to eq(123)

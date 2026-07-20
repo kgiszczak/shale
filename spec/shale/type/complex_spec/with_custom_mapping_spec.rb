@@ -3,6 +3,7 @@
 require 'shale'
 require 'shale/adapter/rexml'
 require 'shale/adapter/csv'
+require 'shale/adapter/rack_url_encoded'
 require 'tomlib'
 
 module ComplexSpec__CustomMapping # rubocop:disable Naming/ClassAndModuleCamelCase
@@ -11,6 +12,11 @@ module ComplexSpec__CustomMapping # rubocop:disable Naming/ClassAndModuleCamelCa
     attribute :two, :string, collection: true
 
     hsh do
+      map 'One', to: :one
+      map 'Two', to: :two
+    end
+
+    urlencoded do
       map 'One', to: :one
       map 'Two', to: :two
     end
@@ -37,6 +43,12 @@ module ComplexSpec__CustomMapping # rubocop:disable Naming/ClassAndModuleCamelCa
     attribute :child, Child
 
     hsh do
+      map 'One', to: :one
+      map 'Two', to: :two
+      map 'Child', to: :child
+    end
+
+    urlencoded do
       map 'One', to: :one
       map 'Two', to: :two
       map 'Child', to: :child
@@ -110,6 +122,7 @@ RSpec.describe Shale::Type::Complex do
     Shale.toml_adapter = Tomlib
     Shale.csv_adapter = Shale::Adapter::CSV
     Shale.xml_adapter = Shale::Adapter::REXML
+    Shale.urlencoded_adapter = Shale::Adapter::RackURLEncoded
   end
 
   let(:mapper) { ComplexSpec__CustomMapping::Parent }
@@ -173,6 +186,66 @@ RSpec.describe Shale::Type::Complex do
           )
 
           expect(mapper.to_hash([instance, instance])).to eq(hash_collection)
+        end
+      end
+    end
+
+    context 'with urlencoded mapping' do
+      let(:urlencoded) do
+        'One=foo&Two%5B%5D=foo&Two%5B%5D=bar&Two%5B%5D=baz&Child%5BOne%5D=foo&' \
+          'Child%5BTwo%5D%5B%5D=foo&Child%5BTwo%5D%5B%5D=bar&Child%5BTwo%5D%5B%5D=baz'
+      end
+
+      let(:urlencoded_collection) do
+        '%5B%5D%5BOne%5D=foo&%5B%5D%5BTwo%5D%5B%5D=foo&%5B%5D%5BTwo%5D%5B%5D=bar&' \
+          '%5B%5D%5BTwo%5D%5B%5D=baz&%5B%5D%5BChild%5D%5BOne%5D=foo&%5B%5D%5BChild%5D%5BTwo%5D%5B%5D=foo&' \
+          '%5B%5D%5BChild%5D%5BTwo%5D%5B%5D=bar&%5B%5D%5BChild%5D%5BTwo%5D%5B%5D=baz&%5B%5D%5BOne%5D=foo&' \
+          '%5B%5D%5BTwo%5D%5B%5D=foo&%5B%5D%5BTwo%5D%5B%5D=bar&%5B%5D%5BTwo%5D%5B%5D=baz&' \
+          '%5B%5D%5BChild%5D%5BOne%5D=foo&%5B%5D%5BChild%5D%5BTwo%5D%5B%5D=foo&' \
+          '%5B%5D%5BChild%5D%5BTwo%5D%5B%5D=bar&%5B%5D%5BChild%5D%5BTwo%5D%5B%5D=baz'
+      end
+
+      describe '.from_urlencoded' do
+        it 'maps urlencoded to object' do
+          instance = mapper.from_urlencoded(urlencoded)
+
+          expect(instance.one).to eq('foo')
+          expect(instance.two).to eq(%w[foo bar baz])
+          expect(instance.child.one).to eq('foo')
+          expect(instance.child.two).to eq(%w[foo bar baz])
+        end
+
+        it 'maps collection to object' do
+          instance = mapper.from_urlencoded(urlencoded_collection)
+
+          2.times do |i|
+            expect(instance[i].one).to eq('foo')
+            expect(instance[i].two).to eq(%w[foo bar baz])
+            expect(instance[i].child.one).to eq('foo')
+            expect(instance[i].child.two).to eq(%w[foo bar baz])
+          end
+        end
+      end
+
+      describe '.to_urlencoded' do
+        it 'converts objects to urlencoded' do
+          instance = mapper.new(
+            one: 'foo',
+            two: %w[foo bar baz],
+            child: child_class.new(one: 'foo', two: %w[foo bar baz])
+          )
+
+          expect(instance.to_urlencoded).to eq(urlencoded)
+        end
+
+        it 'converts array to urlencoded' do
+          instance = mapper.new(
+            one: 'foo',
+            two: %w[foo bar baz],
+            child: child_class.new(one: 'foo', two: %w[foo bar baz])
+          )
+
+          expect(mapper.to_urlencoded([instance, instance])).to eq(urlencoded_collection)
         end
       end
     end

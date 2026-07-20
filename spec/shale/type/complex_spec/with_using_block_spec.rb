@@ -3,6 +3,7 @@
 require 'shale'
 require 'shale/adapter/rexml'
 require 'shale/adapter/csv'
+require 'shale/adapter/rack_url_encoded'
 require 'tomlib'
 
 module ComplexSpec__UsingBlock # rubocop:disable Naming/ClassAndModuleCamelCase
@@ -12,6 +13,13 @@ module ComplexSpec__UsingBlock # rubocop:disable Naming/ClassAndModuleCamelCase
     attribute :three, Shale::Type::String
 
     hsh do
+      group from: :attrs_from_dict, to: :attrs_to_dict do
+        map 'one'
+        map 'two'
+      end
+    end
+
+    urlencoded do
       group from: :attrs_from_dict, to: :attrs_to_dict do
         map 'one'
         map 'two'
@@ -93,6 +101,13 @@ module ComplexSpec__UsingBlock # rubocop:disable Naming/ClassAndModuleCamelCase
       end
     end
 
+    urlencoded do
+      group from: :attrs_from_dict, to: :attrs_to_dict do
+        map 'one'
+        map 'two'
+      end
+    end
+
     json do
       group from: :attrs_from_dict, to: :attrs_to_dict do
         map 'one'
@@ -164,6 +179,7 @@ RSpec.describe Shale::Type::Complex do
     Shale.toml_adapter = Tomlib
     Shale.csv_adapter = Shale::Adapter::CSV
     Shale.xml_adapter = Shale::Adapter::REXML
+    Shale.urlencoded_adapter = Shale::Adapter::RackURLEncoded
   end
 
   context 'with using block' do
@@ -214,6 +230,48 @@ RSpec.describe Shale::Type::Complex do
           it 'converts array to hash' do
             instance = mapper.new(one: 'one', two: 'two')
             expect(mapper.to_hash([instance, instance])).to eq(hash_collection)
+          end
+        end
+      end
+
+      context 'with urlencoded mapping' do
+        let(:urlencoded) do
+          'one=one&two=two'
+        end
+
+        let(:urlencoded_collection) do
+          '%5B%5D%5Bone%5D=one&%5B%5D%5Btwo%5D=two&%5B%5D%5Bone%5D=one&%5B%5D%5Btwo%5D=two'
+        end
+
+        describe '.from_urlencoded' do
+          it 'maps urlencoded to object' do
+            instance = mapper.from_urlencoded(urlencoded)
+
+            expect(instance.one).to eq('one')
+            expect(instance.two).to eq('two')
+          end
+
+          it 'maps collection to urlencoded' do
+            instance = mapper.from_urlencoded(urlencoded_collection)
+
+            2.times do |i|
+              expect(instance[i].one).to eq('one')
+              expect(instance[i].two).to eq('two')
+            end
+          end
+        end
+
+        describe '.to_urlencoded' do
+          it 'converts objects to urlencoded' do
+            instance = mapper.new(one: 'one', two: 'two')
+
+            result = instance.to_urlencoded
+            expect(result).to eq(urlencoded)
+          end
+
+          it 'converts array to urlencoded' do
+            instance = mapper.new(one: 'one', two: 'two')
+            expect(mapper.to_urlencoded([instance, instance], pretty: true)).to eq(urlencoded_collection)
           end
         end
       end
@@ -482,6 +540,52 @@ RSpec.describe Shale::Type::Complex do
               { 'one' => 'one:foo', 'two' => 'two:foo' },
               { 'one' => 'one:foo', 'two' => 'two:foo' },
             ])
+          end
+        end
+      end
+
+      context 'with urlencoded mapping' do
+        let(:urlencoded) do
+          'one=one&two=two'
+        end
+
+        let(:urlencoded_collection) do
+          '%5B%5D%5Bone%5D=one&%5B%5D%5Btwo%5D=two&%5B%5D%5Bone%5D=one&%5B%5D%5Btwo%5D=two'
+        end
+
+        describe '.from_urlencoded' do
+          it 'maps urlencoded to object' do
+            instance = mapper.from_urlencoded(urlencoded, context: 'foo')
+
+            expect(instance.one).to eq('one:foo')
+            expect(instance.two).to eq('two:foo')
+          end
+
+          it 'maps collection to object' do
+            instance = mapper.from_urlencoded(urlencoded_collection, context: 'foo')
+
+            2.times do |i|
+              expect(instance[i].one).to eq('one:foo')
+              expect(instance[i].two).to eq('two:foo')
+            end
+          end
+        end
+
+        describe '.to_urlencoded' do
+          it 'converts objects to urlencoded' do
+            instance = mapper.new(one: 'one', two: 'two')
+
+            result = instance.to_urlencoded(context: 'foo')
+            expect(result).to eq('one=one%3Afoo&two=two%3Afoo')
+          end
+
+          it 'converts array to urlencoded' do
+            instance = mapper.new(one: 'one', two: 'two')
+            result = mapper.to_urlencoded([instance, instance], context: 'foo')
+            expected =
+              '%5B%5D%5Bone%5D=one%3Afoo&%5B%5D%5Btwo%5D=two%3Afoo&%5B%5D%5Bone%5D=one%3Afoo&%5B%5D%5Btwo%5D=two%3Afoo'
+
+            expect(result).to eq(expected)
           end
         end
       end

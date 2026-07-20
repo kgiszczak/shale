@@ -3,6 +3,7 @@
 require 'shale'
 require 'shale/adapter/rexml'
 require 'shale/adapter/csv'
+require 'shale/adapter/rack_url_encoded'
 require 'tomlib'
 
 module ComplexSpec__Delegation # rubocop:disable Naming/ClassAndModuleCamelCase
@@ -16,6 +17,12 @@ module ComplexSpec__Delegation # rubocop:disable Naming/ClassAndModuleCamelCase
     attribute :child, Child
 
     hsh do
+      map 'one', to: :one
+      map 'two', to: :two, receiver: :child
+      map 'three', to: :three, receiver: :child
+    end
+
+    urlencoded do
       map 'one', to: :one
       map 'two', to: :two, receiver: :child
       map 'three', to: :three, receiver: :child
@@ -82,6 +89,13 @@ module ComplexSpec__Delegation # rubocop:disable Naming/ClassAndModuleCamelCase
     attribute :child, Child
 
     hsh do
+      map 'one', to: :one
+      map 'two', to: :two, receiver: :child
+      map 'three', to: :three, receiver: :child
+      map 'child', to: :child
+    end
+
+    urlencoded do
       map 'one', to: :one
       map 'two', to: :two, receiver: :child
       map 'three', to: :three, receiver: :child
@@ -168,6 +182,7 @@ RSpec.describe Shale::Type::Complex do
     Shale.toml_adapter = Tomlib
     Shale.csv_adapter = Shale::Adapter::CSV
     Shale.xml_adapter = Shale::Adapter::REXML
+    Shale.urlencoded_adapter = Shale::Adapter::RackURLEncoded
   end
 
   context 'with delegation' do
@@ -360,6 +375,109 @@ RSpec.describe Shale::Type::Complex do
 
           result = parent.to_hash([instance, instance])
           expect(result).to eq(hash_collection)
+        end
+      end
+    end
+
+    context 'with urlencoded mapping' do
+      describe '.from_urlencoded' do
+        context 'with no child mapping' do
+          let(:parent) { ComplexSpec__Delegation::ParentNoChild }
+
+          let(:urlencoded) do
+            'one=one&two=two&three=three'
+          end
+
+          it 'maps urlencoded to object' do
+            instance = parent.from_urlencoded(urlencoded)
+
+            expect(instance.one).to eq('one')
+            expect(instance.child.two).to eq('two')
+            expect(instance.child.three).to eq('three')
+          end
+        end
+
+        context 'with child mapping before delegates' do
+          let(:parent) { ComplexSpec__Delegation::ParentChild }
+
+          let(:urlencoded) do
+            'one=one&child%5Btwo%5D=foo&child%5Bthree%5D=bar&two=two'
+          end
+
+          it 'maps urlencoded to object' do
+            instance = parent.from_urlencoded(urlencoded)
+
+            expect(instance.one).to eq('one')
+            expect(instance.child.two).to eq('two')
+            expect(instance.child.three).to eq('bar')
+          end
+        end
+
+        context 'with child mapping after delegates' do
+          let(:parent) { ComplexSpec__Delegation::ParentChild }
+
+          let(:urlencoded) do
+            'one=one&two=two&child%5Btwo%5D=foo&child%5Bthree%5D=bar'
+          end
+
+          it 'maps urlencoded to object' do
+            instance = parent.from_urlencoded(urlencoded)
+
+            expect(instance.one).to eq('one')
+            expect(instance.child.two).to eq('two')
+            expect(instance.child.three).to eq('bar')
+          end
+        end
+
+        context 'with collection' do
+          let(:parent) { ComplexSpec__Delegation::ParentNoChild }
+
+          let(:urlencoded) do
+            '%5B%5D%5Bone%5D=one&%5B%5D%5Btwo%5D=two&%5B%5D%5Bthree%5D=three&%5B%5D%5Bone%5D=one&%5B%5D%5Btwo%5D=two&%5B%5D%5Bthree%5D=three'
+          end
+
+          it 'maps collection to array' do
+            instance = parent.from_urlencoded(urlencoded)
+
+            2.times do |i|
+              expect(instance[i].one).to eq('one')
+              expect(instance[i].child.two).to eq('two')
+              expect(instance[i].child.three).to eq('three')
+            end
+          end
+        end
+      end
+
+      describe '.to_urlencoded' do
+        let(:parent) { ComplexSpec__Delegation::ParentNoChild }
+        let(:child) { ComplexSpec__Delegation::Child }
+
+        let(:urlencoded) do
+          'one=one&two=two&three=three'
+        end
+
+        let(:urlencoded_collection) do
+          '%5B%5D%5Bone%5D=one&%5B%5D%5Btwo%5D=two&%5B%5D%5Bthree%5D=three&' \
+            '%5B%5D%5Bone%5D=one&%5B%5D%5Btwo%5D=two&%5B%5D%5Bthree%5D=three'
+        end
+
+        it 'converts objects to urlencoded' do
+          instance = parent.new(
+            one: 'one',
+            child: child.new(two: 'two', three: 'three')
+          )
+
+          expect(parent.to_urlencoded(instance)).to eq(urlencoded)
+        end
+
+        it 'converts objects to array' do
+          instance = parent.new(
+            one: 'one',
+            child: child.new(two: 'two', three: 'three')
+          )
+
+          result = parent.to_urlencoded([instance, instance])
+          expect(result).to eq(urlencoded_collection)
         end
       end
     end

@@ -3,6 +3,22 @@
 require 'shale'
 
 RSpec.describe Shale do
+  describe '.urlencoded_adapter' do
+    context 'when adapter is not set' do
+      it 'returns nil' do
+        described_class.urlencoded_adapter = nil
+        expect(described_class.urlencoded_adapter).to eq(nil)
+      end
+    end
+
+    context 'when adapter is set' do
+      it 'returns adapter' do
+        described_class.urlencoded_adapter = :foobar
+        expect(described_class.urlencoded_adapter).to eq(:foobar)
+      end
+    end
+  end
+
   describe '.json_adapter' do
     context 'when adapter is not set' do
       it 'returns default adapter' do
