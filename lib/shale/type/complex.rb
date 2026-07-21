@@ -1068,8 +1068,7 @@ module Shale
       # @param [Array<Symbol>] only
       # @param [Array<Symbol>] except
       # @param [any] context
-      # @param [true, false] pretty
-      # @param [Hash] json_options
+      # @param [Hash] urlencoded_options
       #
       # @return [String]
       #

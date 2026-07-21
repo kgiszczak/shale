@@ -433,7 +433,8 @@ RSpec.describe Shale::Type::Complex do
           let(:parent) { ComplexSpec__Delegation::ParentNoChild }
 
           let(:urlencoded) do
-            '%5B%5D%5Bone%5D=one&%5B%5D%5Btwo%5D=two&%5B%5D%5Bthree%5D=three&%5B%5D%5Bone%5D=one&%5B%5D%5Btwo%5D=two&%5B%5D%5Bthree%5D=three'
+            '%5B%5D%5Bone%5D=one&%5B%5D%5Btwo%5D=two&%5B%5D%5Bthree%5D=three&' \
+              '%5B%5D%5Bone%5D=one&%5B%5D%5Btwo%5D=two&%5B%5D%5Bthree%5D=three'
           end
 
           it 'maps collection to array' do
