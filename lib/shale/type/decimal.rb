@@ -36,6 +36,10 @@ module Shale
           value.to_f
         end
 
+        def as_urlencoded(value, **)
+          value.to_s('F')
+        end
+
         def as_toml(value, **)
           value.to_f
         end

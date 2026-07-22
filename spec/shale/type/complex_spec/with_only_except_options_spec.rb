@@ -3,6 +3,7 @@
 require 'shale'
 require 'shale/adapter/rexml'
 require 'shale/adapter/csv'
+require 'shale/adapter/rack_url_encoded'
 require 'tomlib'
 
 module ComplexSpec__OnlyExceptOptions # rubocop:disable Naming/ClassAndModuleCamelCase
@@ -80,6 +81,7 @@ RSpec.describe Shale::Type::Complex do
     Shale.toml_adapter = Tomlib
     Shale.csv_adapter = Shale::Adapter::CSV
     Shale.xml_adapter = Shale::Adapter::REXML
+    Shale.urlencoded_adapter = Shale::Adapter::RackURLEncoded
   end
 
   context 'with only/except options' do
@@ -362,6 +364,212 @@ RSpec.describe Shale::Type::Complex do
               },
             ]
           )
+        end
+      end
+    end
+
+    context 'with urlencoded mapping' do
+      let(:urlencoded) do
+        'first_name=John&last_name=Doe&age=44&hobby%5B%5D=Singing&hobby%5B%5D=Dancing&address%5Bcity%5D=London&' \
+          'address%5Bzip%5D=1N+ASD123&address%5Bstreet%5D%5Bname%5D=Oxford+Street&address%5Bstreet%5D%5Bhouse_no%5D=1&' \
+          'address%5Bstreet%5D%5Bflat_no%5D=2&car%5B%5D%5Bbrand%5D=Honda&car%5B%5D%5Bmodel%5D=Accord&' \
+          'car%5B%5D%5Bengine%5D=1.4&car%5B%5D%5Bbrand%5D=Toyota&car%5B%5D%5Bmodel%5D=Corolla&car%5B%5D%5Bengine%5D=2.0'
+      end
+
+      let(:urlencoded_collection) do
+        '%5B%5D%5Bfirst_name%5D=John&%5B%5D%5Blast_name%5D=Doe&%5B%5D%5Bage%5D=44&%5B%5D%5Bhobby%5D%5B%5D=Singing&' \
+          '%5B%5D%5Bhobby%5D%5B%5D=Dancing&%5B%5D%5Baddress%5D%5Bcity%5D=London&%5B%5D%5Baddress%5D%5Bzip%5D=1N+ASD123&' \
+          '%5B%5D%5Baddress%5D%5Bstreet%5D%5Bname%5D=Oxford+Street&%5B%5D%5Baddress%5D%5Bstreet%5D%5Bhouse_no%5D=1&' \
+          '%5B%5D%5Baddress%5D%5Bstreet%5D%5Bflat_no%5D=2&%5B%5D%5Bcar%5D%5B%5D%5Bbrand%5D=Honda&' \
+          '%5B%5D%5Bcar%5D%5B%5D%5Bmodel%5D=Accord&%5B%5D%5Bcar%5D%5B%5D%5Bengine%5D=1.4&' \
+          '%5B%5D%5Bcar%5D%5B%5D%5Bbrand%5D=Toyota&%5B%5D%5Bcar%5D%5B%5D%5Bmodel%5D=Corolla&' \
+          '%5B%5D%5Bcar%5D%5B%5D%5Bengine%5D=2.0&%5B%5D%5Bfirst_name%5D=John&%5B%5D%5Blast_name%5D=Doe&' \
+          '%5B%5D%5Bage%5D=44&%5B%5D%5Bhobby%5D%5B%5D=Singing&%5B%5D%5Bhobby%5D%5B%5D=Dancing&' \
+          '%5B%5D%5Baddress%5D%5Bcity%5D=London&%5B%5D%5Baddress%5D%5Bzip%5D=1N+ASD123&' \
+          '%5B%5D%5Baddress%5D%5Bstreet%5D%5Bname%5D=Oxford+Street&%5B%5D%5Baddress%5D%5Bstreet%5D%5Bhouse_no%5D=1&' \
+          '%5B%5D%5Baddress%5D%5Bstreet%5D%5Bflat_no%5D=2&%5B%5D%5Bcar%5D%5B%5D%5Bbrand%5D=Honda&' \
+          '%5B%5D%5Bcar%5D%5B%5D%5Bmodel%5D=Accord&%5B%5D%5Bcar%5D%5B%5D%5Bengine%5D=1.4&' \
+          '%5B%5D%5Bcar%5D%5B%5D%5Bbrand%5D=Toyota&%5B%5D%5Bcar%5D%5B%5D%5Bmodel%5D=Corolla&' \
+          '%5B%5D%5Bcar%5D%5B%5D%5Bengine%5D=2.0'
+      end
+
+      describe '.from_urlencoded' do
+        it 'maps urlencoded to partial object' do
+          instance = mapper.from_urlencoded(
+            urlencoded,
+            only: [
+              :first_name,
+              { address: [:zip, { street: [:flat_no] }] },
+              { car: [:model] },
+            ]
+          )
+          expect(instance.first_name).to eq('John')
+          expect(instance.last_name).to eq(nil)
+          expect(instance.age).to eq(nil)
+          expect(instance.address.city).to eq(nil)
+          expect(instance.address.zip).to eq('1N ASD123')
+          expect(instance.address.street.name).to eq(nil)
+          expect(instance.address.street.house_no).to eq(nil)
+          expect(instance.address.street.flat_no).to eq('2')
+          expect(instance.car[0].brand).to eq(nil)
+          expect(instance.car[0].model).to eq('Accord')
+          expect(instance.car[0].engine).to eq(nil)
+          expect(instance.car[1].brand).to eq(nil)
+          expect(instance.car[1].model).to eq('Corolla')
+          expect(instance.car[1].engine).to eq(nil)
+
+          instance = mapper.from_urlencoded(
+            urlencoded,
+            except: [
+              :first_name,
+              { address: [:zip, { street: [:flat_no] }] },
+              { car: [:model] },
+            ]
+          )
+          expect(instance.first_name).to eq(nil)
+          expect(instance.last_name).to eq('Doe')
+          expect(instance.age).to eq(44)
+          expect(instance.address.city).to eq('London')
+          expect(instance.address.zip).to eq(nil)
+          expect(instance.address.street.name).to eq('Oxford Street')
+          expect(instance.address.street.house_no).to eq('1')
+          expect(instance.address.street.flat_no).to eq(nil)
+          expect(instance.car[0].brand).to eq('Honda')
+          expect(instance.car[0].model).to eq(nil)
+          expect(instance.car[0].engine).to eq('1.4')
+          expect(instance.car[1].brand).to eq('Toyota')
+          expect(instance.car[1].model).to eq(nil)
+          expect(instance.car[1].engine).to eq('2.0')
+        end
+
+        it 'maps urlencoded collection to partial object' do
+          instance = mapper.from_urlencoded(
+            urlencoded_collection,
+            only: [
+              :first_name,
+              { address: [:zip, { street: [:flat_no] }] },
+              { car: [:model] },
+            ]
+          )
+          2.times do |i|
+            expect(instance[i].first_name).to eq('John')
+            expect(instance[i].last_name).to eq(nil)
+            expect(instance[i].age).to eq(nil)
+            expect(instance[i].address.city).to eq(nil)
+            expect(instance[i].address.zip).to eq('1N ASD123')
+            expect(instance[i].address.street.name).to eq(nil)
+            expect(instance[i].address.street.house_no).to eq(nil)
+            expect(instance[i].address.street.flat_no).to eq('2')
+            expect(instance[i].car[0].brand).to eq(nil)
+            expect(instance[i].car[0].model).to eq('Accord')
+            expect(instance[i].car[0].engine).to eq(nil)
+            expect(instance[i].car[1].brand).to eq(nil)
+            expect(instance[i].car[1].model).to eq('Corolla')
+            expect(instance[i].car[1].engine).to eq(nil)
+          end
+
+          instance = mapper.from_urlencoded(
+            urlencoded_collection,
+            except: [
+              :first_name,
+              { address: [:zip, { street: [:flat_no] }] },
+              { car: [:model] },
+            ]
+          )
+          2.times do |i|
+            expect(instance[i].first_name).to eq(nil)
+            expect(instance[i].last_name).to eq('Doe')
+            expect(instance[i].age).to eq(44)
+            expect(instance[i].address.city).to eq('London')
+            expect(instance[i].address.zip).to eq(nil)
+            expect(instance[i].address.street.name).to eq('Oxford Street')
+            expect(instance[i].address.street.house_no).to eq('1')
+            expect(instance[i].address.street.flat_no).to eq(nil)
+            expect(instance[i].car[0].brand).to eq('Honda')
+            expect(instance[i].car[0].model).to eq(nil)
+            expect(instance[i].car[0].engine).to eq('1.4')
+            expect(instance[i].car[1].brand).to eq('Toyota')
+            expect(instance[i].car[1].model).to eq(nil)
+            expect(instance[i].car[1].engine).to eq('2.0')
+          end
+        end
+      end
+
+      describe '.to_urlencoded' do
+        it 'converts objects to partial urlencoded' do
+          instance = mapper.from_urlencoded(urlencoded)
+
+          result = instance.to_urlencoded(
+            only: [
+              :first_name,
+              { address: [:zip, { street: [:flat_no] }] },
+              { car: [:model] },
+            ],
+            pretty: true
+          )
+          expected =
+            'first_name=John&address%5Bzip%5D=1N+ASD123&address%5Bstreet%5D%5Bflat_no%5D=2&' \
+            'car%5B%5D%5Bmodel%5D=Accord&car%5B%5D%5Bmodel%5D=Corolla'
+
+          expect(result).to eq(expected)
+
+          result = instance.to_urlencoded(
+            except: [
+              :first_name,
+              { address: [:zip, { street: [:flat_no] }] },
+              { car: [:model] },
+            ],
+            pretty: true
+          )
+          expected =
+            'last_name=Doe&age=44&address%5Bcity%5D=London&address%5Bstreet%5D%5Bname%5D=Oxford+Street&' \
+            'address%5Bstreet%5D%5Bhouse_no%5D=1&car%5B%5D%5Bbrand%5D=Honda&car%5B%5D%5Bengine%5D=1.4&' \
+            'car%5B%5D%5Bbrand%5D=Toyota&car%5B%5D%5Bengine%5D=2.0'
+
+          expect(result).to eq(expected)
+        end
+
+        it 'converts array to partial urlencoded' do
+          instance = mapper.from_urlencoded(urlencoded_collection)
+
+          result = mapper.to_urlencoded(
+            instance,
+            only: [
+              :first_name,
+              { address: [:zip, { street: [:flat_no] }] },
+              { car: [:model] },
+            ],
+            pretty: true
+          )
+          expected =
+            '%5B%5D%5Bfirst_name%5D=John&%5B%5D%5Baddress%5D%5Bzip%5D=1N+ASD123&' \
+            '%5B%5D%5Baddress%5D%5Bstreet%5D%5Bflat_no%5D=2&%5B%5D%5Bcar%5D%5B%5D%5Bmodel%5D=Accord&' \
+            '%5B%5D%5Bcar%5D%5B%5D%5Bmodel%5D=Corolla&%5B%5D%5Bfirst_name%5D=John&' \
+            '%5B%5D%5Baddress%5D%5Bzip%5D=1N+ASD123&%5B%5D%5Baddress%5D%5Bstreet%5D%5Bflat_no%5D=2&' \
+            '%5B%5D%5Bcar%5D%5B%5D%5Bmodel%5D=Accord&%5B%5D%5Bcar%5D%5B%5D%5Bmodel%5D=Corolla'
+
+          expect(result).to eq(expected)
+
+          result = mapper.to_urlencoded(
+            instance,
+            except: [
+              :first_name,
+              { address: [:zip, { street: [:flat_no] }] },
+              { car: [:model] },
+            ],
+            pretty: true
+          )
+          expected =
+            '%5B%5D%5Blast_name%5D=Doe&%5B%5D%5Bage%5D=44&%5B%5D%5Baddress%5D%5Bcity%5D=London&' \
+            '%5B%5D%5Baddress%5D%5Bstreet%5D%5Bname%5D=Oxford+Street&' \
+            '%5B%5D%5Baddress%5D%5Bstreet%5D%5Bhouse_no%5D=1&%5B%5D%5Bcar%5D%5B%5D%5Bbrand%5D=Honda&' \
+            '%5B%5D%5Bcar%5D%5B%5D%5Bengine%5D=1.4&%5B%5D%5Bcar%5D%5B%5D%5Bbrand%5D=Toyota&' \
+            '%5B%5D%5Bcar%5D%5B%5D%5Bengine%5D=2.0&%5B%5D%5Blast_name%5D=Doe&%5B%5D%5Bage%5D=44&' \
+            '%5B%5D%5Baddress%5D%5Bcity%5D=London&%5B%5D%5Baddress%5D%5Bstreet%5D%5Bname%5D=Oxford+Street&' \
+            '%5B%5D%5Baddress%5D%5Bstreet%5D%5Bhouse_no%5D=1&%5B%5D%5Bcar%5D%5B%5D%5Bbrand%5D=Honda&' \
+            '%5B%5D%5Bcar%5D%5B%5D%5Bengine%5D=1.4&%5B%5D%5Bcar%5D%5B%5D%5Bbrand%5D=Toyota&' \
+            '%5B%5D%5Bcar%5D%5B%5D%5Bengine%5D=2.0'
+          expect(result).to eq(expected)
         end
       end
     end

@@ -7,12 +7,16 @@ gemspec
 gem 'rake', '~> 13.1'
 gem 'rubocop', '~> 1.60'
 
-gem 'rexml'
-gem 'nokogiri', '1.13.10'
-gem 'ox'
-gem 'toml-rb'
-gem 'tomlib'
+gem 'byebug'
 gem 'csv'
+gem 'irb'
+gem 'nokogiri', '1.13.10'
+gem 'ostruct'
+gem 'ox'
+gem 'rack'
+gem 'rexml'
+gem 'tomlib'
+gem 'toml-rb'
 
 group :test do
   gem 'rspec', '~> 3.13.0'

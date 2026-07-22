@@ -3,6 +3,7 @@
 require 'shale'
 require 'shale/adapter/rexml'
 require 'shale/adapter/csv'
+require 'shale/adapter/rack_url_encoded'
 require 'tomlib'
 
 module ComplexSpec__Types # rubocop:disable Naming/ClassAndModuleCamelCase
@@ -58,6 +59,7 @@ RSpec.describe Shale::Type::Complex do
     Shale.toml_adapter = Tomlib
     Shale.csv_adapter = Shale::Adapter::CSV
     Shale.xml_adapter = Shale::Adapter::REXML
+    Shale.urlencoded_adapter = Shale::Adapter::RackURLEncoded
   end
 
   let(:mapper) { ComplexSpec__Types::Root }
@@ -193,6 +195,51 @@ RSpec.describe Shale::Type::Complex do
         it 'converts objects to hash' do
           result = instance.to_hash
           expect(result).to eq(hash)
+        end
+      end
+    end
+
+    context 'with urlencoded mapping' do
+      let(:urlencoded) do
+        'type_boolean=true&type_date=2022-01-01&type_decimal=1.1&type_float=1.1&type_integer=1&type_string=foo&' \
+          'type_time=2021-01-01T10%3A10%3A10%2B01%3A00&type_value=foo&child%5Btype_boolean%5D=true&' \
+          'child%5Btype_date%5D=2022-01-01&child%5Btype_decimal%5D=1.1&child%5Btype_float%5D=1.1&' \
+          'child%5Btype_integer%5D=1&child%5Btype_string%5D=foo&' \
+          'child%5Btype_time%5D=2021-01-01T10%3A10%3A10%2B01%3A00&' \
+          'child%5Btype_value%5D=foo&type_boolean_collection%5B%5D=true&' \
+          'type_boolean_collection%5B%5D=false&type_date_collection%5B%5D=2022-01-01&' \
+          'type_date_collection%5B%5D=2022-01-02&type_decimal_collection%5B%5D=1.1&' \
+          'type_decimal_collection%5B%5D=2.2&type_float_collection%5B%5D=1.1&' \
+          'type_float_collection%5B%5D=2.2&type_integer_collection%5B%5D=1&' \
+          'type_integer_collection%5B%5D=2&type_string_collection%5B%5D=foo&' \
+          'type_string_collection%5B%5D=bar&type_time_collection%5B%5D=2021-01-01T10%3A10%3A10%2B01%3A00&' \
+          'type_time_collection%5B%5D=2021-01-02T10%3A10%3A10%2B01%3A00&type_value_collection%5B%5D=foo&' \
+          'type_value_collection%5B%5D=1&type_value_collection%5B%5D=true&' \
+          'child_collection%5B%5D%5Btype_boolean%5D=true&child_collection%5B%5D%5Btype_date%5D=2022-01-01&' \
+          'child_collection%5B%5D%5Btype_decimal%5D=1.1&child_collection%5B%5D%5Btype_float%5D=1.1&' \
+          'child_collection%5B%5D%5Btype_integer%5D=1&child_collection%5B%5D%5Btype_string%5D=foo&' \
+          'child_collection%5B%5D%5Btype_time%5D=2021-01-01T10%3A10%3A10%2B01%3A00&' \
+          'child_collection%5B%5D%5Btype_value%5D=foo&child_collection%5B%5D%5Btype_boolean%5D=true&' \
+          'child_collection%5B%5D%5Btype_date%5D=2022-01-01&child_collection%5B%5D%5Btype_decimal%5D=1.1&' \
+          'child_collection%5B%5D%5Btype_float%5D=1.1&child_collection%5B%5D%5Btype_integer%5D=1&' \
+          'child_collection%5B%5D%5Btype_string%5D=foo&' \
+          'child_collection%5B%5D%5Btype_time%5D=2021-01-01T10%3A10%3A10%2B01%3A00&' \
+          'child_collection%5B%5D%5Btype_value%5D=foo'
+      end
+      let(:instance) { mapper.from_urlencoded(urlencoded) }
+
+      describe '.from_urlencoded' do
+        include_examples 'maps to object'
+
+        it 'maps value collection to object as strings' do
+          expect(instance.type_value_collection).to eq(%w[foo 1 true])
+        end
+      end
+
+      describe '.to_urlencoded' do
+        it 'converts objects to JSON' do
+          result = instance.to_urlencoded
+          expect(result).to eq(urlencoded)
         end
       end
     end

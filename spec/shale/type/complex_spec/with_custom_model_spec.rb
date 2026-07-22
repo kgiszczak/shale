@@ -3,6 +3,7 @@
 require 'shale'
 require 'shale/adapter/rexml'
 require 'shale/adapter/csv'
+require 'shale/adapter/rack_url_encoded'
 require 'tomlib'
 
 module ComplexSpec__CustomModels # rubocop:disable Naming/ClassAndModuleCamelCase
@@ -49,6 +50,7 @@ RSpec.describe Shale::Type::Complex do
     Shale.toml_adapter = Tomlib
     Shale.csv_adapter = Shale::Adapter::CSV
     Shale.xml_adapter = Shale::Adapter::REXML
+    Shale.urlencoded_adapter = Shale::Adapter::RackURLEncoded
   end
 
   context 'with custom models' do
@@ -116,6 +118,70 @@ RSpec.describe Shale::Type::Complex do
 
             result = parent_mapper.to_hash([instance, instance])
             expect(result).to eq(hash_collection)
+          end
+        end
+      end
+    end
+
+    context 'with urlencoded mapping' do
+      let(:urlencoded) do
+        'one=one&child%5Bone%5D=one'
+      end
+
+      let(:urlencoded_collection) do
+        '%5B%5D%5Bone%5D=one&%5B%5D%5Bchild%5D%5Bone%5D=one&%5B%5D%5Bone%5D=one&%5B%5D%5Bchild%5D%5Bone%5D=one'
+      end
+
+      describe '.from_urlencoded' do
+        it 'maps urlencoded to object' do
+          instance = parent_mapper.from_urlencoded(urlencoded)
+
+          expect(instance.class).to eq(parent_model_class)
+          expect(instance.one).to eq('one')
+          expect(instance.child.class).to eq(child_model_class)
+          expect(instance.child.one).to eq('one')
+        end
+
+        it 'maps collection to array' do
+          instance = parent_mapper.from_urlencoded(urlencoded_collection)
+          2.times do |i|
+            expect(instance[i].class).to eq(parent_model_class)
+            expect(instance[i].one).to eq('one')
+            expect(instance[i].child.class).to eq(child_model_class)
+            expect(instance[i].child.one).to eq('one')
+          end
+        end
+      end
+
+      describe '.to_urlencoded' do
+        context 'with wrong model' do
+          it 'raises an exception' do
+            msg = /argument is a 'String' but should be a '#{parent_model_class.name}/
+
+            expect do
+              parent_mapper.to_urlencoded('')
+            end.to raise_error(Shale::IncorrectModelError, msg)
+          end
+        end
+
+        context 'with correct model' do
+          it 'converts objects to json' do
+            instance = parent_model_class.new(
+              one: 'one',
+              child: child_model_class.new(one: 'one')
+            )
+
+            expect(parent_mapper.to_urlencoded(instance)).to eq(urlencoded)
+          end
+
+          it 'converts objects to array' do
+            instance = parent_model_class.new(
+              one: 'one',
+              child: child_model_class.new(one: 'one')
+            )
+
+            result = parent_mapper.to_urlencoded([instance, instance])
+            expect(result).to eq(urlencoded_collection)
           end
         end
       end

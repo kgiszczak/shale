@@ -47,6 +47,7 @@ module Shale
     @model = nil
     @attributes = {}
     @hash_mapping = Mapping::Dict.new
+    @urlencoded_mapping = Mapping::Dict.new
     @json_mapping = Mapping::Dict.new
     @yaml_mapping = Mapping::Dict.new
     @toml_mapping = Mapping::Dict.new
@@ -67,6 +68,13 @@ module Shale
       #
       # @api public
       attr_reader :hash_mapping
+
+      # Return x-www-form-urlencoded mapping object
+      #
+      # @return [Shale::Mapping::Dict]
+      #
+      # @api public
+      attr_reader :urlencoded_mapping
 
       # Return JSON mapping object
       #
@@ -115,6 +123,7 @@ module Shale
         subclass.instance_variable_set('@attributes', @attributes.dup)
 
         subclass.instance_variable_set('@__hash_mapping_init', @hash_mapping.dup)
+        subclass.instance_variable_set('@__urlencoded_mapping_init', @urlencoded_mapping.dup)
         subclass.instance_variable_set('@__json_mapping_init', @json_mapping.dup)
         subclass.instance_variable_set('@__yaml_mapping_init', @yaml_mapping.dup)
         subclass.instance_variable_set('@__toml_mapping_init', @toml_mapping.dup)
@@ -122,6 +131,7 @@ module Shale
         subclass.instance_variable_set('@__xml_mapping_init', @xml_mapping.dup)
 
         subclass.instance_variable_set('@hash_mapping', @hash_mapping.dup)
+        subclass.instance_variable_set('@urlencoded_mapping', @urlencoded_mapping.dup)
         subclass.instance_variable_set('@json_mapping', @json_mapping.dup)
         subclass.instance_variable_set('@yaml_mapping', @yaml_mapping.dup)
         subclass.instance_variable_set('@toml_mapping', @toml_mapping.dup)
@@ -186,6 +196,7 @@ module Shale
         @attributes[name] = Attribute.new(name, type, collection, default)
 
         @hash_mapping.map(name.to_s, to: name) unless @hash_mapping.finalized?
+        @urlencoded_mapping.map(name.to_s, to: name) unless @urlencoded_mapping.finalized?
         @json_mapping.map(name.to_s, to: name) unless @json_mapping.finalized?
         @yaml_mapping.map(name.to_s, to: name) unless @yaml_mapping.finalized?
         @toml_mapping.map(name.to_s, to: name) unless @toml_mapping.finalized?
@@ -223,6 +234,30 @@ module Shale
         @hash_mapping = @__hash_mapping_init.dup
         @hash_mapping.finalize!
         @hash_mapping.instance_eval(&block)
+      end
+
+      # Define x-www-form-urlencoded mapping
+      #
+      # @param [Proc] block
+      #
+      # @example
+      #   class Person < Shale::Mapper
+      #     attribute :first_name, :string
+      #     attribute :last_name, :string
+      #     attribute :age, :integer
+      #
+      #     urlencoded do
+      #       map 'firstName', to: :first_name
+      #       map 'lastName', to: :last_name
+      #       map 'age', to: :age
+      #     end
+      #   end
+      #
+      # @api public
+      def urlencoded(&block)
+        @urlencoded_mapping = @__urlencoded_mapping_init.dup
+        @urlencoded_mapping.finalize!
+        @urlencoded_mapping.instance_eval(&block)
       end
 
       # Define JSON mapping

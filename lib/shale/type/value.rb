@@ -67,6 +67,28 @@ module Shale
           value
         end
 
+        # Extract value from x-www-form-urlencoded document
+        #
+        # @param [any] value
+        #
+        # @return [any]
+        #
+        # @api private
+        def of_urlencoded(value, **)
+          value
+        end
+
+        # Convert value to form accepted by x-www-form-urlencoded document
+        #
+        # @param [any] value
+        #
+        # @return [any]
+        #
+        # @api private
+        def as_urlencoded(value, **)
+          value.to_s
+        end
+
         # Extract value from YAML document
         #
         # @param [any] value

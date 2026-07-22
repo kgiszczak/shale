@@ -14,9 +14,9 @@ module Shale
     # @api private
     class Complex < Value
       class << self
-        %i[hash json yaml toml csv].each do |format|
+        %i[hash urlencoded json yaml toml csv].each do |format|
           class_eval(<<-RUBY, __FILE__, __LINE__ + 1)
-            # Convert Hash to Object using Hash/JSON/YAML/TOML mapping
+            # Convert Hash to Object using Hash/JSON/YAML/TOML/urlencoded mapping
             #
             # @param [Hash, Array] hash Hash to convert
             # @param [Array<Symbol>] only
@@ -136,7 +136,7 @@ module Shale
               instance
             end
 
-            # Convert Object to Hash using Hash/JSON/YAML/TOML mapping
+            # Convert Object to Hash using Hash/JSON/YAML/TOML/urlencoded mapping
             #
             # @param [any, Array<any>] instance Object to convert
             # @param [Array<Symbol>] only
@@ -287,6 +287,45 @@ module Shale
           Shale.json_adapter.dump(
             as_json(instance, only: only, except: except, context: context),
             **json_options.merge(pretty: pretty)
+          )
+        end
+
+        # Convert x-www-form-urlencoded to Object
+        #
+        # @param [String] urlencoded x-www-form-urlencoded text to convert
+        # @param [Array<Symbol>] only
+        # @param [Array<Symbol>] except
+        # @param [any] context
+        # @param [Hash] urlencoded_options
+        #
+        # @return [model instance]
+        #
+        # @api public
+        def from_urlencoded(urlencoded, only: nil, except: nil, context: nil, **urlencoded_options)
+          of_urlencoded(
+            Shale.urlencoded_adapter.load(urlencoded, **urlencoded_options),
+            only: only,
+            except: except,
+            context: context
+          )
+        end
+
+        # Convert Object to x-www-form-urlencoded
+        #
+        # @param [model instance] instance Object to convert
+        # @param [Array<Symbol>] only
+        # @param [Array<Symbol>] except
+        # @param [any] context
+        # @param [true, false] pretty
+        # @param [Hash] urlencoded_options
+        #
+        # @return [String]
+        #
+        # @api public
+        def to_urlencoded(instance, only: nil, except: nil, context: nil, pretty: false, **urlencoded_options)
+          Shale.urlencoded_adapter.dump(
+            as_urlencoded(instance, only: only, except: except, context: context),
+            **urlencoded_options.merge(pretty: pretty)
           )
         end
 
@@ -1021,6 +1060,26 @@ module Shale
           context: context,
           pretty: pretty,
           **json_options
+        )
+      end
+
+      # Convert Object to x-www-form-urlencoded
+      #
+      # @param [Array<Symbol>] only
+      # @param [Array<Symbol>] except
+      # @param [any] context
+      # @param [Hash] urlencoded_options
+      #
+      # @return [String]
+      #
+      # @api public
+      def to_urlencoded(only: nil, except: nil, context: nil, **urlencoded_options)
+        self.class.to_urlencoded(
+          self,
+          only: only,
+          except: except,
+          context: context,
+          **urlencoded_options
         )
       end
 

@@ -3,6 +3,7 @@
 require 'shale'
 require 'shale/adapter/rexml'
 require 'shale/adapter/csv'
+require 'shale/adapter/rack_url_encoded'
 require 'tomlib'
 
 module ComplexSpec__RenderNil # rubocop:disable Naming/ClassAndModuleCamelCase
@@ -11,6 +12,11 @@ module ComplexSpec__RenderNil # rubocop:disable Naming/ClassAndModuleCamelCase
     attribute :attr_false, Shale::Type::String
 
     hsh do
+      map 'attr_true', to: :attr_true, render_nil: true
+      map 'attr_false', to: :attr_false, render_nil: false
+    end
+
+    urlencoded do
       map 'attr_true', to: :attr_true, render_nil: true
       map 'attr_false', to: :attr_false, render_nil: false
     end
@@ -77,6 +83,7 @@ RSpec.describe Shale::Type::Complex do
     Shale.toml_adapter = Tomlib
     Shale.csv_adapter = Shale::Adapter::CSV
     Shale.xml_adapter = Shale::Adapter::REXML
+    Shale.urlencoded_adapter = Shale::Adapter::RackURLEncoded
   end
 
   let(:mapper) { ComplexSpec__RenderNil::RenderNilDict }
@@ -99,6 +106,24 @@ RSpec.describe Shale::Type::Complex do
           { 'attr_true' => nil },
           { 'attr_true' => 'foo', 'attr_false' => 'bar' },
         ])
+      end
+    end
+
+    describe '.to_urlencoded' do
+      it 'converts objects to urlencoded' do
+        instance1 = mapper.new(attr_true: nil, attr_false: nil)
+        instance2 = mapper.new(attr_true: 'foo', attr_false: 'bar')
+
+        expect(instance1.to_urlencoded).to eq('attr_true')
+        expect(instance2.to_urlencoded).to eq('attr_true=foo&attr_false=bar')
+      end
+
+      it 'converts collection to urlencoded' do
+        instance1 = mapper.new(attr_true: nil, attr_false: nil)
+        instance2 = mapper.new(attr_true: 'foo', attr_false: 'bar')
+
+        result = mapper.to_urlencoded([instance1, instance2])
+        expect(result).to eq('%5B%5D%5Battr_true%5D&%5B%5D%5Battr_true%5D=foo&%5B%5D%5Battr_false%5D=bar')
       end
     end
 

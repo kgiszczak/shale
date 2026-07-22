@@ -32,6 +32,10 @@ require_relative 'shale/version'
 #   Shale.json_adapter = MultiJson
 #   Shale.json_adapter # => MultiJson
 #
+# @example setting Rack::Utils for handling x-www-form-urlencoded documents
+#   Shale.urlencoded_adapter = RackURLEncoded
+#   Shale.urlencoded_adapter # => RackURLEncoded
+#
 # @example setting TOML adapter for handling TOML documents
 #   require 'shale/adapter/toml_rb'
 #
@@ -45,8 +49,8 @@ require_relative 'shale/version'
 # @example setting Nokogiri adapter for handling XML documents
 #   require 'shale/adapter/nokogiri'
 #
-#   Shale.xml_adapter = Shale::Adapter::Nokogir
-#   Shale.xml_adapter # => Shale::Adapter::Nokogir
+#   Shale.xml_adapter = Shale::Adapter::Nokogiri
+#   Shale.xml_adapter # => Shale::Adapter::Nokogiri
 #
 # @example setting Ox adapter for handling XML documents
 #   require 'shale/adapter/ox'
@@ -72,6 +76,16 @@ module Shale
     #
     # @api public
     attr_writer :json_adapter
+
+    # Set x-www-form-urlencoded adapter
+    #
+    # @param [.load, .dump] adapter
+    #
+    # @example
+    #   Shale.urlencoded_adapter = Shale::Adapter::RackURLEncoded
+    #
+    # @api public
+    attr_accessor :urlencoded_adapter
 
     # Set YAML adapter
     #
