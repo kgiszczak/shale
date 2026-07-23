@@ -4,8 +4,6 @@ Shale is a Ruby object mapper and serializer for JSON, YAML, TOML, CSV, XML and 
 It allows you to parse JSON, YAML, TOML, CSV, XML and x-www-form-urlencoded data and convert it into Ruby data structures,
 as well as serialize data structures into JSON, YAML, TOML, CSV, XML or x-www-form-urlencoded.
 
-Documentation with interactive examples is available at [Shale website](https://www.shalerb.org)
-
 ## Features
 
 * Convert JSON, YAML, TOML, CSV, XML and x-www-form-urlencoded to Ruby data model
