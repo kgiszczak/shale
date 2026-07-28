@@ -19,7 +19,8 @@ module Shale
 
           case value
           when ::BigDecimal then value
-          when ::Float then BigDecimal(value, value.to_s.length)
+          # BigDecimal(float, n) caps n at 16, so parse the float's shortest round-trip string
+          when ::Float then BigDecimal(value.to_s)
           else BigDecimal(value)
           end
         end
